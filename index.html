@@ -10,7 +10,23 @@
 </head>
 <body>
     <h1 id="message"></h1>
+    <input type="text" placeholder="Enter a video ID" value="1M5vGlvic_o" />
     <button id="fetch" onclick="fetchResults()">Fetch Results</button>
-    <ul id="comments"></ul>
+    <div id="results" class="hidden">
+        <hr>
+        <div id="stats">
+            <h2>Showing stats for:</h2>
+        </div>
+        <hr>
+        <div id="termSpace" class="hidden">
+            <h2>Results:</h2>
+            <ul id="termResults"></ul>
+        </div>
+        <hr>
+        <div id="commentSpace" class="hidden">
+            <h2>Comments:</h2>
+            <ul id="comments"></ul>
+        </div>
+    </div> 
 </body>
 </html>
