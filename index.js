@@ -65,18 +65,40 @@ function hideMessage() {
 
 function fetchResults() {
     gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
-    loadComments(50, '1M5vGlvic_o');
+    loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + '1M5vGlvic_o' + "/comments?v=2&alt=json&max-results=" + 20);
     hideMessage();
     
 }
 
-function loadComments(count, videoID) {
+function getNextPageUrl(data) {
+    //data.feed.link[5].rel == 'next'
+    //data.feed.link[5].href
+
+    var url = ""
+
+    $.each(data.feed.link, function (key, val) {
+        if (val.hasOwnProperty("rel") && val.rel == "next")
+            url = val.href;
+    });
+
+    return url;
+
+}
+
+function loadComments(count, url) {
     $.ajax({
-        url: "http://gdata.youtube.com/feeds/api/videos/" + videoID + "/comments?v=2&alt=json&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&max-results=" + count,
+        url: url,
         //gets the max first 50 results.  To get the 'next' 50, use &start-index=50
         dataType: "jsonp",
+        error: function(jqXHR, textStatus, errorThrown) {
+            console.log('error');
+            console.log(errorThrown);
+            console.log(jqXHR);
+            displayMessage("Woops! Error retrieving data.");
+        },
         success: function (data) {
-            var count = 1;
+            nextUrl = getNextPageUrl(data);
+            console.log(nextUrl);
             $.each(data.feed.entry, function (key, val) {
 
                 var comment = $("<li class='comment'></li>");
@@ -122,6 +144,8 @@ function loadComments(count, videoID) {
                 //$('#comments').append("<div style='font-size: 14px;' class='content'>" + JSON.stringify(data.feed.entry) + "</div>");
             });
 
+            if (nextUrl != "")
+                loadComments(count, nextUrl);
         }
     });
 }
@@ -135,7 +159,7 @@ function appendComments(commentParent, id, count, pageToken) {
         if (pageToken == "")
             url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments";
         else
-            url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments?" + "&pageToken=" + pageToken;
+            url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments?" + "pageToken=" + pageToken;
 
         gapi.client.request({ 'path': url }).then(function (resp) {
             var page = JSON.parse(resp.body).nextPageToken;
@@ -172,7 +196,7 @@ function appendComments(commentParent, id, count, pageToken) {
                     appendComments(commentParent, id, count, page);
             }
         }, function (reason) {
-            commentParent('<li>Error: ' + reason.result.error.message + '</li>');
+            commentParent.append('<li>Error: ' + reason.result.error.message + '</li>');
         });
     });
 
