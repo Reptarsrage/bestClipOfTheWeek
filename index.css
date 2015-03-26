@@ -5,6 +5,10 @@
   padding-right: 50px;
 }
 
+#userSpace {
+    margin-bottom: 100px;
+}
+
 h1 {
     width: auto;
     height: auto;
@@ -12,6 +16,42 @@ h1 {
     padding: 20px;
     margin-top: 5px;
     margin-bottom: 5px;
+}
+
+.error {
+    font-style: italic;
+    color: gray;
+    text-align: center;
+    width: 100%;
+    font-weight: normal;
+}
+
+.section::after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.section {
+    width: 100%;
+    height: wr;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    min-width: 500px;
+    clear: both;
+}
+
+button {
+    margin-left: 20px;
+    height: 25px;
+    float: right;
+}
+
+input {
+    float: left;
+    min-width: 256px;
+    width: 70%;
+    height: 20px;
 }
 
 #message {
@@ -41,13 +81,33 @@ comment
 
 */
 
+#termResults {
+    float: right;
+    overflow:hidden; 
+    overflow-y:scroll;
+    height:200px; 
+    width:18%;
+    border: 2px solid gray;
+}
+
+#termResults li {
+    border: none;
+    border-bottom: 1px solid gray;
+    margin: 1px;
+    padding: 0px;
+}
+
 .hidden {
     display: none;
     visibility: hidden;
 }
 
-.comment div:hover {
+.commentBody:hover {
     background-color:lightblue;
+}
+
+.commentBody:hover span.highlight {
+    background-color: yellow;
 }
 
 .comment {
@@ -84,7 +144,6 @@ li {
 #stats {
     width: auto;
     height: auto;
-    padding: 5px;
     margin-top: 5px;
     margin-bottom: 5px;
 }
@@ -106,8 +165,4 @@ h2 {
     margin: 2px;
     margin-left: 10px;
     padding: 0px;
-}
-
-.highlight {
-    background-color: yellow;
 }

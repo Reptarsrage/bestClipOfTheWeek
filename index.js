@@ -30,42 +30,8 @@ const TERMS = Array('Alpha'
 	, 'Zulu');
 
 (function () {
-    // Retrieve your client ID from the Google APIs Console at
-    // https://code.google.com/apis/console.
-    var OAUTH2_CLIENT_ID = "1077489651789-gfg6h47916jhisojg8v29qguj4u1lclf.apps.googleusercontent.com";
-    var OAUTH2_SCOPES = [
-      'https://www.googleapis.com/auth/yt-analytics.readonly',
-      'https://www.googleapis.com/auth/youtube.readonly'
-    ];
-
-    var ONE_MONTH_IN_MILLISECONDS = 1000 * 60 * 60 * 24 * 30;
-
-    // Keeps track of the currently authenticated user's YouTube user ID.
-    var channelId;
-
-    // For information about the Google Chart Tools API, see
-    // https://developers.google.com/chart/interactive/docs/quick_start
-    google.load('visualization', '1.0', { 'packages': ['corechart'] });
-
-    // The Google APIs JS client invokes this callback automatically after loading.
-    // See http://code.google.com/p/google-api-javascript-client/wiki/Authentication
     window.onJSClientLoad = function () {
-        gapi.auth.init(function () {
-            window.setTimeout(checkAuth, 1);
-        });
-    };
-
-    // Attempt the immediate OAuth 2 client flow as soon as the page loads.
-    // If the currently logged-in Google Account has previously authorized
-    // OAUTH2_CLIENT_ID, then it will succeed with no user intervention.
-    // Otherwise, it will fail and the user interface that prompts for
-    // authorization will need to be displayed.
-    function checkAuth() {
-        gapi.auth.authorize({
-            client_id: OAUTH2_CLIENT_ID,
-            scope: OAUTH2_SCOPES,
-            immediate: true
-        }, handleAuthResult);
+        handleAuthResult(true);
     }
 
     // Handle the result of a gapi.auth.authorize() call.
@@ -85,7 +51,7 @@ const TERMS = Array('Alpha'
 })();
 
 var termStats;
-
+var colorArray;
 
 // Helper method to display a message on the page.
 function displayMessage(message, good) {
@@ -104,13 +70,32 @@ function hideMessage() {
     $('#message').hide();
 }
 
+function showErrors() {
+    $("#stats").append("<h3 class='error'>" + "Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)" + "</h3>");
+    $("#termSpace").append("<h3 class='error'>" + "There are no results to display for your video." + "</h3>");
+    $("#commentSpace").append("<h3 class='error'>" + "Unable to find comments for your video." + "</h3>");
+    $("#termSpace").removeClass("hidden");
+    $("#commentSpace").removeClass("hidden");
+    $("#results").removeClass("hidden");
+                
+}
+
 function fetchResults() {
+    // clean up
+    $("#commentSpace").addClass("hidden");
+    $("#termSpace").addClass("hidden");
+    $("#results").addClass("hidden");
+    $(".error").remove();
+    $("#termResults").empty();
+    $("#comments").empty();
+    $("#stats").empty();
+
+
     gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
     displayMessage('Processing query...please wait', OKAY);
-    getVideoStats('1M5vGlvic_o');
-    loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + '1M5vGlvic_o' + "/comments?v=2&alt=json&max-results=" + 20);
-    $("#termSpace").attr("class", "");
-    //hideMessage();
+    var id = grabVideoId();
+    $("#termSpace").append("<h3 class='error'>" + "There are no results to display for your video." + "</h3>");
+    getVideoStats(id);
 }
 
 
@@ -134,6 +119,13 @@ function getVideoStats(id) {
         "favoriteCount": unsigned long,
         "commentCount": unsigned long
     */
+    if (!id) {
+        // no results
+        showErrors();
+        displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+        return;
+    }
+
 
     var title, description, thumbUrl, thumbW, thumbH, viewCount, likeCount, dislikeCount, favoriteCount, commentCount;
 
@@ -145,36 +137,44 @@ function getVideoStats(id) {
             id: id
         });
         request.execute(function (response) {
-            // snippet
-            title = response.result.items[0].snippet.title;
-            description = response.result.items[0].snippet.description;
-            //thumbUrl = response.result.items[0].snippet.thumbnails.high.url;
-            //thumbW = response.result.items[0].snippet.thumbnails.high.width;
-            //thumbH = response.result.items[0].snippet.thumbnails.high.height;
+            if (response.pageInfo.totalResults > 0) {
+                // snippet
+                title = response.result.items[0].snippet.title;
+                description = response.result.items[0].snippet.description;
+                //thumbUrl = response.result.items[0].snippet.thumbnails.high.url;
+                //thumbW = response.result.items[0].snippet.thumbnails.high.width;
+                //thumbH = response.result.items[0].snippet.thumbnails.high.height;
 
 
-           // stats
-            viewCount = response.result.items[0].statistics.viewCount;
-           likeCount = response.result.items[0].statistics.likeCount;
-           dislikeCount = response.result.items[0].statistics.dislikeCount;
-           favoriteCount = response.result.items[0].statistics.favoriteCount;
-           commentCount = response.result.items[0].statistics.commentCount;
+                // stats
+                viewCount = response.result.items[0].statistics.viewCount;
+                likeCount = response.result.items[0].statistics.likeCount;
+                dislikeCount = response.result.items[0].statistics.dislikeCount;
+                favoriteCount = response.result.items[0].statistics.favoriteCount;
+                commentCount = response.result.items[0].statistics.commentCount;
 
-            // construct html
-           title = "<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>";
-           description = "<h3 class='hidden'>" + description + "</h3>";
+                // construct html
+                title = "<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>";
+                description = "<h3 class='hidden'>" + description + "</h3>";
 
-           viewCount = "<p>Views: " + viewCount + "</p>";
-           likeCount = "<p>Likes: " + likeCount + "</p>";
-           dislikeCount = "<p>Dislikes: " + dislikeCount + "</p>";
-           favoriteCount = "<p>Favorites: " + favoriteCount + "</p>";
-           commentCount = "<p>Comments: " + commentCount + "</p>";
+                viewCount = "<p>Views: " + viewCount + "</p>";
+                likeCount = "<p>Likes: " + likeCount + "</p>";
+                dislikeCount = "<p>Dislikes: " + dislikeCount + "</p>";
+                favoriteCount = "<p>Favorites: " + favoriteCount + "</p>";
+                commentCount = "<p>Comments: " + commentCount + "</p>";
 
-            // add to DOM
-           $("#stats").append(title).append(description).append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
-           $("#results").attr("class", "");
+                // add to DOM
+                $("#stats").append(title).append(description).append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
+                $("#results").removeClass("hidden");
+                loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20);
+            } else {
+                // no results
+                showErrors();
+                displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+            }
         }, function (reason) {
             displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
+            showErrors();
         });
     });
 }
@@ -203,14 +203,17 @@ function loadComments(count, url) {
             console.log('error');
             console.log(errorThrown);
             console.log(jqXHR);
-            displayMessage("Woops! Error retrieving comments. \n" + errorThrown + "\n" + jqXHR, BAD);
+            displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
+            $("#termSpace").append("<h3 class='error'>" + "There are no results to display for your video." + "</h3>").removeClass("hidden");
+            $("#commentSpace").append("<h3 class='error'>" + "Unable to find comments for your video." + "</h3>").removeClass("hidden");
         },
         success: function (data) {
             nextUrl = getNextPageUrl(data);
             console.log(nextUrl);
             $.each(data.feed.entry, function (key, val) {
-                $("#commentSpace").attr("class", "");
+                $("#commentSpace").removeClass("hidden");
                 var comment = $("<li class='comment'></li>");
+                var body = $("<div class='commentBody'></div>");
 
                 var author = $("<h2 class='author'></h2>");
                 author.html(val.author[0].name.$t);
@@ -246,14 +249,14 @@ function loadComments(count, url) {
                     appendComments(comment, commentID, 1, "");
                 }
 
-
-                comment.append(author).append(content).append(userData);
+                body.append(author).append(content).append(userData);
+                comment.append(body);
                 $('#comments').append(comment);
                 count++;
 
             });
 
-            if (nextUrl != "")// && count < 40)
+            if (nextUrl != "" && count < 40)
                 loadComments(count, nextUrl);
             else
                 displayMessage('Completed query.', GOOD);
@@ -278,6 +281,7 @@ function appendComments(commentParent, id, count, pageToken) {
                 var items = JSON.parse(resp.body).items
                 $.each(items, function (key, val) {
                     var comment = $("<li class='comment'></li>");
+                    var body = $("<div class='commentBody'></div>");
 
                     var author = $("<h2 class='author'></h2>");
                     author.html(val.actor.displayName);
@@ -296,7 +300,8 @@ function appendComments(commentParent, id, count, pageToken) {
                                 "<p> page token: " + page + "</p>");
 
 
-                    comment.append(author).append(content).append(userdata);
+                    body.append(author).append(content).append(userdata);
+                    comment.append(body);
                     commentParent.append(comment);
                   //  commentParent.append(JSON.stringify(val));
                     count++;
@@ -316,14 +321,25 @@ function appendComments(commentParent, id, count, pageToken) {
 function parseComment(comment) {
     if (!termStats) {
         termStats = Array(TERMS.length);
+        colorArray = Array(TERMS.length);
         for (i = 0; i < TERMS.length; i++) {
             termStats[i] = 0;
+            colorArray[i] = getRandomColor();
+            $("<style>")
+                .prop("type", "text/css")
+                .html("\
+                ."+ TERMS[i] +" {\
+                    font-weight: bold; \
+                    color: " + colorArray[i] + ";\
+                }")
+                .appendTo("head");
         }
     }
 
     var res = comment;
     var index = -1;
     var t;
+
     comment = comment.toLowerCase();
 
     for (i = 0; i < TERMS.length; i++) {
@@ -331,20 +347,58 @@ function parseComment(comment) {
             termStats[i]++;
             t = res.substring(index, index + TERMS[i].length);
             res = res.substring(0, index) +
-                "<span class='highlight'>" + t + "</span>" +
+                "<span class='" + TERMS[i] + " highlight'>" + t + "</span>" +
                 res.substring(index + TERMS[i].length, res.length + 1);
             comment = res.toLowerCase();
             $("#termResults ." + TERMS[i]).remove();
             $("#termResults").append("<li class='" + TERMS[i] + "'>" + TERMS[i] + ": " + termStats[i] + "</li>");
-            //$("#termSpace").attr("class", "");
+            $("#termSpace .error").remove();
         }
     }
 
+    // sort
     var mylist = $('#termResults');
     var listitems = mylist.children('li').get();
     listitems.sort(function (a, b) {
         return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
     })
     $.each(listitems, function (idx, itm) { mylist.append(itm); });
+
+    // add the rest
+    for (i = 0; i < TERMS.length; i++) {
+        if (termStats[i] == 0) {
+            $("#termResults ." + TERMS[i]).remove();
+            $("#termResults").append("<li class='" + TERMS[i] + "'>" + TERMS[i] + ": " + termStats[i] + "</li>");
+        }
+    }
+
+    $("#termSpace").removeClass("hidden");
     return res;
+}
+
+
+function grabVideoId() {
+    //https://www.youtube.com/watch?v=zPQZ8psBwO4
+    var url = $("#input_video").val();
+    var i = -1;
+    var res;
+    if ((i = url.indexOf("v=")) > -1) {
+        // looks promising
+        var nextParamIndex = url.indexOf("&");
+        if (nextParamIndex > -1) {
+            res = url.substring(i + 2, nextParamIndex);
+        } else {
+            res = url.substring(i + 2, url.length);
+        }
+    }
+    return res;
+}
+
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
 }

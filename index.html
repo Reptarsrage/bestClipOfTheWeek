@@ -9,21 +9,24 @@
     <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=onJSClientLoad"></script>
 </head>
 <body>
-    <h1 id="message"></h1>
-    <input type="text" placeholder="Enter a video ID" value="1M5vGlvic_o" />
-    <button id="fetch" onclick="fetchResults()">Fetch Results</button>
-    <div id="results" class="hidden">
+    <h1 id="message" class="section"></h1>
+    <div id="userSpace" class="section">
+        <input id="input_video" type="text" placeholder="Enter a video ID" value="https://www.youtube.com/watch?v=1M5vGlvic_o" />
+        <button id="fetch" onclick="fetchResults()">Fetch Results</button>
+    </div>
+    <div id="results" class="hidden section">
         <hr>
-        <div id="stats">
+        <div id="statsSpace" class="section">
             <h2>Showing stats for:</h2>
+            <div id="stats"></div>
         </div>
         <hr>
-        <div id="termSpace" class="hidden">
+        <div id="termSpace" class="hidden section">
             <h2>Results:</h2>
             <ul id="termResults"></ul>
         </div>
         <hr>
-        <div id="commentSpace" class="hidden">
+        <div id="commentSpace" class="hidden section">
             <h2>Comments:</h2>
             <ul id="comments"></ul>
         </div>
