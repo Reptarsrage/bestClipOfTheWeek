@@ -1,0 +1,71 @@
+﻿body {
+  font-family: Helvetica, sans-serif;
+}
+
+.pre-auth {
+  display: none;
+}
+
+.post-auth {
+  display: none;
+}
+
+#chart {
+  width: 500px;
+  height: 300px;
+  margin-bottom: 1em;
+}
+
+#video-list {
+  padding-left: 1em;
+  list-style-type: none;
+}
+#video-list > li {
+  cursor: pointer;
+}
+#video-list > li:hover {
+  color: blue;
+}
+
+
+/* 
+comment
+    author
+    content
+    commentData
+        p
+        p
+        p    
+
+*/
+
+.comment {
+    font-family: 'Segoe UI';
+    font-size: 12px;
+}
+
+.author {
+    margin: 5px;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.content {
+    font-size: 14px;
+    margin: 8px;
+}
+
+.commentData p {
+    color: gray;
+    font-size: 10px;
+    margin: 2px;
+    margin-left: 10px;
+    padding: 0px;
+}
+
+li {
+    margin: 10px;
+    margin-left: 40px;
+    border: 1px solid lightgray;
+    list-style-type: none;
+}

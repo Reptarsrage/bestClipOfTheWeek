@@ -1,0 +1,28 @@
+﻿<!doctype html>
+<html>
+<head>
+    <title>Sample YouTube Analytics API Implementation</title>
+    <link type="text/css" rel="stylesheet" href="index.css">
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//www.google.com/jsapi"></script>
+    <script type="text/javascript" src="index.js"></script>
+    <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=onJSClientLoad"></script>
+    <script src="https://apis.google.com/js/platform.js" async defer></script>
+    <meta name="google-signin-client_id" content="1077489651789-gfg6h47916jhisojg8v29qguj4u1lclf.apps.googleusercontent.com" />
+</head>
+<body>
+    <div id="login-container" class="pre-auth">
+        This application requires access to your YouTube account.
+        Please <a href="#" id="login-link">authorize</a> to continue.
+    </div>
+    <div class="post-auth">
+        <div id="message"></div>
+        <button id="fetch" onclick="fetchResults()">Fetch Results</button>
+        <ul id="comments"></ul> 
+        <div id="chart"></div>
+
+        <div>Choose a Video:</div>
+        <ul id="video-list"></ul>
+    </div>
+</body>
+</html>
