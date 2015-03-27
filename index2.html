@@ -1,28 +1,31 @@
-﻿<!doctype html>
-<html>
+﻿<html>
 <head>
-    <title>Sample YouTube Analytics API Implementation</title>
-    <link type="text/css" rel="stylesheet" href="index.css">
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
-    <script type="text/javascript" src="//www.google.com/jsapi"></script>
-    <script type="text/javascript" src="index.js"></script>
-    <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=onJSClientLoad"></script>
-    <script src="https://apis.google.com/js/platform.js" async defer></script>
-    <meta name="google-signin-client_id" content="1077489651789-gfg6h47916jhisojg8v29qguj4u1lclf.apps.googleusercontent.com" />
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+        google.load("visualization", "1", { packages: ["corechart"] });
+        google.setOnLoadCallback(drawChart);
+        function drawChart() {
+
+            var data = google.visualization.arrayToDataTable([
+              ['Task', 'Hours per Day'],
+              ['Work', 11],
+              ['Eat', 2],
+              ['Commute', 2],
+              ['Watch TV', 2],
+              ['Sleep', 7]
+            ]);
+
+            var options = {
+                title: 'My Daily Activities'
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+            chart.draw(data, options);
+        }
+    </script>
 </head>
 <body>
-    <div id="login-container" class="pre-auth">
-        This application requires access to your YouTube account.
-        Please <a href="#" id="login-link">authorize</a> to continue.
-    </div>
-    <div class="post-auth">
-        <div id="message"></div>
-        <button id="fetch" onclick="fetchResults()">Fetch Results</button>
-        <ul id="comments"></ul> 
-        <div id="chart"></div>
-
-        <div>Choose a Video:</div>
-        <ul id="video-list"></ul>
-    </div>
+    <div id="piechart" style="width: 900px; height: 500px;"></div>
 </body>
 </html>

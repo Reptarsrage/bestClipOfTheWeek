@@ -30,7 +30,7 @@ const TERMS = Array('Alpha'
 	, 'Zulu');
 
 (function () {
-    window.onJSClientLoad = function () {
+   window.onJSClientLoad = function () {
         handleAuthResult(true);
     }
 
@@ -89,7 +89,6 @@ function fetchResults() {
     $("#termResults").empty();
     $("#comments").empty();
     $("#stats").empty();
-
 
     gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
     displayMessage('Processing query...please wait', OKAY);
@@ -256,7 +255,7 @@ function loadComments(count, url) {
 
             });
 
-            if (nextUrl != "" && count < 40)
+            if (nextUrl != "")// && count < 40)
                 loadComments(count, nextUrl);
             else
                 displayMessage('Completed query.', GOOD);
@@ -373,6 +372,7 @@ function parseComment(comment) {
     }
 
     $("#termSpace").removeClass("hidden");
+    loadChart();
     return res;
 }
 
@@ -401,4 +401,44 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function loadChart() {
+    google.load("visualization", "1", 
+                { packages: ["corechart"],
+                callback: function () {
+                    var data = new google.visualization.DataTable();
+
+                    // get count
+                    var count = 0;
+                    for (i = 0; i < TERMS.length; i++) {
+                        if (termStats[i] > 0)
+                            count++;
+                    }
+                    // Add columns
+                    data.addColumn('string', 'Video');
+                    data.addColumn('number', 'Votes');
+
+                    // Add rows
+                    data.addRows(count);
+                    var row = 0;
+                    for (i = 0; i < TERMS.length; i++) {
+                        if (termStats[i] > 0) {
+                            data.setCell(row, 0, TERMS[i]);
+                            data.setCell(row, 1, termStats[i]);
+                            row++;
+                        }
+                    }
+
+                    console.log(data.toString());
+
+                    var options = {
+                        title: 'Vote results'
+                    };
+
+                    var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+
+                    chart.draw(data, options);
+
+                }});
 }

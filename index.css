@@ -81,6 +81,13 @@ comment
 
 */
 
+#piechart {
+    width: 50%;
+    min-width: 250px; 
+    min-height: 250px;
+    border: 1px solid gray;
+}
+
 #termResults {
     float: right;
     overflow:hidden; 
