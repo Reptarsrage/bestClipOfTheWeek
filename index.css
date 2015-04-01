@@ -47,7 +47,7 @@ button {
     float: right;
 }
 
-input {
+#input_video {
     float: left;
     min-width: 256px;
     width: 70%;
@@ -80,6 +80,21 @@ comment
         p    
 
 */
+
+#commentSpace label {
+    display: block;
+    float: left;
+    padding-right: 10px;
+    white-space: nowrap;
+}
+
+#commentSpace label input {
+    vertical-align: middle;
+}
+
+#commentSpace label span {
+    vertical-align: middle;
+}
 
 #piechart {
     width: 70%;
