@@ -3,6 +3,7 @@
   padding: 10px;
   padding-left: 50px;
   padding-right: 50px;
+  min-width: 1000px;
 }
 
 #userSpace {
@@ -26,12 +27,6 @@ h1 {
     font-weight: normal;
 }
 
-.section::after {
-    content: "";
-    display: table;
-    clear: both;
-}
-
 .section {
     width: 100%;
     height: auto;
@@ -39,19 +34,21 @@ h1 {
     margin-bottom: 15px;
     min-width: 500px;
     clear: both;
+    overflow: hidden;
 }
 
 button {
     margin-left: 20px;
-    height: 25px;
     float: right;
+    font-size: x-large;
 }
 
 #input_video {
     float: left;
     min-width: 256px;
     width: 70%;
-    height: 20px;
+    margin-left: 10px;
+    font-size: x-large;
 }
 
 #message {
@@ -101,19 +98,26 @@ comment
     vertical-align: middle;
 }
 
-#piechart {
+#chartSection {
     width: 70%;
     min-width: 250px; 
+    min-height: 1000px;
+    float: left;
+    overflow-x: scroll;
+    overflow-y: scroll;
+}
+
+#piechart {
+    width: 100%;
+    min-width: 250px; 
     min-height: 500px;
-    border: 1px solid gray;
     float: left;
 }
 
 #barchart {
-    width: 70%;
-    min-width: 250px; 
+    width: 100%;
+    min-width: 250px;
     height: 500px;
-    border: 1px solid gray;
     float: left;
     clear: left;
 }
@@ -205,8 +209,8 @@ li {
 }
 
 h2 {
-    margin-top: 0px;
-    margin-bottom: 0px;
+    margin-top: 10px;
+    margin-bottom: 10px;
     font-weight: normal;
 }
 
