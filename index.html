@@ -31,8 +31,10 @@
         <hr>
         <div id="commentSpace" class="hidden section">
             <h2 >Comments (<span id="h2_comments"></span>):</h2>
-            <label><input onclick="toggleComments(this)" type="checkbox" id="checkbox_comments" checked="checked" /><span>comments hidden</span></label>
+            <label><input onclick="toggleComments(this, true)" type="checkbox" id="checkbox_comments" /><span>show comments</span></label>
+            <label><input onclick="toggleVoters(this, true)" type="checkbox" id="checkbox_voters" checked="checked"/><span>show voters</span></label>
             <ul id="comments"></ul>
+            <ol id="voters"></ol>
         </div>
     </div> 
 </body>

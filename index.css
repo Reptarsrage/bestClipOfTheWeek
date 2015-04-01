@@ -81,6 +81,11 @@ comment
 
 */
 
+#comments, #voters {
+    clear: both;
+    margin-top: 50px;
+}
+
 #commentSpace label {
     display: block;
     float: left;

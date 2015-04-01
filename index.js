@@ -43,6 +43,7 @@ var timerCount = 0;
 var gapiPieChart, gapiBarChart;
 var maxValue = 500;
 var fetchID = 0;
+var voters = new Array();
 
 displayMessage("Authorizing...", OKAY);
 
@@ -111,13 +112,34 @@ function chartTimeUpdate(currFetchID) {
     }
 }
 
-function toggleComments(cb) {
-    if (typeof cb.checked == "undefined" || cb.checked) {
+function toggleComments(cb, manual) {
+
+    if (manual) {
+        $("#checkbox_voters").prop('checked', false);
+        toggleVoters($("#checkbox_voters"), false);
+    }
+
+    if (cb.checked) {
+       // $("#comments").empty();
+        $("#comments").append(commentHTML);
+        $("#comments").show();
+    } else {
         $("#comments").hide();
         $("#comments").empty();
+    }
+}
+
+function toggleVoters(cb, manual) {
+
+    if (manual) {
+        $("#checkbox_comments").prop('checked', false);
+        toggleComments($("#checkbox_comments"), false);
+    }
+
+    if (cb.checked) {
+        $("#voters").show();
     } else {
-        $("#comments").show();
-        $("#comments").append(commentHTML);
+        $("#voters").hide();
     }
 }
 
@@ -156,6 +178,8 @@ function fetchResults() {
     $(".error").remove();
     $("#termResults").empty();
     $("#stats").empty();
+    $("#voters").empty();
+    $("#comments").empty();
 
     //reset
     loaded = false;
@@ -167,12 +191,11 @@ function fetchResults() {
     gapiPieChart, gapiBarChart = null;
     maxValue = 500;
     data = new google.visualization.DataTable();
+    voters = new Array();
 
     // Start
     fetchID++;
     startTime = new Date().getTime();
-
-    toggleComments($("#checkbox_comments"));
 
     displayMessage('Processing query...please wait', OKAY);
     var id = grabVideoId();
@@ -341,7 +364,7 @@ function loadComments(count, url, currFetchID) {
                             "<p> commentID: " + commentID + "</p>");
 
                 var content = $("<div class='content'></div>");
-                content.html(parseComment(val.content.$t, currFetchID));
+                content.html(parseComment(val.content.$t, currFetchID, val.author[0].name.$t));
 
                 // find replies
                 if (commentID != "N/A") {
@@ -351,7 +374,7 @@ function loadComments(count, url, currFetchID) {
                 body.append(author).append(content).append(userData);
                 comment.append(body);
                 commentHTML.append(comment);
-                $("#h2_comments").html("Comments (" + count + ")");
+                $("#h2_comments").html(count);
                 count++;
 
             });
@@ -397,7 +420,7 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
                 //json.parse(resp.body).items[0].object.originalcontent
 
                 var content = $("<div class='content'></div>");
-                content.html(parseComment(val.object.content, currFetchID));
+                content.html(parseComment(val.object.content, currFetchID, val.actor.displayName));
 
                 var userdata = $("<div class='commentData'></div>");
                 userdata.html("<p> reply number: " + count + "</p>" +
@@ -421,7 +444,7 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
     });
 }
 
-function parseComment(comment, currFetchID) {
+function parseComment(comment, currFetchID, author) {
     if (currFetchID != fetchID)
         return;
 
@@ -472,6 +495,11 @@ function parseComment(comment, currFetchID) {
             $("#termResults ." + TERMS[i]).remove();
             $("#termResults").append("<li class='" + TERMS[i] + "'>" + TERMS[i] + ": " + data.getValue(i, 1) + "</li>");
             $("#termSpace .error").remove();
+
+            if (voters.indexOf(author) < 0) {
+                voters.push(author);
+                addToSortedList("voters", author);
+            }
         }
     }
 
@@ -494,6 +522,26 @@ function parseComment(comment, currFetchID) {
     $("#termSpace").removeClass("hidden");
     overallCount++;
     return res;
+}
+
+
+function addToSortedList(listID, elt) {
+    var name = elt;
+    if (name != '') {
+        var toinsert = true;
+        $("#" + listID + " > li").each(function () {
+            var item = $(this).html();
+            if (name.toUpperCase() < item.toUpperCase()) {
+                if (toinsert) {
+                    $(this).before('<li>' + name + '</li>');
+                    toinsert = false;
+                }
+            }
+        });
+        if (toinsert) {
+            $("#" + listID).append('<li>' + name + '</li>');
+        }
+    }
 }
 
 
