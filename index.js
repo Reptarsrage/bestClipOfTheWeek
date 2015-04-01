@@ -1,8 +1,9 @@
 ﻿const GOOD = 0;
 const BAD = 1;
 const OKAY = 2
-const TIMER_DELAY = 500;
+const TIMER_DELAY = 2500;
 const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
+const BAR_CHART_MAX_RATIO = 0.5;
 
 const TERMS = Array('Alpha'
 	, 'Bravo'
@@ -31,15 +32,17 @@ const TERMS = Array('Alpha'
 	, 'Yankee'
 	, 'Zulu');
 
-//var termStats;
+var startTime, endTime;
 var loaded = false;
 var colorArray;
 var data = null;
 var commentHTML = $("<div></div>");
-var long = 0;
 var overallCount = 0;
 var lastCount = 0;
-var timeCount = 0;
+var timerCount = 0;
+var gapiPieChart, gapiBarChart;
+var maxValue = 500;
+var fetchID = 0;
 
 displayMessage("Authorizing...", OKAY);
 
@@ -50,8 +53,6 @@ google.load("visualization", "1", {
 google.setOnLoadCallback(function () {
     displayMessage("Authorize - Success", GOOD);
     data = new google.visualization.DataTable();
-    drawChart('piechart', 'piechart', data, null);
-    drawChart('barchart', 'barchart', data, null);
 });
 
 function onJSClientLoad() {
@@ -68,12 +69,16 @@ function drawChart(chartType, containerID, dataTablo, options) {
     var containerDiv = document.getElementById(containerID);
     var chart = false;
     if (chartType.toUpperCase() == 'BARCHART') {
-        chart = new google.visualization.BarChart(containerDiv);
+        if (!gapiBarChart)
+            gapiBarChart = new google.visualization.BarChart(containerDiv)
+        chart = gapiBarChart;
     } else if (chartType.toUpperCase() == 'COLUMNCHART') {
         chart = new google.visualization.ColumnChart(containerDiv);
         columnChart = chart;
     } else if (chartType.toUpperCase() == 'PIECHART') {
-        chart = new google.visualization.PieChart(containerDiv);
+        if (!gapiPieChart)
+            gapiPieChart = new google.visualization.PieChart(containerDiv)
+        chart = gapiPieChart;
     } else if (chartType.toUpperCase() == 'TABLECHART') {
         chart = new google.visualization.Table(containerDiv);
         tableChart = chart;
@@ -85,8 +90,8 @@ function drawChart(chartType, containerID, dataTablo, options) {
     chart.draw(dataTablo, options);
 }
 
-function chartTimeUpdate() {
-    if (timerCount > MAX_TIMER_COUNT) {
+function chartTimeUpdate(currFetchID) {
+    if (currFetchID != fetchID || timerCount > MAX_TIMER_COUNT) {
         overallCount = 0;
         lastCount = 0;
         timerCount = 0;
@@ -95,14 +100,14 @@ function chartTimeUpdate() {
     } else if (lastCount == overallCount) {
         timerCount++;
         console.log("tick");
-        setTimeout(chartTimeUpdate, TIMER_DELAY);
+        setTimeout(chartTimeUpdate, TIMER_DELAY, currFetchID);
         return;
     } else {
         lastCount = overallCount;
         timerCount = 0;
         console.log("UPDATE!");
         loadChart();
-        setTimeout(chartTimeUpdate, TIMER_DELAY);
+        setTimeout(chartTimeUpdate, TIMER_DELAY, currFetchID);
     }
 }
 
@@ -151,22 +156,33 @@ function fetchResults() {
     $(".error").remove();
     $("#termResults").empty();
     $("#stats").empty();
+
+    //reset
+    loaded = false;
+    colorArray = null;
+    commentHTML = $("<div></div>");
     overallCount = 0;
     lastCount = 0;
     timerCount = 0;
+    gapiPieChart, gapiBarChart = null;
+    maxValue = 500;
+    data = new google.visualization.DataTable();
 
+    // Start
+    fetchID++;
+    startTime = new Date().getTime();
 
     toggleComments($("#checkbox_comments"));
 
     displayMessage('Processing query...please wait', OKAY);
     var id = grabVideoId();
     $("#termSpace").append("<h3 class='error'>" + "There are no results to display for your video." + "</h3>");
-    executeAsync(getVideoStats(id));
-    chartTimeUpdate();
+    executeAsync(getVideoStats(id, fetchID));
+    chartTimeUpdate(fetchID);
 }
 
 
-function getVideoStats(id) {
+function getVideoStats(id, currFetchID) {
     /*
     response.result.items[0].snippet
         "publishedAt": datetime,
@@ -186,6 +202,10 @@ function getVideoStats(id) {
         "favoriteCount": unsigned long,
         "commentCount": unsigned long
     */
+
+    if (currFetchID != fetchID)
+        return;
+
     if (!id) {
         // no results
         showErrors();
@@ -219,6 +239,7 @@ function getVideoStats(id) {
             commentCount = response.result.items[0].statistics.commentCount;
 
             // construct html
+            maxValue = commentCount * BAR_CHART_MAX_RATIO;
             var image = $("<img id='img_thumb' src='" + thumbUrl + "' alt='" + title + "' style='width:" + thumbW + "px;height:" + thumbH + "px'>");
 
             title = $("<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>");
@@ -236,7 +257,7 @@ function getVideoStats(id) {
             $("#stats").append(title).append(description).append(image)
             $("#stats").append(videoStats);
             $("#results").removeClass("hidden");
-            executeAsync(loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20));
+            executeAsync(loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20, currFetchID));
         } else {
             // no results
             showErrors();
@@ -263,12 +284,18 @@ function getNextPageUrl(data) {
 
 }
 
-function loadComments(count, url) {
+function loadComments(count, url, currFetchID) {
+    if (currFetchID != fetchID)
+        return;
+
     $.ajax({
         url: url,
         dataType: "jsonp",
         async: true,
         error: function(jqXHR, textStatus, errorThrown) {
+            if (currFetchID != fetchID)
+                return;
+
             console.log('error');
             console.log(errorThrown);
             console.log(jqXHR);
@@ -277,6 +304,9 @@ function loadComments(count, url) {
             $("#commentSpace").append("<h3 class='error'>" + "Unable to find comments for your video." + "</h3>").removeClass("hidden");
         },
         success: function (data) {
+            if (currFetchID != fetchID)
+                return;
+
             nextUrl = getNextPageUrl(data);
             console.log(nextUrl);
             $.each(data.feed.entry, function (key, val) {
@@ -311,11 +341,11 @@ function loadComments(count, url) {
                             "<p> commentID: " + commentID + "</p>");
 
                 var content = $("<div class='content'></div>");
-                content.html(parseComment(val.content.$t));
+                content.html(parseComment(val.content.$t, currFetchID));
 
                 // find replies
                 if (commentID != "N/A") {
-                    appendComments(comment, commentID, 1, "");
+                    appendComments(comment, commentID, 1, "", currFetchID);
                 }
 
                 body.append(author).append(content).append(userData);
@@ -327,24 +357,30 @@ function loadComments(count, url) {
             });
 
             if (nextUrl != "")// && count < 100)
-                executeAsync(loadComments(count, nextUrl));
+                executeAsync(loadComments(count, nextUrl, currFetchID));
             else {
                 displayMessage('Completed query.', GOOD);
-                //var end = new Date().getTime();
-                //var time = end - start;
-                //alert('Execution time: ' + time);
+                endTime = new Date().getTime();
+                var time = (endTime - startTime) / 1000.00;
+                console.log('Execution time: ' + time + " seconds");
             }
         }
     });
 }
 
-function appendComments(commentParent, id, count, pageToken) {
+function appendComments(commentParent, id, count, pageToken, currFetchID) {
+    if (currFetchID != fetchID)
+        return;
+
     if (pageToken == "")
         url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments";
     else
         url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments?" + "pageToken=" + pageToken;
 
     gapi.client.request({ 'path': url }).then(function (resp) {
+        if (currFetchID != fetchID)
+            return;
+
         var page = JSON.parse(resp.body).nextPageToken;
 
         if (JSON.parse(resp.body).hasOwnProperty("items")) {
@@ -361,7 +397,7 @@ function appendComments(commentParent, id, count, pageToken) {
                 //json.parse(resp.body).items[0].object.originalcontent
 
                 var content = $("<div class='content'></div>");
-                content.html(parseComment(val.object.content));
+                content.html(parseComment(val.object.content, currFetchID));
 
                 var userdata = $("<div class='commentData'></div>");
                 userdata.html("<p> reply number: " + count + "</p>" +
@@ -377,7 +413,7 @@ function appendComments(commentParent, id, count, pageToken) {
             });
 
             if (typeof page !== 'undefined' && page != pageToken)
-                executeAsync(appendComments(commentParent, id, count, page));
+                executeAsync(appendComments(commentParent, id, count, page, currFetchID));
         }
     }, function (reason) {
         commentParent.append('<li>Error loading reply: ' + reason.result.error.message + '</li>');
@@ -385,7 +421,10 @@ function appendComments(commentParent, id, count, pageToken) {
     });
 }
 
-function parseComment(comment) {
+function parseComment(comment, currFetchID) {
+    if (currFetchID != fetchID)
+        return;
+
     if (!loaded) {
         colorArray = Array(TERMS.length);
 
@@ -423,6 +462,7 @@ function parseComment(comment) {
     for (i = 0; i < TERMS.length; i++) {
         if ((index = comment.indexOf(TERMS[i].toLowerCase())) > -1) {
             data.setCell(i, 1, data.getValue(i, 1) + 1);
+
             s = res.substring(0, index);
             t = res.substring(index, index + TERMS[i].length);
             v = res.substring(index + TERMS[i].length, res.length + 1);
@@ -436,12 +476,12 @@ function parseComment(comment) {
     }
 
     // sort
-    //var mylist = $('#termResults');
-    //var listitems = mylist.children('li').get();
-    //listitems.sort(function (a, b) {
-    //    return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
-    //})
-    //$.each(listitems, function (idx, itm) { mylist.append(itm); });
+    var mylist = $('#termResults');
+    var listitems = mylist.children('li').get();
+    listitems.sort(function (a, b) {
+        return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
+    })
+    $.each(listitems, function (idx, itm) { mylist.append(itm); });
 
     //// add the rest
     //for (i = 0; i < TERMS.length; i++) {
@@ -511,7 +551,8 @@ function loadChart() {
 
     var options = {
         title: 'Vote results',
-        colors: pieColors
+        colors: pieColors,
+        fontName: 'Segoe UI'
     };
 
 
@@ -520,18 +561,20 @@ function loadChart() {
     // BAR
     var options = {
         title: 'Vote results',
-        chartArea: { width: '50%' },
-        hAxis: { title: 'Votes' },
+        hAxis: {
+            title: 'Votes',
+            minValue: 0,
+            maxValue: maxValue
+        },
         vAxis: { title: 'Video' },
         animation: {
-            duration: 1000,
+            duration: TIMER_DELAY,
             easing: 'out'
         },
-        //fontName: 'Segoe UI',
+        fontName: 'Segoe UI',
         legend: {
             position: 'none',
         },
-        minValue: 0
     };
 
     drawChart('barchart', 'barchart', nonNullData, options);
