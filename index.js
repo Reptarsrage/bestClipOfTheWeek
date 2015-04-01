@@ -140,9 +140,9 @@ function getVideoStats(id) {
                 // snippet
                 title = response.result.items[0].snippet.title;
                 description = response.result.items[0].snippet.description;
-                //thumbUrl = response.result.items[0].snippet.thumbnails.high.url;
-                //thumbW = response.result.items[0].snippet.thumbnails.high.width;
-                //thumbH = response.result.items[0].snippet.thumbnails.high.height;
+                thumbUrl = response.result.items[0].snippet.thumbnails.high.url;
+                thumbW = response.result.items[0].snippet.thumbnails.high.width;
+                thumbH = response.result.items[0].snippet.thumbnails.high.height;
 
 
                 // stats
@@ -153,17 +153,22 @@ function getVideoStats(id) {
                 commentCount = response.result.items[0].statistics.commentCount;
 
                 // construct html
-                title = "<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>";
-                description = "<h3 class='hidden'>" + description + "</h3>";
+                var image = $("<img id='img_thumb' src='" + thumbUrl + "' alt='" + title + "' style='width:" + thumbW + "px;height:" + thumbH + "px'>");
 
-                viewCount = "<p>Views: " + viewCount + "</p>";
-                likeCount = "<p>Likes: " + likeCount + "</p>";
-                dislikeCount = "<p>Dislikes: " + dislikeCount + "</p>";
-                favoriteCount = "<p>Favorites: " + favoriteCount + "</p>";
-                commentCount = "<p>Comments: " + commentCount + "</p>";
+                title = $("<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>");
+                description = $("<h3 class='hidden'>" + description + "</h3>");
+
+                viewCount = $("<p>Views: " + viewCount + "</p>");
+                likeCount = $("<p>Likes: " + likeCount + "</p>");
+                dislikeCount = $("<p>Dislikes: " + dislikeCount + "</p>");
+                favoriteCount = $("<p>Favorites: " + favoriteCount + "</p>");
+                commentCount = $("<p>Comments: " + commentCount + "</p>");
+                var videoStats = $("<div id='div_video_stats' style='left:" + thumbW + "px'></div>");
+                videoStats.append(viewCount).append(dislikeCount).append(favoriteCount).append(commentCount);
 
                 // add to DOM
-                $("#stats").append(title).append(description).append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
+                $("#stats").append(title).append(description).append(image)
+                $("#stats").append(videoStats);
                 $("#results").removeClass("hidden");
                 loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20);
             } else {
@@ -194,6 +199,7 @@ function getNextPageUrl(data) {
 }
 
 function loadComments(count, url) {
+    var start = new Date().getTime();
     $.ajax({
         url: url,
         //gets the max first 50 results.  To get the 'next' 50, use &start-index=50
@@ -255,10 +261,14 @@ function loadComments(count, url) {
 
             });
 
-            if (nextUrl != "")// && count < 40)
+            if (nextUrl != "" && count < 100)
                 loadComments(count, nextUrl);
-            else
+            else {
                 displayMessage('Completed query.', GOOD);
+                var end = new Date().getTime();
+                var time = end - start;
+                alert('Execution time: ' + time);
+            }
         }
     });
 }
@@ -404,7 +414,8 @@ function getRandomColor() {
 }
 
 function loadChart() {
-    google.load("visualization", "1", 
+  // PIE
+    google.load("visualization", "1",
                 { packages: ["corechart"],
                 callback: function () {
                     var data = new google.visualization.DataTable();
@@ -438,6 +449,22 @@ function loadChart() {
 
                     var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 
+                    chart.draw(data, options);
+
+
+                    var options = {
+                        title: 'Vote results',
+                        chartArea: { width: '50%' },
+                        hAxis: {
+                            title: 'Votes',
+                            minValue: 0
+                        },
+                        vAxis: {
+                            title: 'Video'
+                        }
+                    };
+
+                    var chart = new google.visualization.BarChart(document.getElementById('barchart'));
                     chart.draw(data, options);
 
                 }});
