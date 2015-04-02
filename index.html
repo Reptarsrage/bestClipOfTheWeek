@@ -13,31 +13,46 @@
     <h1 id="message" class="section"></h1>
     <div id="userSpace" class="section">
         <h2>Fetch: </h2>
-        <input id="input_video" type="text" placeholder="Enter a video ID" value="https://www.youtube.com/watch?v=1M5vGlvic_o" />
+        <input id="input_video" type="text" placeholder="Enter a YouTube video Url" />
         <button id="fetch" onclick="fetchResults()">Fetch Results</button>
-    </div>
+        <h3 id="h3_recommended">Recommended: </h3>
+        <ol id="select_bestOfTheWeek">
+            
+        </ol>
+</div>
     <div id="results" class="hidden section">
         <hr>
         <div id="statsSpace" class="section">
             <h2>Showing stats for:</h2>
-            <div id="stats"></div>
+            <div id="stats">
+                <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
+            </div>
         </div>
         <hr>
         <div id="termSpace" class="hidden section">
             <h2>Results:</h2>
+            <h3 class='error'>There are no results to display for your video.</h3>
             <div id="chartSection">
                 <div id="piechart"></div>
                 <div id="barchart"></div>
             </div>
-            <ul id="termResults"></ul>
+            <div id="termResults">
+                <h3>Terms:</h3>
+                <ul id="termResults_list"></ul>
+            </div>
         </div>
         <hr>
         <div id="commentSpace" class="hidden section">
-            <h2 >Comments (<span id="h2_comments"></span>):</h2>
-            <label><input onclick="toggleComments(this, true)" type="checkbox" id="checkbox_comments" /><span>show comments</span></label>
-            <label><input onclick="toggleVoters(this, true)" type="checkbox" id="checkbox_voters" checked="checked"/><span>show voters</span></label>
-            <ul id="comments"></ul>
-            <ol id="voters"></ol>
+            <h2 >Comments (<span id="h2_comments">0</span>):</h2>
+            <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
+            <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
+            <h3 class='error'>Unable to find comments for your video.</h3>
+            <ul id="comments">
+                <li class="error">No comments</li>
+            </ul>
+            <ol id="voters">
+                <li class="error">No voters</li>
+            </ol>
         </div>
     </div> 
 </body>

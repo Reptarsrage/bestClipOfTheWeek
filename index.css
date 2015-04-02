@@ -10,6 +10,14 @@
     margin-bottom: 100px;
 }
 
+#select_bestOfTheWeek {
+    clear: both;
+    min-width: 250px;
+    font-size: x-large;
+    margin: 20px;
+    float: left;
+}
+
 h1 {
     width: auto;
     height: auto;
@@ -17,14 +25,6 @@ h1 {
     padding: 20px;
     margin-top: 5px;
     margin-bottom: 5px;
-}
-
-.error {
-    font-style: italic;
-    color: gray;
-    text-align: center;
-    width: 100%;
-    font-weight: normal;
 }
 
 .section {
@@ -101,7 +101,7 @@ comment
 #chartSection {
     width: 70%;
     min-width: 250px; 
-    min-height: 1000px;
+    min-height: 1050px;
     float: left;
     overflow-x: scroll;
     overflow-y: scroll;
@@ -136,22 +136,29 @@ comment
 
 #termResults {
     overflow:hidden; 
-    overflow-y:scroll;
     height: 1000px; 
-    min-width: 200px;
+    min-width: 230px;
     width: 25%;
-    border: 2px solid gray;
     margin-left: auto;
     margin-right: auto;
-    font-size: x-large;
     margin-top: 0px;
 }
 
-#termResults li {
+#termResults_list {
+    overflow-y:scroll;
+    min-width: 100px;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: x-large;
+    padding-left: 0px;
+}
+
+#termResults_list li {
     border: none;
     border-bottom: 1px solid gray;
     margin: 1px;
     padding: 0px;
+    margin-left: 0px;
 }
 
 .hidden {
@@ -225,4 +232,77 @@ h2 {
     margin: 2px;
     margin-left: 10px;
     padding: 0px;
+}
+
+
+/* selector */
+.selected {
+    background-color: royalblue;
+}
+
+#h3_recommended {
+    float: left;
+    clear: both;
+    margin: 10px;
+    font-size: 26px;
+    font-weight: normal;
+    margin-bottom: 0px;
+}
+
+#select_bestOfTheWeek {
+    float: left;
+    clear: both;
+    max-height: 550px;
+    overflow-y: scroll;
+    margin-top: 0px;
+}
+
+.option {
+    overflow: hidden;
+    min-width: 200px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    padding: 2px;
+    min-height: 110px;
+}
+
+.option:hover {
+    background-color: lightblue;
+    cursor: pointer;
+}
+
+.selected:hover {
+    background-color: royalblue;
+}
+
+.option_thumb {
+    float: left;
+    margin-right: 5px;
+    height: 100px;
+    width: 100px;
+
+}
+
+.option_date {
+    font-size: 12px;
+    color: darkslategrey;
+    float: left;
+}
+
+.option_title {
+    float: left;
+    color: black;
+    font-size: 16px;
+    height: 100%;
+}
+
+
+/*lastly*/
+.error {
+    font-style: italic;
+    color: gray;
+    text-align: center;
+    width: 100%;
+    font-weight: normal;
+    border: none;
+    clear: both;
 }
