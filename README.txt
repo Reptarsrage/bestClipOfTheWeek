@@ -1,0 +1,35 @@
+todo:
+	php:
+		make it return all the errors not just the last one!
+	
+	login:
+		create page
+			username
+			password
+			submit
+			errors
+			pretty css
+		create backend support for login feature
+			create table login_cred
+				userID
+				password
+				security token
+				security token expiration datetime
+		on login authorize
+			js send username and password to php
+			php generates a security token
+			php sends request to sql proc to login user using credentials (return success/failure)
+				security token expires in 24hrs / when user logs out manually
+			is successfull then return security token to js
+			js saves this information
+		on query authorize user
+			js passes security token recieved from backend on login to php
+			php querys sql to validate token
+				returns 403 forbidden on failure
+			php sends query to sql and returns results
+			
+		things to think about:
+			protect/encrypt a table or column in mysql
+			how will we handle expired tokens? (never let user stay logged on for more than 24 hours)
+			use ssl when communicating with php
+			

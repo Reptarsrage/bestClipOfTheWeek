@@ -33,6 +33,34 @@ const TERMS = Array('Alpha'
 	, 'Yankee'
 	, 'Zulu');
 
+
+const COLORS = Array('#ff0000'
+	, '#ff8000'
+	, '#fff700'
+	, '#d0ff00'
+	, '#00ff6e'
+	, '#00fff2'
+	, '#009dff'
+	, '#0040ff'
+	, '#8400ff'
+	, '#d400ff'
+	, '#ff00ee'
+	, '#ff005d'
+	, '#9e2b55'
+	, '#9e2b87'
+	, '#872b9e'
+	, '#3a2b9e'
+	, '#2b709e'
+	, '#2b9e94'
+	, '#2b9e4d'
+	, '#689e2b'
+	, '#a9ab4b'
+	, '#bf8e11'
+	, '#bf5a11'
+	, '#bf1d11'
+	, '#c78783'
+	, '#737373');
+
 var startTime, endTime;
 var loaded = false;
 var colorArray, termStats;
