@@ -110,7 +110,7 @@ function populateBestOfTheWeek() {
 
     }, function (reason) {
         select.append("<li>Error retrieving videos</li>");
-        select.attr("disabled", 'disabled');
+        select.prop('disabled', true);
     });
 }
 
@@ -146,7 +146,7 @@ function requestVideoPlaylist(channelID, pageToken) {
 
     }, function (reason) {
         select.append("<option value='Error'>Error retrieving videos</option>");
-        select.attr("disabled", 'disabled');
+        select.prop('disabled', true);
     });
 }
 
@@ -314,13 +314,13 @@ function showErrors() {
     $("#termSpace").removeClass("hidden");
     $("#commentSpace").removeClass("hidden");
     $("#results").removeClass("hidden");
-    $("input[type='checkbox']").attr("disabled", true);
+    $("input[type='checkbox']").prop('disabled', true);
                 
 }
 
 function fetchResults() {
     // clean up
-    $("input[type='checkbox']").removeAttr("disabled");
+    $("input[type='checkbox']").prop('disabled', false);
     $("#commentSpace").addClass("hidden");
     $("#termSpace").addClass("hidden");
     $("#results").addClass("hidden");
@@ -485,7 +485,7 @@ function loadComments(count, url, currFetchID) {
             console.log(jqXHR);
             displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
             $("#commentSpace > .error").show();
-            $("input[type='checkbox']").attr("disabled", true);
+            $("input[type='checkbox']").prop('disabled', true);
         },
         success: function (data) {
             if (currFetchID != fetchID)
