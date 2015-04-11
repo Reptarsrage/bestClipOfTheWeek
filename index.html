@@ -2,58 +2,86 @@
 <html>
 <head>
     <title>Best Clip of the Week - Results</title>
+
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="/common/common.css">
     <link type="text/css" rel="stylesheet" href="index.css">
 
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script type="text/javascript" src="/header.js"></script>
     <script type="text/javascript" src="index.js"></script>
     <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=onJSClientLoad"></script>
 </head>
 <body>
-    <h1 id="message" class="section"></h1>
-    <div id="userSpace" class="section">
-        <h2>Fetch: </h2>
-        <input id="input_video" type="text" placeholder="Enter a YouTube video Url" />
-        <button id="fetch" onclick="fetchResults()">Fetch Results</button>
-        <h3 id="h3_recommended">Recommended: </h3>
-        <ol id="select_bestOfTheWeek">
-            
-        </ol>
-</div>
-    <div id="results" class="hidden section">
-        <hr>
-        <div id="statsSpace" class="section">
-            <h2>Showing stats for:</h2>
-            <div id="stats">
-                <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
-            </div>
-        </div>
-        <hr>
-        <div id="termSpace" class="hidden section">
-            <h2>Results:</h2>
-            <h3 class='error'>There are no results to display for your video.</h3>
-            <div id="chartSection">
-                <div id="piechart"></div>
-                <div id="barchart"></div>
-            </div>
-            <div id="termResults">
-                <h3>Terms:</h3>
-                <ul id="termResults_list"></ul>
-            </div>
-        </div>
-        <hr>
-        <div id="commentSpace" class="hidden section">
-            <h2 >Comments (<span id="h2_comments">0</span>):</h2>
-            <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
-            <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
-            <h3 class='error'>Unable to find comments for your video.</h3>
-            <ul id="comments">
-                <li class="error">No comments</li>
+    <!--DUPLICATED ACCROSS PAGES-->
+    <div id="header">
+        <div id='cssmenu'>
+            <ul>
+                <li class='active'><a href="/index.html">Search Youtube</a></li>
+                <li><a href="/config.html">Configure search terms</a></li>
+                <li><a href="/about.html">About</a></li>
             </ul>
-            <ol id="voters">
-                <li class="error">No voters</li>
-            </ol>
         </div>
-    </div> 
+    </div>
+
+    <div id="body">
+        <h1 id="message" class="section"></h1>
+        <div id="userSpace" class="section">
+            <h2>Fetch: </h2>
+            <input id="input_video" type="text" placeholder="Enter a YouTube video Url" />
+            <button id="fetch">Fetch Results</button>
+            <h3 id="h3_recommended">Recommended: </h3>
+            <ol id="select_bestOfTheWeek"></ol>
+        </div>
+        <div id="results" class="hidden section">
+            <hr>
+            <div id="statsSpace" class="section">
+                <h2>Showing stats for:</h2>
+                <div id="stats">
+                    <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
+                </div>
+            </div>
+            <hr>
+            <div id="termSpace" class="hidden section">
+                <h2>Results:</h2>
+                <h3 class='error'>There are no results to display for your video.</h3>
+                <div id="chartSection">
+                    <div id="piechart"></div>
+                    <div id="barchart"></div>
+                </div>
+                <div id="termResults">
+                    <h3>Terms:</h3>
+                    <ul id="termResults_list"></ul>
+                </div>
+            </div>
+            <hr>
+            <div id="commentSpace" class="hidden section">
+                <h2>Comments (<span id="h2_comments">0</span>):</h2>
+                <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
+                <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
+                <h3 class='error'>Unable to find comments for your video.</h3>
+                <ul hidden="hidden" id="comments">
+                    <li class="error">No comments</li>
+                </ul>
+                <ol hidden="hidden" id="voters">
+                    <li class="error">No voters</li>
+                </ol>
+            </div>
+        </div>
+    </div>
+
+    <!--DUPLICATED ACCROSS PAGES-->
+    <div id="footer">
+        <div id="foot_content">
+            <span id="foot_credits">Website made by: <b id="foot_myname">Justin Robb</b></span><br />
+            <span id="foot_contact_info"><a href="mailto:justinprobb@gmail.com">Contact me</a></span><br />
+            <span id="foot_linked_in"><a href="https://www.linkedin.com/in/jurobb">Linkedin</a></span>
+            <span id="foot_giy_hub"><a href="https://github.com/Reptarsrage">Github</a></span>
+        </div>
+    </div>
 </body>
 </html>

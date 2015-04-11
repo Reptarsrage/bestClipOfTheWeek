@@ -2,27 +2,56 @@
 <html>
 <head>
     <title>Best Clip of the Week - Configuration</title>
+
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="common/common.css">
     <link type="text/css" rel="stylesheet" href="config.css">
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
+
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script type="text/javascript" src="/JSColor/jscolor.js"></script>
+    <script type="text/javascript" src="/header.js"></script>
     <script type="text/javascript" src="config.js"></script>
 </head>
 <body>
-    <h1>Configuration:</h1>
-    <table id="table_config">
-        <thead>
-            <tr>
-                <th>Term</th>
-                <th>Color</th>
-                <th>Enabled</th>
-                <th></th>
-            </tr>
-        </thead>
-        <tbody>
-        </tbody>
-    </table>
+    <!--DUPLICATED ACCROSS PAGES-->
+    <div id="header">
+        <div id='cssmenu'>
+            <ul>
+                <li><a href="/index.html">Search Youtube</a></li>
+                <li class='active'><a href="/config.html">Configure search terms</a></li>
+                <li><a href="/about.html">About</a></li>
+            </ul>
+        </div>
+    </div>
+    <div id="body">
+        <h1>Configuration:</h1>
+        <table id="table_config">
+            <thead>
+                <tr>
+                    <th>Term</th>
+                    <th>Color</th>
+                    <th>Enabled</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
 
-    <h2>Response:</h2>
-    <p id="response"></p>  
+        <h2>Response:</h2>
+        <p id="response"></p>
+    </div>
+
+    <!--DUPLICATED ACCROSS PAGES-->
+    <div id="footer">
+        <div id="foot_content">
+            <span id="foot_credits">Website made by: <b id="foot_myname">Justin Robb</b></span><br />
+            <span id="foot_contact_info"><a href="mailto:justinprobb@gmail.com">Contact me</a></span><br />
+            <span id="foot_linked_in"><a href="https://www.linkedin.com/in/jurobb">Linkedin</a></span>
+            <span id="foot_giy_hub"><a href="https://github.com/Reptarsrage">Github</a></span>
+        </div>
+    </div>
 </body>
 </html>

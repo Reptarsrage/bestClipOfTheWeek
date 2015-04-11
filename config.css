@@ -1,12 +1,9 @@
-﻿body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  font-size: 10px;
-  padding: 10px;
-  padding-left: 50px;
-  padding-right: 50px;
-  min-width: 800px;
-}
-
+﻿/*
+ * Justin Robb
+ * 4/10/15
+ * Best Clip of the Week Application
+ * Term Configuration page style
+ */
 
 td {
     padding-left: 10px;

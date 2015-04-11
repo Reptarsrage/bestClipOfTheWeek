@@ -1,4 +1,11 @@
-﻿const USER_NAME = "Admin";
+﻿/*
+ * Justin Robb
+ * 4/10/15
+ * Best Clip of the Week Application
+ * Term configuration page
+ */
+
+const USER_NAME = "Admin";
 
 $(document).ready(function () {
     handleEvent('GET', null);
@@ -159,7 +166,7 @@ function createTableRow(row, buttonType, before) {
                 var vterm = parent.find(".input_term").val();
                 var vcolor = parent.find(".color").val();
                 var venabled = 'no';
-                if (parent.find(".checkpox_enabled").attr('checked') == 'checked')
+                if (parent.find(".checkpox_enabled").prop('checked'))
                     venabled = 'yes';
 
                 if (vterm.length == 0) {
@@ -217,7 +224,7 @@ function createTableRow(row, buttonType, before) {
                 var vterm = parent.find(".input_term").val();
                 var vcolor = "#" + parent.find(".color").val();
                 var venabled = 'no';
-                if ($(this).attr('checked') == 'checked')
+                if ($(this).prop('checked'))
                     venabled = 'yes';
                 handleEvent('POST', [vterm, vcolor, venabled]);
             });
@@ -231,7 +238,7 @@ function createTableRow(row, buttonType, before) {
                 var vterm = $(this).val().trim();
                 var vcolor = "#" + parent.find(".color").val();
                 var venabled = 'no';
-                if (parent.find(".checkpox_enabled").attr('checked') == 'checked')
+                if (parent.find(".checkpox_enabled").prop('checked'))
                     venabled = 'yes';
                     
                 if (vterm.length == 0) {
@@ -256,7 +263,7 @@ function createTableRow(row, buttonType, before) {
                 var vterm = parent.find(".input_term").val();
                 var vcolor = "#" + $(this).val();
                 var venabled = 'no';
-                if (parent.find(".checkpox_enabled").attr('checked') == 'checked')
+                if (parent.find(".checkpox_enabled").prop('checked'))
                     venabled = 'yes';
 
                 // library ensures us the color is always valid

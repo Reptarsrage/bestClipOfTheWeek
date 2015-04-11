@@ -1,69 +1,27 @@
-﻿const GOOD = 0;
+﻿/*
+ * Justin Robb
+ * 4/10/15
+ * Best Clip of the Week Application
+ * Index (home) page
+ */
+
+
+// Constants
+const GOOD = 0;
 const BAD = 1;
 const OKAY = 2
 const TIMER_DELAY = 2500;
 const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
 const BAR_CHART_MAX_RATIO = 0.5;
 const PLAYLIST_TITLE = "World's Best Clip of the Week"
+const USER_NAME = "Admin";
 
-const TERMS = Array('Alpha'
-	, 'Bravo'
-	, 'Charlie'
-	, 'Delta'
-	, 'Echo'
-	, 'Foxtrot'
-	, 'Golf'
-	, 'Hotel'
-	, 'India'
-	, 'Juliet'
-	, 'Kilo'
-	, 'Lima'
-	, 'Mike'
-	, 'November'
-	, 'Oscar'
-	, 'Papa'
-	, 'Quebec'
-	, 'Romeo'
-	, 'Sierra'
-	, 'Tango'
-	, 'Uniform'
-	, 'Victor'
-	, 'Whiskey'
-	, 'X-ray'
-	, 'Yankee'
-	, 'Zulu');
-
-
-const COLORS = Array('#ff0000'
-	, '#ff8000'
-	, '#fff700'
-	, '#d0ff00'
-	, '#00ff6e'
-	, '#00fff2'
-	, '#009dff'
-	, '#0040ff'
-	, '#8400ff'
-	, '#d400ff'
-	, '#ff00ee'
-	, '#ff005d'
-	, '#9e2b55'
-	, '#9e2b87'
-	, '#872b9e'
-	, '#3a2b9e'
-	, '#2b709e'
-	, '#2b9e94'
-	, '#2b9e4d'
-	, '#689e2b'
-	, '#a9ab4b'
-	, '#bf8e11'
-	, '#bf5a11'
-	, '#bf1d11'
-	, '#c78783'
-	, '#737373');
-
+// Variables
+var ConfiguredTermArray;
+var ConfiguredColorArray;
 var startTime, endTime;
 var loaded = false;
-var colorArray, termStats;
+var termStats;
 var data = null;
 var commentHTML = $("<div></div>");
 var overallCount = 0;
@@ -73,6 +31,59 @@ var gapiPieChart, gapiBarChart;
 var maxValue = 500;
 var fetchID = 0;
 var voters = new Array();
+
+$(document).ready(function () {
+    // executes when HTML-Document is loaded and DOM is ready
+    $("#fetch").click(fetchResults);
+    loadTermsAndColors(USER_NAME);
+    
+});
+function loadTermsAndColors(user) {
+    // get terms and colors
+    $.ajax({
+        url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
+        type: "GET",
+        data: {
+            username: user
+        },
+        success: function (resp) {
+            if (resp.hasOwnProperty("status")) {
+                // error?
+                console.log(reason);
+                showErrors();
+                displayMessage("Unable to load terms for user "+user+".", BAD);
+            } else {
+                ConfiguredColorArray = new Array();
+                ConfiguredTermArray = new Array();
+                var rows = resp.split("<br/>");
+                for (i = 0; i < rows.length; i++) {
+                    cols = rows[i].split(" ");
+                    if (cols[0].trim() == '')
+                        continue;
+
+                    // color
+                    ConfiguredColorArray.push(cols[1]);
+                    $("<style>")
+                        .prop("type", "text/css")
+                        .html("\
+                        ." + cols[0] + " {\
+                            font-weight: bold; \
+                            color: " + cols[1] + ";\
+                        }")
+                        .appendTo("head");
+
+                    // term
+                    ConfiguredTermArray.push(cols[0]);
+                }
+            }
+        },
+        error: function (reason) {
+            console.log(reason);
+            showErrors();
+            displayMessage("Unable to load terms for user " + user + ".", BAD);
+        },
+    });
+}
 
 displayMessage("Authorizing...", OKAY);
 
@@ -261,7 +272,7 @@ function toggleComments(cb, manual) {
         toggleVoters($("#checkbox_voters"), false);
     }
 
-    if (cb.attr('checked') == 'checked') {
+    if (cb.prop('checked')) {
         $("#comments").append(commentHTML);
         $("#comments").show();
     } else {
@@ -277,7 +288,7 @@ function toggleVoters(cb, manual) {
         toggleComments($("#checkbox_comments"), false);
     }
 
-    if (cb.attr('checked') == 'checked') {
+    if (cb.prop('checked')) {
         $("#voters").show();
     } else {
         $("#voters").hide();
@@ -339,7 +350,7 @@ function fetchResults() {
 
     //reset
     loaded = false;
-    colorArray, termStats = null;
+    termStats = null;
     commentHTML = $("<div></div>");
     overallCount = 0;
     lastCount = 0;
@@ -352,6 +363,13 @@ function fetchResults() {
     toggleComments($("#checkbox_comments"), false);
 
     // Start
+    if (!ConfiguredColorArray || !ConfiguredTermArray) {
+        showErrors();
+        displayMessage("Unable to load terms for user " + user + ".", BAD);
+        return false;
+    }
+
+
     fetchID++;
     startTime = new Date().getTime();
 
@@ -614,33 +632,20 @@ function parseComment(comment, currFetchID, author) {
         return;
 
     if (!loaded) {
-        colorArray = Array(TERMS.length);
-        termStats = Array(TERMS.length);
+        termStats = Array(ConfiguredTermArray.length);
 
         data.addColumn('string', 'Video');
         data.addColumn('number', 'Votes');
 
         // Add rows
-        data.addRows(TERMS.length);
-        for (i = 0; i < TERMS.length; i++) {
+        data.addRows(ConfiguredTermArray.length);
+        for (i = 0; i < ConfiguredTermArray.length; i++) {
             // terms
             termStats[i] = 0
 
-
             // data
-            data.setCell(i, 0, TERMS[i]);
+            data.setCell(i, 0, ConfiguredTermArray[i]);
             data.setCell(i, 1, null);
-
-            // color
-            colorArray[i] = getRandomColor();
-            $("<style>")
-                .prop("type", "text/css")
-                .html("\
-                ."+ TERMS[i] + " {\
-                    font-weight: bold; \
-                    color: " + colorArray[i] + ";\
-                }")
-                .appendTo("head");
         }
         loaded = true;
     }
@@ -651,19 +656,19 @@ function parseComment(comment, currFetchID, author) {
 
     comment = comment.toLowerCase();
 
-    for (i = 0; i < TERMS.length; i++) {
-        if ((index = comment.indexOf(TERMS[i].toLowerCase())) > -1) {
+    for (i = 0; i < ConfiguredTermArray.length; i++) {
+        if ((index = comment.indexOf(ConfiguredTermArray[i].toLowerCase())) > -1) {
             data.setCell(i, 1, data.getValue(i, 1) + 1);
             termStats[i]++;
 
             s = res.substring(0, index);
-            t = res.substring(index, index + TERMS[i].length);
-            v = res.substring(index + TERMS[i].length, res.length + 1);
+            t = res.substring(index, index + ConfiguredTermArray[i].length);
+            v = res.substring(index + ConfiguredTermArray[i].length, res.length + 1);
 
-            res = s + "<span class='" + TERMS[i] + " highlight'>" + t + "</span>" + v;    
+            res = s + "<span class='" + ConfiguredTermArray[i] + " highlight'>" + t + "</span>" + v;    
             comment = res.toLowerCase();
-            $("#termResults_list ." + TERMS[i]).remove();
-            $("#termResults_list").append("<li class='" + TERMS[i] + "'>" + TERMS[i] + ": " + data.getValue(i, 1) + "</li>");
+            $("#termResults_list ." + ConfiguredTermArray[i]).remove();
+            $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + data.getValue(i, 1) + "</li>");
             $("#termSpace > .error").hide();
             $("#chartSection").show();
             $("#termResults").show();
@@ -695,9 +700,9 @@ function parseComment(comment, currFetchID, author) {
 
     //// add the rest
     $("#termResults_list").append("<li class='remove' style='color: gray'>&nbsp</li>");
-    for (i = 0; i < TERMS.length; i++) {
+    for (i = 0; i < ConfiguredTermArray.length; i++) {
         if (termStats[i] == 0) {
-            $("#termResults_list").append("<li class='remove' style='color: gray'>" + TERMS[i] + ": 0</li>");
+            $("#termResults_list").append("<li class='remove' style='color: gray'>" + ConfiguredTermArray[i] + ": 0</li>");
         }
     }
 
@@ -756,7 +761,7 @@ function getRandomColor() {
 function loadChart() {
     // get only non zero vals
     var nonNullData = new google.visualization.DataTable();
-    var pieColors = Array(TERMS.length);
+    var pieColors = Array(ConfiguredTermArray.length);
 
     nonNullData.addColumn('string', 'Video');
     nonNullData.addColumn('number', 'Votes');
@@ -769,8 +774,8 @@ function loadChart() {
             nonNullData.addRows(1);
             nonNullData.setCell(x, 0, data.getValue(i, 0));
             nonNullData.setCell(x, 1, data.getValue(i, 1));
-            nonNullData.setCell(x, 2, 'color: ' + colorArray[i]);
-            pieColors[x] = colorArray[i];
+            nonNullData.setCell(x, 2, 'color: ' + ConfiguredColorArray[i]);
+            pieColors[x] = ConfiguredColorArray[i];
             x++;
         }
     }
