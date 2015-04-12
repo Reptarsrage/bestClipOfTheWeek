@@ -27,15 +27,99 @@ var commentHTML = $("<div></div>");
 var overallCount = 0;
 var lastCount = 0;
 var timerCount = 0;
-var gapiPieChart, gapiBarChart;
+var gapiPieChart, gapiBarChart, gapiColumnChart;
+var gapiPieChart_options, gapiBarChart_options, gapiColumnChart_options;
+var gapiPieChart_data, gapiPieChart_data, gapiPieChart_data;
 var maxValue = 500;
 var fetchID = 0;
 var voters = new Array();
+var videoHistoryStats;
+
+window.addEventListener('resize', function (event) {
+    // resizing, so redraw charts
+    if (gapiPieChart)
+        gapiPieChart.draw(gapiPieChart_data, gapiPieChart_options);
+
+    if (gapiBarChart)
+        gapiBarChart.draw(gapiBarChart_data, gapiBarChart_options);
+
+    if (gapiColumnChart)
+        gapiColumnChart.draw(gapiColumnChart_data, gapiColumnChart_options);
+});
+
+window.onerror = function (msg, url, line, col, error) {
+    // Note that col & error are new to the HTML 5 spec and may not be 
+    // supported in every browser.  It worked for me in Chrome.
+    var extra = !col ? '' : '\ncolumn: ' + col;
+    extra += !error ? '' : '\nerror: ' + error;
+
+    // You can view the information in an alert to see things working like this:
+    console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
+    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+
+    // TODO: Report this error via ajax so you can keep track
+    //       of what pages have JS issues
+
+    var suppressErrorAlert = true;
+    // If you return true, then error alerts (like in older versions of 
+    // Internet Explorer) will be suppressed.
+    return suppressErrorAlert;
+};
 
 $(document).ready(function () {
     // executes when HTML-Document is loaded and DOM is ready
     $("#fetch").click(fetchResults);
     loadTermsAndColors(USER_NAME);
+    $("#collapse").click(function () {
+        if ($(this).hasClass("expanded")) {
+            $("#userSpace").slideUp("slow", function () {
+                $("#userSpace").fadeOut(500);
+                $("#collapse").removeClass("expanded");
+                $("#collapse").addClass("collapsed");
+            });
+        } else {
+            $("#userSpace").slideDown("slow", function () {
+                $("#userSpace").fadeIn(500);
+                $("#userSpace .loading").fadeOut(500);
+                $("#collapse").removeClass("collapsed");
+                $("#collapse").addClass("expanded");
+            });
+        }
+    });
+
+
+    // clean up
+    $("#termResults_list").children().filter(":not(.loading)").remove();
+    $("input[type='checkbox']").prop('disabled', false);
+    $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
+    $("#comments").children().filter(":not(.error)").remove();
+    $("#h2_comments").html('0');
+    $("#voters").children().filter(":not(.error)").remove();
+
+    // start off hiding errors, will be shown as they crop up
+    $(".error").fadeOut(500);
+    $(".loading").fadeIn(500);
+    
+    // hide all sections (will show one at a time as it completes
+    $("#commentSpace").fadeOut(500);
+    $("#termSpace").fadeOut(500);
+    $("#results").fadeOut(500);
+    $("#chartSection").fadeOut(500);
+    $("#termResults").fadeOut(500);
+
+    //reset
+    loaded = false;
+    termStats = null;
+    commentHTML = $("<div></div>");
+    overallCount = 0;
+    lastCount = 0;
+    timerCount = 0;
+    gapiPieChart, gapiBarChart, gapiColumnChart = null;
+    maxValue = 500;
+    data = new google.visualization.DataTable();
+    voters = new Array();
+    toggleVoters($("#checkbox_voters"), false);
+    toggleComments($("#checkbox_comments"), false);
     
 });
 function loadTermsAndColors(user) {
@@ -49,8 +133,9 @@ function loadTermsAndColors(user) {
         success: function (resp) {
             if (resp.hasOwnProperty("status")) {
                 // error?
-                console.log(reason);
-                showErrors();
+                console.log("Error: " + resp.status);
+                $("#list_starting_terms .loading").fadeOut(500);
+                $("#list_starting_terms .error").fadeIn(500);
                 displayMessage("Unable to load terms for user "+user+".", BAD);
             } else {
                 ConfiguredColorArray = new Array();
@@ -62,6 +147,8 @@ function loadTermsAndColors(user) {
                         continue;
 
                     // color
+                    if (cols[1].indexOf('#') < 0)
+                        cols[1] = '#' + cols[1];
                     ConfiguredColorArray.push(cols[1]);
                     $("<style>")
                         .prop("type", "text/css")
@@ -74,12 +161,15 @@ function loadTermsAndColors(user) {
 
                     // term
                     ConfiguredTermArray.push(cols[0]);
+                    $("#list_starting_terms .loading").fadeOut(500);
+                    $("#list_starting_terms").append($("<li class=" + cols[0] + ">" + cols[0] + "</li>"));
                 }
             }
         },
         error: function (reason) {
-            console.log(reason);
-            showErrors();
+            console.log("Error: " + reason);
+            $("#list_starting_terms .loading").fadeOut(500);
+            $("#list_starting_terms .error").fadeIn(500);
             displayMessage("Unable to load terms for user " + user + ".", BAD);
         },
     });
@@ -90,6 +180,8 @@ displayMessage("Authorizing...", OKAY);
 google.load("visualization", "1", {
     packages: ["corechart", 'table']
 });
+
+google.load("visualization", "1.1", {packages:["bar"]});
 
 google.setOnLoadCallback(function () {
     displayMessage("Authorize - Success", GOOD);
@@ -147,6 +239,7 @@ function requestVideoPlaylist(channelID, pageToken) {
                 var title = item.snippet.title;
                 var id = item.id;
                 if (title == PLAYLIST_TITLE) {
+                    videoHistoryStats = new Array();
                     requestVideosInPlaylist(id);
                     return;
                 }
@@ -174,8 +267,12 @@ function requestVideosInPlaylist(playlistId, pageToken) {
     }
     var request = gapi.client.youtube.playlistItems.list(requestOptions);
     request.execute(function (response) {
-        // Only show pagination buttons if there is a pagination token for the
-        // next or previous page of results.
+        if (response.hasOwnProperty("code") && response.code != 200) {
+            $("#select_bestOfTheWeek .loading").fadeOut(500);
+            $("#select_bestOfTheWeek .error").fadeIn(500);
+            return;
+        }
+
         nextPageToken = response.result.nextPageToken;
 
         var playlistItems = response.result.items;
@@ -188,20 +285,32 @@ function requestVideosInPlaylist(playlistId, pageToken) {
                 id = item.snippet.resourceId.videoId;
 
                 if (title.length > 80) {
-                    title = title.substring(0, 87) + "...";
+                    title = title.substring(0, 77) + "...";
                 }
 
 
                 content = $("<li class='option' onclick='addUrlToInput(\"https://www.youtube.com/watch?v=" + id + "\", this)' title='" + item.snippet.title + "'></li>");
                 content.append($("<img class='option_thumb' src='" + url + "' alt='" + pos + "' \>"));
                 content.append($("<h3 class='option_title' >" + title + "<br><p class='option_date'>Date added: " + date.toLocaleDateString() + "</p></h3>"));
-
+                $("#select_bestOfTheWeek .loading").fadeOut(500);
                 $("#select_bestOfTheWeek").append(content);
+    
+                // add to stored list for column chart usage
+                if (!addVideoStatsToArray(item.snippet.resourceId.videoId, item.snippet.title, item.snippet.title.substring(0, 20) + "...", date)) {
+                    $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
+                    $("#select_bestOfTheWeek .loading").fadeOut(500);
+                    $("#select_bestOfTheWeek .error").fadeIn(500);
+                    return;
+                }
             });
         }
 
         if (nextPageToken)
             requestVideosInPlaylist(playlistId, nextPageToken);
+    }, function (reason) {
+        $("#select_bestOfTheWeek .loading").fadeOut(500);
+        $("#select_bestOfTheWeek .error").fadeIn(500);
+        return;
     });
 }
 
@@ -219,29 +328,37 @@ function addUrlToInput(url, elt) {
 }
 
 
-function drawChart(chartType, containerID, dataTablo, options) {
+function drawChart(chartType, containerID, dataTable, options) {
     var containerDiv = document.getElementById(containerID);
     var chart = false;
     if (chartType.toUpperCase() == 'BARCHART') {
         if (!gapiBarChart)
             gapiBarChart = new google.visualization.BarChart(containerDiv)
+
         chart = gapiBarChart;
+        gapiBarChart_options = options;
+        gapiBarChart_data = dataTable;
     } else if (chartType.toUpperCase() == 'COLUMNCHART') {
-        chart = new google.visualization.ColumnChart(containerDiv);
-        columnChart = chart;
+        if (!gapiColumnChart)
+            gapiColumnChart = new google.charts.Bar(containerDiv);
+
+        chart = gapiColumnChart
+        gapiColumnChart_options = options;
+        gapiColumnChart_data = dataTable;
     } else if (chartType.toUpperCase() == 'PIECHART') {
         if (!gapiPieChart)
             gapiPieChart = new google.visualization.PieChart(containerDiv)
+
         chart = gapiPieChart;
-    } else if (chartType.toUpperCase() == 'TABLECHART') {
-        chart = new google.visualization.Table(containerDiv);
-        tableChart = chart;
-    }
+        gapiPieChart_options = options;
+        gapiPieChart_data = dataTable;
+    } 
 
     if (chart == false) {
         return false;
     }
-    chart.draw(dataTablo, options);
+    $("#" + containerID + " .loading").fadeOut(500);
+    chart.draw(dataTable, options);
 }
 
 function chartTimeUpdate(currFetchID) {
@@ -249,17 +366,17 @@ function chartTimeUpdate(currFetchID) {
         overallCount = 0;
         lastCount = 0;
         timerCount = 0;
-        console.log("TIMEOUT!");
+        //console.log("TIMEOUT!");
         return;
     } else if (lastCount == overallCount) {
         timerCount++;
-        console.log("tick");
+        //console.log("tick");
         setTimeout(chartTimeUpdate, TIMER_DELAY, currFetchID);
         return;
     } else {
         lastCount = overallCount;
         timerCount = 0;
-        console.log("UPDATE!");
+        //console.log("UPDATE!");
         loadChart();
         setTimeout(chartTimeUpdate, TIMER_DELAY, currFetchID);
     }
@@ -274,9 +391,16 @@ function toggleComments(cb, manual) {
 
     if (cb.prop('checked')) {
         $("#comments").append(commentHTML);
-        $("#comments").show();
+        $("#comments").fadeIn(500);
+        $(".commentBody").hover(function () {
+            // in
+            $(this).find("span.highlight").css("font-size", "24pt");
+        }, function () {
+            // out
+            $(this).find("span.highlight").css("font-size", "12pt");
+        });
     } else {
-        $("#comments").hide();
+        $("#comments").fadeOut(500);
         $("#comments").empty();
     }
 }
@@ -289,64 +413,54 @@ function toggleVoters(cb, manual) {
     }
 
     if (cb.prop('checked')) {
-        $("#voters").show();
+        $("#voters").fadeIn(500);
     } else {
-        $("#voters").hide();
+        $("#voters").fadeOut(500);
     }
 }
 
 // Helper method to display a message on the page.
 function displayMessage(message, good) {
-    $('#message').text(message).show();
+    $('#message').text(message);
 
-    if (good == GOOD)
+    if (good == GOOD) {
         $('#message').attr("class", "good");
-    else if (good == BAD)
+        $('#message').fadeOut(500);
+    } else if (good == BAD) {
         $('#message').attr("class", "bad");
-    else
+        $('#message').fadeIn(500);
+    } else {
         $('#message').attr("class", "okay");
+        $('#message').fadeIn(500);
+    }
 }
 
 // Helper method to hide a previously displayed message on the page.
 function hideMessage() {
-    $('#message').hide();
-}
-
-function showErrors() {
-    $("#chartSection").hide();
-    $("#termResults").hide();
-    $("#termSpace > .error").show();
-    $("#commentSpace > .error").show();
-    $("#stats > .error").show();
-
-   // $("#stats").append("<h3 class='error'>" + "Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)" + "</h3>");
-    //$("#termSpace").append("<h3 class='error'>" + "There are no results to display for your video." + "</h3>");
-    //$("#commentSpace").append("<h3 class='error'>" + "Unable to find comments for your video." + "</h3>");
-    $("#termSpace").removeClass("hidden");
-    $("#commentSpace").removeClass("hidden");
-    $("#results").removeClass("hidden");
-    $("input[type='checkbox']").prop('disabled', true);
-                
+    $('#message').fadeOut(500);
 }
 
 function fetchResults() {
     // clean up
+    $("#termResults_list").children().filter(":not(.loading)").remove();
     $("input[type='checkbox']").prop('disabled', false);
-    $("#commentSpace").addClass("hidden");
-    $("#termSpace").addClass("hidden");
-    $("#results").addClass("hidden");
-    //$(".error").remove();
-    $("#termResults_list").empty();
-    $("#stats").children().filter(":not(.error)").remove();
-    $("#voters .error").show();
-    $("#comments").empty();
-    $("#chartSection").show();
-    $("#termResults").show();
+    $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
+    $("#comments").children().filter(":not(.error)").remove();
     $("#h2_comments").html('0');
-    $("#chartSection").hide();
-    $("#termResults").hide();
-    $("#termSpace").removeClass("hidden");
     $("#voters").children().filter(":not(.error)").remove();
+
+    // start off hiding errors, will be shown as they crop up
+    $(".error").fadeOut(500);
+
+    // starting off showing all loading images, will hide as they load
+    $(".loading").fadeIn(500);
+    
+    // hide all sections (will show one at a time as it completes
+    $("#commentSpace").fadeOut(500);
+    $("#termSpace").fadeOut(500);
+    $("#results").fadeOut(500);
+    $("#chartSection").fadeOut(500);
+    $("#termResults").fadeOut(500);
 
     //reset
     loaded = false;
@@ -355,7 +469,7 @@ function fetchResults() {
     overallCount = 0;
     lastCount = 0;
     timerCount = 0;
-    gapiPieChart, gapiBarChart = null;
+    gapiPieChart, gapiBarChart, gapiColumnChart = null;
     maxValue = 500;
     data = new google.visualization.DataTable();
     voters = new Array();
@@ -363,22 +477,53 @@ function fetchResults() {
     toggleComments($("#checkbox_comments"), false);
 
     // Start
+    $("#collapse").click();
+
     if (!ConfiguredColorArray || !ConfiguredTermArray) {
-        showErrors();
-        displayMessage("Unable to load terms for user " + user + ".", BAD);
+        displayMessage("Unable to load terms for user " + USER_NAME + ".", BAD);
         return false;
     }
 
+    $("#results").slideDown("slow", function () {
+        // Animation complete.
+        $(this).fadeIn(500);
+    });
 
     fetchID++;
     startTime = new Date().getTime();
 
     displayMessage('Processing query...please wait', OKAY);
+    $("#results").fadeIn(500);
     var id = grabVideoId();
-    executeAsync(getVideoStats(id, fetchID));
+    executeAsync(function () { getVideoStats(id, fetchID) });
     chartTimeUpdate(fetchID);
 }
 
+function addVideoStatsToArray(id, title, shorthand, dateadded) {
+    if (id.trim() == '')
+        return false;
+
+    // See https://developers.google.com/youtube/v3/docs/videos/list
+    var request = gapi.client.youtube.videos.list({
+        part: 'statistics',
+        id: id
+    });
+    request.execute(function (response) {
+        if (response.pageInfo.totalResults > 0) {
+            // stats
+            viewCount = response.result.items[0].statistics.viewCount;
+            likeCount = response.result.items[0].statistics.likeCount;
+            commentCount = response.result.items[0].statistics.commentCount;
+            videoHistoryStats.push([title, viewCount, commentCount, likeCount, shorthand, dateadded]);
+            return true;
+        } else {
+            return false;
+        }
+    }, function(reason) {
+        return false;
+    });
+    return true;
+}
 
 function getVideoStats(id, currFetchID) {
     /*
@@ -404,9 +549,14 @@ function getVideoStats(id, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
+    $("#statsSpace").slideDown( "slow", function() {
+        // Animation complete.
+        $(this).fadeIn(500);
+    });
+
     if (!id) {
         // no results
-        showErrors();
+        $("#statsSpace .error").fadeIn(500);
         displayMessage("No results found for video with ID='" + id + "'.", OKAY);
         return;
     }
@@ -438,7 +588,7 @@ function getVideoStats(id, currFetchID) {
 
             // construct html
             maxValue = commentCount * BAR_CHART_MAX_RATIO;
-            var image = $("<img id='img_thumb' src='" + thumbUrl + "' alt='" + title + "' style='width:" + thumbW + "px;height:" + thumbH + "px'>");
+            var image = $("<img id='img_thumb' src='" + thumbUrl + "' alt='" + title + "'>");
 
             title = $("<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>");
             description = $("<h3 class='hidden'>" + description + "</h3>");
@@ -448,26 +598,99 @@ function getVideoStats(id, currFetchID) {
             dislikeCount = $("<p>Dislikes: " + dislikeCount + "</p>");
             favoriteCount = $("<p>Favorites: " + favoriteCount + "</p>");
             commentCount = $("<p>Comments: " + commentCount + "</p>");
-            var videoStats = $("<div id='div_video_stats' style='left:" + thumbW + "px'></div>");
+            var videoStats = $("<div id='div_video_stats'></div>");
             videoStats.append(viewCount).append(dislikeCount).append(favoriteCount).append(commentCount);
 
             // add to DOM
-            $("#stats > .error").hide();
-            $("#stats").append(title).append(description).append(image)
-            $("#stats").append(videoStats);
-            $("#results").removeClass("hidden");
-            executeAsync(loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20, currFetchID));
+            $("#stats > .error").fadeOut(500);
+            $("#stats_group").append(title).append(description).append(image)
+            $("#stats_group").append(videoStats);
+            $("#stats_group .loading").fadeOut(500);
+            executeAsync(function () { loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20, currFetchID) });
+
+            // draw column chart
+            var nonNullData = new google.visualization.DataTable();
+
+            nonNullData.addColumn('string', '');
+            nonNullData.addColumn('number', 'Views');
+            nonNullData.addColumn('number', 'Comments');
+            nonNullData.addColumn('number', 'Likes');
+
+            videoHistoryStats.sort(function (a, b) {
+                var date1 = new Date(a[5]);
+                var date2 = new Date(b[5]);
+                if (date1 > date2)
+                    return -1;
+                else if (date1 == date2)
+                    return 0;
+                else
+                    return 1;
+            });
 
 
+            for (pos = 0; pos < videoHistoryStats.length; pos++) {
+                if (videoHistoryStats[pos][0] == response.result.items[0].snippet.title)
+                    break;
+            }
+            high = Math.min(pos + 4, videoHistoryStats.length - 1);
+            low = Math.max(pos - 4, 0);
+
+            for (i = high; i >= low; i--) {
+                nonNullData.addRows([["BCotW #" + (videoHistoryStats.length - i)
+                                    , parseInt(videoHistoryStats[i][1])
+                                    , parseInt(videoHistoryStats[i][2])
+                                    , parseInt(videoHistoryStats[i][3])]]);
+            }
+
+            var options = {
+                backgroundColor: '#ECECEC',
+                fontName: 'Segoe UI',
+                animation: {
+                    startup: true,
+                    easing: 'out',
+                    duration: 'slow',
+                },
+                haxis: {
+                    slantedText: true,
+                }, 
+                chart: {
+                    title: 'Video Statistics',
+                    subtitle: 'With comparison to similar videos',
+                },
+                series: {
+                    0: {
+                        color: '#3D3D3D',
+                        axis: 'views'
+                    },
+                    1: {
+                        color: '#3078DB',
+                        axis: 'likes'
+                    },
+                    2: {
+                        color: '#CC4158',
+                        axis: 'likes'
+                    }
+                },
+                axes: {
+                    y: {
+                        views: { label: 'Views' }, // Left y-axis.
+                        likes: { side: 'right', label: 'Likes / Comments' }, // Right y-axis.
+                    },
+                },
+                legend: {
+                    position: 'none',
+                },
+            };
+            drawChart('columnchart', 'columnchart', nonNullData, google.charts.Bar.convertOptions(options));
 
         } else {
             // no results
-            showErrors();
+            $("#statsSpace .error").fadeIn(500);
             displayMessage("No results found for video with ID='" + id + "'.", OKAY);
         }
     }, function (reason) {
         displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
-        showErrors();
+        $("#statsSpace .error").fadeIn(500);
     });
 }
 
@@ -490,6 +713,11 @@ function loadComments(count, url, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
+    $("#commentSpace").slideDown("slow", function () {
+        // Animation complete.
+        $(this).fadeIn(500);
+    });
+
     $.ajax({
         url: url,
         dataType: "jsonp",
@@ -502,18 +730,20 @@ function loadComments(count, url, currFetchID) {
             console.log(errorThrown);
             console.log(jqXHR);
             displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
-            $("#commentSpace > .error").show();
+            $("#commentSpace > .error").fadeIn(500);
             $("input[type='checkbox']").prop('disabled', true);
         },
         success: function (data) {
             if (currFetchID != fetchID)
                 return;
 
+            if (!data.feed.hasOwnProperty("entry"))
+                return;
+  
             nextUrl = getNextPageUrl(data);
-            console.log(nextUrl);
+            //console.log(nextUrl);
             $.each(data.feed.entry, function (key, val) {
-                $("#commentSpace > .error").hide();
-                $("#commentSpace").removeClass("hidden");
+                $("#commentSpace > .error").fadeOut(500);
                 var comment = $("<li class='comment'></li>");
                 var body = $("<div class='commentBody'></div>");
 
@@ -554,8 +784,16 @@ function loadComments(count, url, currFetchID) {
                 }
 
                 body.append(author).append(content).append(userData);
+                body.hover(function () {
+                    // in
+                    $(this).find("span.highlight").css("font-size", "24pt");
+                }, function () {
+                    // out
+                    $(this).find("span.highlight").css("font-size", "12pt");
+                });
+
                 comment.append(body);
-                $("#comments .error").remove();
+                $("#comments > .error").fadeOut(500);
                 commentHTML.append(comment);
                 $("#h2_comments").html(count);
                 count++;
@@ -563,7 +801,7 @@ function loadComments(count, url, currFetchID) {
             });
 
             if (nextUrl != "")// && count < 100)
-                executeAsync(loadComments(count, nextUrl, currFetchID));
+                executeAsync(function () { loadComments(count, nextUrl, currFetchID) });
             else {
                 displayMessage('Completed query.', GOOD);
                 endTime = new Date().getTime();
@@ -613,16 +851,29 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
 
 
                 body.append(author).append(content).append(userdata);
+                body.hover(function () {
+                    // in
+                    $(this).find("span.highlight").css("font-size", "24pt");
+                }, function () {
+                    // out
+                    $(this).find("span.highlight").css("font-size", "12pt");
+                });
+
                 comment.append(body);
                 commentParent.append(comment);
                 count++;
             });
 
             if (typeof page !== 'undefined' && page != pageToken)
-                executeAsync(appendComments(commentParent, id, count, page, currFetchID));
+                executeAsync(function () { appendComments(commentParent, id, count, page, currFetchID) });
+        } else {
+            var comment = $("<li class='error comment'>Error loading replies.</li>");
+            commentParent.append(comment);
+            displayMessage('Issue retrieving replies.', BAD);
         }
     }, function (reason) {
-        commentParent.append('<li>Error loading reply: ' + reason.result.error.message + '</li>');
+        var comment = $("<li class='error comment'>Error loading replies: " + reason.result.error.message + "</li>");
+        commentParent.append(comment);
         displayMessage('Issue retrieving replies.', BAD);
     });
 }
@@ -630,6 +881,11 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
 function parseComment(comment, currFetchID, author) {
     if (currFetchID != fetchID)
         return;
+    
+    $("#termSpace").slideDown("slow", function () {
+        // Animation complete.
+        $(this).fadeIn(500);
+    });
 
     if (!loaded) {
         termStats = Array(ConfiguredTermArray.length);
@@ -668,15 +924,16 @@ function parseComment(comment, currFetchID, author) {
             res = s + "<span class='" + ConfiguredTermArray[i] + " highlight'>" + t + "</span>" + v;    
             comment = res.toLowerCase();
             $("#termResults_list ." + ConfiguredTermArray[i]).remove();
+            $("#termResults_list .loading").fadeOut(500);
             $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + data.getValue(i, 1) + "</li>");
-            $("#termSpace > .error").hide();
-            $("#chartSection").show();
-            $("#termResults").show();
+            $("#termSpace > .error").fadeOut(500);
+            $("#chartSection").fadeIn(500);
+            $("#termResults").fadeIn(500);
 
 
             if (voters.indexOf(author) < 0) {
                 voters.push(author);
-                $("#voters .error").hide();
+                $("#voters .error").fadeOut(500);
                 addToSortedList("voters", author);
             }
         }
@@ -685,7 +942,7 @@ function parseComment(comment, currFetchID, author) {
     $("#termResults .remove").remove();
     // sort
     var mylist = $('#termResults_list');
-    var listitems = mylist.children('li').get();
+    var listitems = mylist.children('li').filter(":not(.loading, .error)").get();
     var numberPattern = /\d+/g;
     listitems.sort(function (a, b) {
         anum = parseInt($(a).text().match(numberPattern)[0]);
@@ -706,7 +963,6 @@ function parseComment(comment, currFetchID, author) {
         }
     }
 
-    $("#termSpace").removeClass("hidden");
     overallCount++;
     return res;
 }
@@ -780,14 +1036,21 @@ function loadChart() {
         }
     }
 
-    console.log("chart update");
+    //console.log("chart update");
 
     // PIE
 
     var options = {
-        title: 'Vote results',
         colors: pieColors,
-        fontName: 'Segoe UI'
+        fontName: 'Segoe UI',
+        theme: 'maximized',
+        backgroundColor: '#ECECEC',
+        pieSliceText: 'label',
+        pieSliceTextStyle: {
+            color: 'black',
+            fontName: 'Segoe UI',
+            fontSize: '24pt',
+        },
     };
 
 
@@ -795,13 +1058,19 @@ function loadChart() {
 
     // BAR
     var options = {
-        title: 'Vote results',
+        theme: 'maximized',
+        chartArea: {
+            backgroundColor: '#ECECEC',
+        },
         hAxis: {
             title: 'Votes',
             minValue: 0,
-            maxValue: maxValue
+            //maxValue: maxValue,
         },
-        vAxis: { title: 'Video' },
+        vAxis: {
+            title: 'Video',
+            position: 'in',
+        },
         animation: {
             duration: TIMER_DELAY,
             easing: 'out'
@@ -810,6 +1079,14 @@ function loadChart() {
         legend: {
             position: 'none',
         },
+        annotations: {
+            highContrast: false,
+            textStyle: {
+                color: 'black',
+                fontName: 'Segoe UI',
+                fontSize: '24pt',
+            }
+        }
     };
 
     drawChart('barchart', 'barchart', nonNullData, options);

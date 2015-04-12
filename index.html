@@ -6,6 +6,9 @@
     <meta charset='utf-8'>
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv='cache-control' content='no-cache'>
+    <meta http-equiv='expires' content='0'>
+    <meta http-equiv='pragma' content='no-cache'>
 
     <link rel="stylesheet" href="/common/common.css">
     <link type="text/css" rel="stylesheet" href="index.css">
@@ -29,37 +32,82 @@
     </div>
 
     <div id="body">
-        <h1 id="message" class="section"></h1>
+        <h1 id="message" class="section" hidden="hidden"></h1>
         <div id="userSpace" class="section">
-            <h2>Fetch: </h2>
+            <h2>Choose a video: </h2>
             <input id="input_video" type="text" placeholder="Enter a YouTube video Url" />
             <button id="fetch">Fetch Results</button>
-            <h3 id="h3_recommended">Recommended: </h3>
-            <ol id="select_bestOfTheWeek"></ol>
+            <div id="recommended">
+                <h3 id="h3_recommended">Recommended: </h3>
+                <ol id="select_bestOfTheWeek">
+                    <li class="loading">
+                        <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                    </li>
+                    <li class='error'>Error retrieving recommended videos.</li>
+                </ol>
+            </div>
+            <div id="startingterms">
+                <h3 id="h3_starting_terms">Terms: </h3>
+                <ul id="list_starting_terms">
+                    <li class="loading">
+                        <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                    </li>
+                    <li class='error'>Error retrieving terms.</li>
+                </ul>
+            </div>
         </div>
-        <div id="results" class="hidden section">
-            <hr>
+        <div id="collapse" class="expanded">
+            <img src="/common/images/arrow.png" />
+        </div>
+
+        <div id="results" class="section" hidden="hidden">
+
             <div id="statsSpace" class="section">
+                <hr />
                 <h2>Showing stats for:</h2>
                 <div id="stats">
                     <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
+                    <div id="stats_group">
+                        <div class="loading">
+                            <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                        </div>
+                    </div>
+                    <div id="columnchart">
+                        <div class="loading">
+                            <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                        </div>
+                    </div>
                 </div>
             </div>
-            <hr>
-            <div id="termSpace" class="hidden section">
+
+            <div id="termSpace" class="section">
+                <hr />
                 <h2>Results:</h2>
                 <h3 class='error'>There are no results to display for your video.</h3>
                 <div id="chartSection">
-                    <div id="piechart"></div>
-                    <div id="barchart"></div>
+                    <div id="piechart">
+                        <div class="loading">
+                            <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                        </div>
+                    </div>
+                    <div id="barchart">
+                        <div class="loading">
+                            <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                        </div>
+                    </div>
                 </div>
                 <div id="termResults">
                     <h3>Terms:</h3>
-                    <ul id="termResults_list"></ul>
+                    <ul id="termResults_list">
+                        <li class="loading">
+                            <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                        </li>
+                    </ul>
                 </div>
             </div>
-            <hr>
-            <div id="commentSpace" class="hidden section">
+
+            <div id="commentSpace" class="section">
+                <hr />
                 <h2>Comments (<span id="h2_comments">0</span>):</h2>
                 <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
                 <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
@@ -76,11 +124,13 @@
 
     <!--DUPLICATED ACCROSS PAGES-->
     <div id="footer">
-        <div id="foot_content">
-            <span id="foot_credits">Website made by: <b id="foot_myname">Justin Robb</b></span><br />
-            <span id="foot_contact_info"><a href="mailto:justinprobb@gmail.com">Contact me</a></span><br />
-            <span id="foot_linked_in"><a href="https://www.linkedin.com/in/jurobb">Linkedin</a></span>
-            <span id="foot_giy_hub"><a href="https://github.com/Reptarsrage">Github</a></span>
+        <div id="footer_overlay">
+            <div id="foot_content">
+                <span id="foot_credits">Website made by: <b id="foot_myname">Justin Robb</b></span><br />
+                <span id="foot_contact_info"><a href="mailto:justinprobb@gmail.com">Contact me</a></span><br />
+                <span id="foot_linked_in"><a href="https://www.linkedin.com/in/jurobb">Linkedin</a></span>
+                <span id="foot_giy_hub"><a href="https://github.com/Reptarsrage">Github</a></span>
+            </div>
         </div>
     </div>
 </body>

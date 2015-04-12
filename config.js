@@ -5,12 +5,54 @@
  * Term configuration page
  */
 
+// Constants
+const GOOD = 0;
+const BAD = 1;
+const OKAY = 2
 const USER_NAME = "Admin";
 
+window.onerror = function (msg, url, line, col, error) {
+    // Note that col & error are new to the HTML 5 spec and may not be 
+    // supported in every browser.  It worked for me in Chrome.
+    var extra = !col ? '' : '\ncolumn: ' + col;
+    extra += !error ? '' : '\nerror: ' + error;
+
+    // You can view the information in an alert to see things working like this:
+    console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
+    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+
+    // TODO: Report this error via ajax so you can keep track
+    //       of what pages have JS issues
+
+    var suppressErrorAlert = true;
+    // If you return true, then error alerts (like in older versions of 
+    // Internet Explorer) will be suppressed.
+    return suppressErrorAlert;
+};
+
 $(document).ready(function () {
-    handleEvent('GET', null);
+    $("#table_config").fadeOut(500);
+    $("#table_config tbody").empty();
+    $(".loading").fadeIn(500);
+    executeAsync(function () { handleEvent('GET', null) });
 });
 
+
+// Helper method to display a message on the page.
+function displayMessage(message, good) {
+    $('#message').text(message);
+
+    if (good == GOOD) {
+        $('#message').attr("class", "good");
+        $('#message').fadeOut(500);
+    } else if (good == BAD) {
+        $('#message').attr("class", "bad");
+        $('#message').fadeIn(500);
+    } else {
+        $('#message').attr("class", "okay");
+        $('#message').fadeIn(500);
+    }
+}
 
 function handleEvent(method, options) {
     if (method == 'GET') {
@@ -34,8 +76,8 @@ function handleEvent(method, options) {
 }
 
 function getData(user) {
-    $("#response").html("Fetching data...");
-
+    // show loading
+    $(".loading").fadeIn(500);
 
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
@@ -52,8 +94,6 @@ function getData(user) {
 
 
 function postData(user, term, color, enabled) {
-    $("#response").html("Posting data...");
-
 
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
@@ -74,9 +114,6 @@ function postData(user, term, color, enabled) {
 
 
 function deleteData(user, term) {
-    $("#response").html("Deleting data...");
-
-
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "POST",
@@ -93,33 +130,30 @@ function deleteData(user, term) {
 }
 
 function showResultStatus(msg) {
-    if (!msg)
-        return false;
-
+    $(".loading").fadeOut(500);
+    if (!msg) {
+        displayMessage("No message to display", GOOD)
+    }
     // msg.status
     // msg.responseText
     // msg. statusText
-    $("#response").html("Result: ");
-    htm = $("<div></div>");
     if (msg.hasOwnProperty("status")) {
-        htm.append($("<h3>" + msg.status + " - " + msg.statusText + "</h3>"));
-        htm.append($("<p>" + msg.responseText + "</p>"));
+        if (msg.status != 200)
+            displayMessage("Error: " + msg.status + " - " + msg.statusText + ". " + msg.responseText, BAD);
+        else
+            displayMessage("Success: " + msg.status + " - " + msg.statusText + ". " + msg.responseText, GOOD);
     } else
-        htm.append($("<p>" + msg + "</p>"));
-    $("#response").append(htm);
+        displayMessage("Success", GOOD);
 }
 
 function displayData(msg) {
     if (!msg)
         return false;
 
-    $("#response").html("Success");
+    showResultStatus(msg);
+    $("#table_config").fadeIn(500);
 
-    htm = $("<div></div>");
-    if (msg.hasOwnProperty("status")) {
-        htm.append($("<h3>" + msg.status + " - " + msg.statusText + "</h3>"));
-        htm.append($("<p>" + msg.responseText + "</p>"));
-    } else {
+    if (!msg.hasOwnProperty("status")) {
         var rows = msg.split("<br/>");
         createTableRow("   ", 'add');
         for (i = 0; i < rows.length; i++) {
@@ -127,7 +161,6 @@ function displayData(msg) {
         }
         jscolor.init();
     }
-    $("#response").append(htm);
 }
 
 
@@ -231,8 +264,9 @@ function createTableRow(row, buttonType, before) {
         enabled = $("<td class='center'></td>").append(enabled);
 
         // term input
-        term = $("<input placeholder='Add a term' class='input_term' type='text'></input>");
+        term = $("<input placeholder='Add a term' class='input_term' type='text' maxlength='50'></input>");
         if (case_delete)
+            term.prop("disabled", "disabled");
             term.change(function () {
                 var parent = $(this).closest("tr");
                 var vterm = $(this).val().trim();
@@ -293,4 +327,8 @@ function getRandomColor() {
         color += letters[Math.floor(Math.random() * 16)];
     }
     return color;
+}
+
+function executeAsync(func) {
+    setTimeout(func, 0);
 }
