@@ -11,6 +11,10 @@ const BAD = 1;
 const OKAY = 2
 const USER_NAME = "Admin";
 
+// Variables
+var lastAdded = null;
+var lastRemoved = null;
+
 window.onerror = function (msg, url, line, col, error) {
     // Note that col & error are new to the HTML 5 spec and may not be 
     // supported in every browser.  It worked for me in Chrome.
@@ -51,6 +55,8 @@ function displayMessage(message, good) {
     } else if (good == BAD) {
         $('#message').attr("class", "bad");
         $('#message').fadeIn(500);
+        if (lastAdded) lastAdded.fadeOut(500, function () { $(this).remove(); });
+        if (lastRemoved) lastRemoved.find("td").fadeIn(500);
     } else {
         $('#message').attr("class", "okay");
         $('#message').fadeIn(500);
@@ -63,12 +69,16 @@ function handleEvent(method, options) {
     } 
 
     if (method == 'POST') {
+        lastAdded = null;
+        if (lastRemoved) lastRemoved.remove();
         if (options.length != 3)
             return false;
         return postData(USER_NAME, options[0], options[1], options[2]);
     }
 
     if (method == 'DELETE') {
+        lastAdded = null;
+        if (lastRemoved) lastRemoved.remove();
         if (options.length != 1)
             return false;
 
@@ -86,8 +96,10 @@ function getData(user) {
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "GET",
         timeout: 5000,
+        cache: false,
         data: {
-            username: user
+            username: user,
+            token: urlParams['token']
         },
         success: displayData,
         error: showResultStatus
@@ -105,10 +117,12 @@ function postData(user, term, color, enabled) {
         timeout: 5000,
         data: {
             method: 'POST',
+            cache: false,
             username: user,
             term: term,
             color: color,
-            enabled: enabled
+            enabled: enabled,
+            token: urlParams['token']
         },
         success: showResultStatus,
         error: showResultStatus
@@ -126,7 +140,9 @@ function deleteData(user, term) {
         data: {
             method: 'DELETE',
             username: user,
-            term: term
+            cache: false,
+            term: term,
+            token: urlParams['token']
         },
         success: showResultStatus,
         error: showResultStatus
@@ -185,16 +201,17 @@ function createTableRow(row, buttonType, before) {
         row_dom.addClass("tr_add");
     }
     if (cols.length == 3) {
-
+        cols[0] = cols[0].replace(/&nbsp;/g, ' ');
         if (case_delete) {
             // delete button (last column)
             var button = $("<button class='button_delete'>Delete</button>");
             button.click(function () {
                 $(this).prop('disabled', true);
                 var parent = $(this).closest("tr");
-                var vterm = parent.find(".input_term").val();
+                var vterm = parent.find(".input_term").val().replace(/\s/g, '&nbsp;');
                 handleEvent('DELETE', [vterm]);
-                $(this).closest('tr').find("td").fadeOut(1000, function () { $(this).parent().remove(); }); // There is a problem in jQuery when hiding trs. This is the current workaround
+                lastRemoved = $(this).closest('tr');
+                $(this).closest('tr').find("td").fadeOut(1000); // There is a problem in jQuery when hiding trs. This is the current workaround
             });
         } else {
             // add button (last column)
@@ -202,7 +219,7 @@ function createTableRow(row, buttonType, before) {
             button.click(function () {
                 $(this).prop('disabled', true);
                 var parent = $(this).closest("tr");
-                var vterm = parent.find(".input_term").val();
+                var vterm = parent.find(".input_term").val().replace(/\s/g, '&nbsp;');
                 var vcolor = parent.find(".color").val();
                 var venabled = 'no';
                 if (parent.find(".checkpox_enabled").prop('checked'))
@@ -235,15 +252,15 @@ function createTableRow(row, buttonType, before) {
                 var toinsert = true;
                 $("#table_config > tbody > tr").each(function () {
                     var item = $(this).find(".input_term").val();
-                    if (item && vterm.toUpperCase() < item.toUpperCase()) {
+                    if (item && vterm.toUpperCase() < item.replace(/\s/g, '&nbsp;').toUpperCase()) {
                         if (toinsert) {
-                            createTableRow(vterm + " " + vcolor + " " + venabled, 'delete', this);
+                            createTableRow(vterm.replace(/\s/g,'&nbsp;') + " " + vcolor + " " + venabled, 'delete', this);
                             toinsert = false;
                         }
                     }
                 });
                 if (toinsert) {
-                    createTableRow(vterm + " " + vcolor + " " + venabled, 'delete');
+                    createTableRow(vterm.replace(/\s/g, '&nbsp;') + " " + vcolor + " " + venabled, 'delete');
                 }
                 jscolor.init();
             });
@@ -260,7 +277,7 @@ function createTableRow(row, buttonType, before) {
         if (case_delete)
             enabled.click(function () {
                 var parent = $(this).closest("tr");
-                var vterm = parent.find(".input_term").val();
+                var vterm = parent.find(".input_term").val().replace(/\s/g, '&nbsp;');
                 var vcolor = "#" + parent.find(".color").val();
                 var venabled = 'no';
                 if ($(this).prop('checked'))
@@ -275,7 +292,7 @@ function createTableRow(row, buttonType, before) {
             term.prop("disabled", "disabled");
             term.change(function () {
                 var parent = $(this).closest("tr");
-                var vterm = $(this).val().trim();
+                var vterm = $(this).val().trim().replace(/\s/g, '&nbsp;');
                 var vcolor = "#" + parent.find(".color").val();
                 var venabled = 'no';
                 if (parent.find(".checkpox_enabled").prop('checked'))
@@ -300,7 +317,7 @@ function createTableRow(row, buttonType, before) {
         if (case_delete)
             color.change(function () {
                 var parent = $(this).closest("tr");
-                var vterm = parent.find(".input_term").val();
+                var vterm = parent.find(".input_term").val().replace(/\s/g, '&nbsp;');
                 var vcolor = "#" + $(this).val();
                 var venabled = 'no';
                 if (parent.find(".checkpox_enabled").prop('checked'))
@@ -324,6 +341,8 @@ function createTableRow(row, buttonType, before) {
     } else {
         $("#table_config tbody").append(row_dom);
     }
+
+    lastAdded = row_dom;
 }
 
 function getRandomColor() {

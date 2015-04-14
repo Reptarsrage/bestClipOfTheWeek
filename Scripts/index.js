@@ -55,7 +55,7 @@ window.onerror = function (msg, url, line, col, error) {
 
     // You can view the information in an alert to see things working like this:
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    displayMessage("An error occured on the page. Please try a hard refresh (CTRL + F5). If you experience any further issues you can <a href='mailto:justinprobb@gmail.com'>contact me</a> for support.", BAD);
+    displayMessage("An error occured on the page. Please try a hard refresh (CTRL + F5). If you experience any further issues please contact me for support (link in footer).", BAD);
     fetchID++; // stop all events
 
     // TODO: Report this error via ajax so you can keep track
@@ -158,8 +158,10 @@ function loadTermsAndColors(user) {
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "GET",
         timeout: 5000,
+        cache: false,
         data: {
-            username: user
+            username: user,
+            token: urlParams['token']
         },
         success: function (resp) {
             if (resp.hasOwnProperty("status")) {
@@ -184,16 +186,18 @@ function loadTermsAndColors(user) {
                     $("<style>")
                         .prop("type", "text/css")
                         .html("\
-                        ." + cols[0] + " {\
+                        ." + cols[0].replace(/[^\w]/gi, '') + " {\
                             font-weight: bold; \
                             color: " + cols[1] + ";\
                         }")
                         .appendTo("head");
 
                     // term
-                    ConfiguredTermArray.push(cols[0]);
+                    ConfiguredTermArray.push(cols[0].replace(/&nbsp;/g, ' '));
                     $("#list_starting_terms .loading").fadeOut(500);
-                    $("#list_starting_terms").append($("<li class=" + cols[0] + ">" + cols[0] + "</li>"));
+                    var list = $("<li class=" + cols[0].replace(/[^\w]/gi, '') + "></li>");
+                    list.text(cols[0].replace(/&nbsp;/g, ' '));
+                    $("#list_starting_terms").append(list);
                     $("#fetch").prop("disabled", false);
                     $("#fetch").prop("title", "");
                 }
@@ -741,6 +745,7 @@ function loadComments(count, url, currFetchID) {
         url: url,
         dataType: "jsonp",
         async: true,
+        cache: false,
         error: function(jqXHR, textStatus, errorThrown) {
             if (currFetchID != fetchID)
                 return;
@@ -978,7 +983,9 @@ function parseComment(comment, currFetchID, author) {
     $("#termResults_list").append("<li class='remove' style='color: gray'>&nbsp</li>");
     for (i = 0; i < ConfiguredTermArray.length; i++) {
         if (termStats[i] == 0) {
-            $("#termResults_list").append("<li class='remove' style='color: gray'>" + ConfiguredTermArray[i] + ": 0</li>");
+            var li = $("<li class='remove' style='color: gray'></li>");
+            li.text(ConfiguredTermArray[i] + ": 0");
+            $("#termResults_list").append(li);
         }
     }
 
