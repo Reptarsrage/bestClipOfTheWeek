@@ -15,6 +15,57 @@
 
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+
+    <!-- check login -->
+    <script>
+        var urlParams;
+        var match,
+        pl = /\+/g,  // Regex for replacing addition symbol with a space
+        search = /([^&=]+)=?([^&]*)/g,
+        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
+        query = window.location.search.substring(1);
+
+        urlParams = {};
+        while (match = search.exec(query))
+            urlParams[decode(match[1])] = decode(match[2]);
+
+        //check for token
+        if (!urlParams['token'] || !urlParams['username'])
+            window.location = "login.html";
+
+        // authorize
+        var username = urlParams['username'];
+        var token = urlParams['token'];
+
+        $.ajax({
+            url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
+            async: false,
+            type: "GET",
+            timeout: 5000,
+            data: {
+                username: username,
+                token: token,
+                authorize: 'authorize'
+            },
+            success: function (msg) {
+                if (!msg) {
+                    window.location = "login.html";
+                }
+                // msg.status
+                // msg.responseText
+                // msg. statusText
+                if (msg.hasOwnProperty("status")) {
+                    if (msg.status != 200)
+                        window.location = "login.html";
+                } 
+            },
+            error: function (reason) {
+                window.location = "login.html";
+            },
+        });
+    </script>
+
+
     <script type="text/javascript" src="/Scripts/header.js"></script>
     <script type="text/javascript" src="/Scripts/index.js"></script>
     <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=onJSClientLoad"></script>
@@ -24,9 +75,9 @@
     <div id="header">
         <div id='cssmenu'>
             <ul>
-                <li class='active'><a href="/index.html">Search Youtube</a></li>
-                <li><a href="/config.html">Configure search terms</a></li>
-                <li><a href="/about.html">About</a></li>
+                <li><a class='active' id="a_index">Search Youtube</a></li>
+                <li ><a id="a_config">Configure search terms</a></li>
+                <li><a id="a_about">About</a></li>
             </ul>
         </div>
     </div>

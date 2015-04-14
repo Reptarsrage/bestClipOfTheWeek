@@ -35,6 +35,9 @@ $(document).ready(function () {
     $("#table_config tbody").empty();
     $(".loading").fadeIn(500);
     executeAsync(function () { handleEvent('GET', null) });
+
+    $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
+    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
 });
 
 

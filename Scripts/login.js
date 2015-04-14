@@ -11,7 +11,6 @@ const ROW_COUNT = 10;
 const COL_COUNT = 10;
 
 // vars
-var securityToken;
 var backgroundImgArray;
 var stopTimer = false;
 var backgroundInit = false;
@@ -20,25 +19,53 @@ var backgroundImgQueue;
 
 $(document).ready(function () {
     $("#login").click(function () {
+        disable();
+        if ($("#result").text().trim() != "")
+            $("#result").fadeTo(50, 0);
         login();
     });
     $("#signup").click(function () {
+        disable();
+        if ($("#result").text().trim() != "")
+            $("#result").fadeTo(50, 0);
         signup();
     });
 
-    $("#authorize").click(function () {
-        authorize();
+    setTimeout(function () {
+        $("#userid").focus();
+    }, 0);
+
+    $(document).keypress(function (e) {
+        if (e.which == 13) {
+            login();
+        }
     });
 });
 
 
-function login(form) { /*function to check userid & password*/
+function disable() {
+    $("#userid").prop("disabled", true);
+    $("#pswrd").prop("disabled", true);
+    $("#login").prop("disabled", true);
+    //$("#signup").prop("disabled", true);
+}
+
+function enable() {
+    $("#userid").prop("disabled", false);
+    $("#pswrd").prop("disabled", false);
+    $("#login").prop("disabled", false);
+    //$("#signup").prop("disabled", false);
+}
+
+
+
+function login() { /*function to check userid & password*/
     /*the following code checkes whether the entered userid and password are matching*/
     var username = $("#userid").val().trim();
     var password = $("#pswrd").val().trim();
 
     if (username == "" || password == "") {
-        alert("Error Password or Username")/*displays error message*/
+        displayMessage("Please enter a valid username and password", BAD)/*displays error message*/
         return false;
     }
 
@@ -59,46 +86,25 @@ function login(form) { /*function to check userid & password*/
     
 }
 
-function authorize(form) { /*function to check userid & password*/
-    /*the following code checkes whether the entered userid and password are matching*/
-    var username = $("#userid").val().trim();
-    var password = $("#pswrd").val().trim();
-;
-    if (username == "" ) {
-        alert("Error Password or Username")/*displays error message*/
-        return false;
-    }
-
-    $.ajax({
-        url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
-        type: "GET",
-        timeout: 10000,
-        data: {
-            username: username,
-            token: securityToken,
-            authorize: 'authorize'
-        },
-        success: showResultStatus,
-        error: showResultStatus
-    });
-
-    return true;
-
-}
-
 // Helper method to display a message on the page.
 function displayMessage(message, good) {
     $('#result').text(message);
 
     if (good == GOOD) {
         $('#result').attr("class", "good");
-        $('#result').fadeIn(500);
+        $('#result').fadeTo(1000, 1);
+        var token = message;
+        var username = $("#userid").val().trim();
+        window.location = "index.html?username=" + username + "&token=" + token;
+
     } else if (good == BAD) {
         $('#result').attr("class", "bad");
-        $('#result').fadeIn(500);
+        $('#result').fadeTo(1000, 1);
+        enable();
     } else {
         $('#result').attr("class", "okay");
-        $('#result').fadeIn(500);
+        $('#result').fadeTo(1000, 1);
+        enable();
     }
 }
 
@@ -112,25 +118,21 @@ function showResultStatus(msg) {
     // msg. statusText
     if (msg.hasOwnProperty("status")) {
         if (msg.status != 200)
-            displayMessage("Error: " + msg.status + " - " + msg.statusText + ". " + msg.responseText, BAD);
+            displayMessage(msg.status + " - " + msg.statusText + ". " + msg.responseText, BAD);
         else
-            displayMessage("Success: " + msg.status + " - " + msg.statusText + ". " + msg.responseText, GOOD);
+            displayMessage(msg.responseText, GOOD);
     } else {
-        displayMessage("Success: " + msg, GOOD);
-        if (!securityToken)
-            securityToken = msg;
-
-        $("#authorize").fadeIn(1000);
+        displayMessage(msg, GOOD);
     }
 }
 
-function signup(form) { /*function to check userid & password*/
+function signup() { /*function to check userid & password*/
     /*the following code checkes whether the entered userid and password are matching*/
     var username = $("#userid").val().trim();
     var password = $("#pswrd").val().trim();
 
     if (username == "" || password == "") {
-        alert("Error Password or Username")/*displays error message*/
+        displayMessage("Please enter a valid username and password", BAD)/*displays error message*/
         return false;
     }
 
@@ -241,7 +243,7 @@ function requestVideosInPlaylist(playlistId, pageToken) {
                 }
                 if (url.length > 0) {
                     backgroundImgArray.push(url);
-                    displayBackgroundImage();
+                    //displayBackgroundImage();
                 }
             });
         }
