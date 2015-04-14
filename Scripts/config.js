@@ -9,7 +9,7 @@
 const GOOD = 0;
 const BAD = 1;
 const OKAY = 2
-const USER_NAME = "Admin";
+//const urlParams['username'] = "Admin";
 
 // Variables
 var lastAdded = null;
@@ -35,6 +35,36 @@ window.onerror = function (msg, url, line, col, error) {
 };
 
 $(document).ready(function () {
+    // tool-tips
+    $(document).on("click", ".tooltip", function () {
+        var name = $(this).attr("name");
+        $(this).tooltip(
+            {
+                items: ".tooltip",
+                content: function () {
+                    return TOOL_TIPS['config'][name];//$(this).data('description');
+                },
+                close: function (event, ui) {
+                    var me = this;
+                    ui.tooltip.hover(
+                        function () {
+                            $(this).stop(true).fadeTo(400, 1);
+                        },
+                        function () {
+                            $(this).fadeOut("400", function () {
+                                $(this).remove();
+                            });
+                        }
+                    );
+                    ui.tooltip.on("remove", function () {
+                        $(me).tooltip("destroy");
+                    });
+                },
+            }
+        );
+        $(this).tooltip("open");
+    });
+
     $("#table_config").fadeOut(500);
     $("#table_config tbody").empty();
     $(".loading").fadeIn(500);
@@ -65,7 +95,7 @@ function displayMessage(message, good) {
 
 function handleEvent(method, options) {
     if (method == 'GET') {
-        return getData(USER_NAME);
+        return getData(urlParams['username']);
     } 
 
     if (method == 'POST') {
@@ -73,7 +103,7 @@ function handleEvent(method, options) {
         if (lastRemoved) lastRemoved.remove();
         if (options.length != 3)
             return false;
-        return postData(USER_NAME, options[0], options[1], options[2]);
+        return postData(urlParams['username'], options[0], options[1], options[2]);
     }
 
     if (method == 'DELETE') {
@@ -82,7 +112,7 @@ function handleEvent(method, options) {
         if (options.length != 1)
             return false;
 
-        return deleteData(USER_NAME, options[0]);
+        return deleteData(urlParams['username'], options[0]);
     }
 
     return false;
@@ -205,6 +235,7 @@ function createTableRow(row, buttonType, before) {
         if (case_delete) {
             // delete button (last column)
             var button = $("<button class='button_delete'>Delete</button>");
+            var ico = $("<img name='delete' class='tooltip' src='/common/images/info.png' alt='?' />");
             button.click(function () {
                 $(this).prop('disabled', true);
                 var parent = $(this).closest("tr");
@@ -216,6 +247,7 @@ function createTableRow(row, buttonType, before) {
         } else {
             // add button (last column)
             var button = $("<button class='button_delete'>Add</button>");
+            var ico = $("<img name='add' class='tooltip' src='/common/images/info.png' alt='?' />");
             button.click(function () {
                 $(this).prop('disabled', true);
                 var parent = $(this).closest("tr");
@@ -265,7 +297,7 @@ function createTableRow(row, buttonType, before) {
                 jscolor.init();
             });
         }
-        button = $("<td class='center'></td>").append(button);
+        button = $("<td class='center'></td>").append(button).append(ico);
 
         // enabled checkbox
         enabled = $("<input type='checkbox' class='checkpox_enabled'></input>");

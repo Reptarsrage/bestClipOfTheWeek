@@ -161,7 +161,7 @@ function onJSClientLoad() {
 }
 
 function fillBackground() {
-    backgroundIniialize();
+    backgroundInitialize();
 
     var request = gapi.client.youtube.channels.list({
         forUsername: 'StoneMountain64',
@@ -298,7 +298,7 @@ function displayBackgroundImage() {
         elt.find(".card").flip(false);
 }
 
-function backgroundIniialize() {
+function backgroundInitialize() {
     if (!backgroundInit) {
         backgroundImgArray = new Array();
         overallCount = 0;

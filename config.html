@@ -10,6 +10,7 @@
     <meta http-equiv='expires' content='0'>
     <meta http-equiv='pragma' content='no-cache'>
 
+    <link type="text/css" rel="stylesheet" href="/Style/jquery-ui.min.css">
     <link type="text/css" rel="stylesheet" href="/Style/common.css">
     <link type="text/css" rel="stylesheet" href="/Style/config.css">
 
@@ -64,7 +65,8 @@
         });
     </script>
 
-
+    <script type="text/javascript" src="/Scripts/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js"></script>
     <script type="text/javascript" src="/JSColor/jscolor.js"></script>
     <script type="text/javascript" src="/Scripts/header.js"></script>
     <script type="text/javascript" src="/Scripts/config.js"></script>
@@ -82,16 +84,16 @@
     </div>
     <div id="body">
         <h1 id="message" class="section" hidden="hidden"></h1>
-        <h2>Configuration:</h2>
+        <h2>Configuration:<img name="configuration" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
         <div class="loading">
             <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
         </div>
         <table id="table_config" hidden="hidden">
             <thead>
                 <tr>
-                    <th>Term</th>
-                    <th>Color</th>
-                    <th class="center">Enabled</th>
+                    <th>Term<img name="term" class="tooltip" src="/common/images/info.png" alt="?" /></th>
+                    <th>Color<img name="color" class="tooltip" src="/common/images/info.png" alt="?" /></th>
+                    <th class="center">Enabled<img name="enabled" class="tooltip" src="/common/images/info.png" alt="?" /></th>
                     <th></th>
                 </tr>
             </thead>

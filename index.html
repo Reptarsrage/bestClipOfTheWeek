@@ -10,6 +10,7 @@
     <meta http-equiv='expires' content='0'>
     <meta http-equiv='pragma' content='no-cache'>
 
+    <link type="text/css" rel="stylesheet" href="/Style/jquery-ui.min.css">
     <link type="text/css" rel="stylesheet" href="/Style/common.css">
     <link type="text/css" rel="stylesheet" href="/Style/index.css">
 
@@ -65,7 +66,8 @@
         });
     </script>
 
-
+    <script type="text/javascript" src="/Scripts/jquery-ui.min.js"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js"></script>
     <script type="text/javascript" src="/Scripts/header.js"></script>
     <script type="text/javascript" src="/Scripts/index.js"></script>
     <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=onJSClientLoad"></script>
@@ -75,7 +77,7 @@
     <div id="header">
         <div id='cssmenu'>
             <ul>
-                <li><a class='active' id="a_index">Search Youtube</a></li>
+                <li class='active'><a id="a_index">Search Youtube</a></li>
                 <li ><a id="a_config">Configure search terms</a></li>
                 <li><a id="a_about">About</a></li>
             </ul>
@@ -85,11 +87,11 @@
     <div id="body">
         <h1 id="message" class="section" hidden="hidden"></h1>
         <div id="userSpace" class="section">
-            <h2>Choose a video: </h2>
+            <h2>Choose a video: <img name="choose" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
             <input id="input_video" type="text" placeholder="Enter a YouTube video Url" />
             <button id="fetch">Fetch Results</button>
             <div id="recommended">
-                <h3 id="h3_recommended">Recommended: </h3>
+                <h3 id="h3_recommended">Recommended: <img name="recommended" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                 <ol id="select_bestOfTheWeek">
                     <li class="loading">
                         <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
@@ -98,7 +100,7 @@
                 </ol>
             </div>
             <div id="startingterms">
-                <h3 id="h3_starting_terms">Terms: </h3>
+                <h3 id="h3_starting_terms">Terms: <img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                 <ul id="list_starting_terms">
                     <li class="loading">
                         <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
@@ -115,7 +117,7 @@
 
             <div id="statsSpace" class="section">
                 <hr />
-                <h2>Showing stats for:</h2>
+                <h2>Showing stats for: <img name="stats" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <div id="stats">
                     <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
                     <div id="stats_group">
@@ -133,7 +135,7 @@
 
             <div id="termSpace" class="section">
                 <hr />
-                <h2>Results:</h2>
+                <h2>Results: <img name="results" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <h3 class='error'>There are no results to display for your video.</h3>
                 <div id="chartSection">
                     <div id="piechart">
@@ -148,7 +150,7 @@
                     </div>
                 </div>
                 <div id="termResults">
-                    <h3>Terms:</h3>
+                    <h3>Terms:<img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                     <ul id="termResults_list">
                         <li class="loading">
                             <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
@@ -159,7 +161,7 @@
 
             <div id="commentSpace" class="section">
                 <hr />
-                <h2>Comments (<span id="h2_comments">0</span>):</h2>
+                <h2>Comments (<span id="h2_comments">0</span>):<img name="comments" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
                 <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
                 <h3 class='error'>Unable to find comments for your video.</h3>

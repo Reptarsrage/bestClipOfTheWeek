@@ -31,6 +31,11 @@ body {
   min-height:100%;
 }
 
+.disabled {
+    color: gray;
+    font-style: italic;
+}
+
 button:disabled {
     color: gray;
     border: none;
@@ -105,22 +110,22 @@ h1 {
     text-align: left;
     padding: 20px;
     margin: 5px 0 5px 0;
-    font-size: x-large;
+    font-size: xx-large;
     font-weight: bold;
 }
 
 h2 {
     margin: 5px 0 5px 0;
     font-weight: normal;
-    font-size: large;
+    font-size: x-large;
     text-align: left;
 }
 
 h3 {
-    margin: 5px 0 5px 0;
+    margin: 0 0 5px 0;
     font-weight: normal;
-    font-size: medium;
     text-align: left;
+    font-size: large;
 }
 
 #body, #header, #footer{
@@ -132,6 +137,19 @@ h3 {
 
 #body {
     padding: 0 0 100px 0;
+}
+
+.tooltip {
+    height: 24px;
+    width: 24px;
+    display: inline-block; 
+    position: relative;
+    bottom: -5px;
+    margin: 0 0 0 10px;
+}
+
+.tooltip:hover {
+    cursor: pointer;
 }
 
 .hidden {

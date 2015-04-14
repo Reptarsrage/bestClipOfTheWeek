@@ -14,7 +14,6 @@ const TIMER_DELAY = 2500;
 const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
 const BAR_CHART_MAX_RATIO = 0.5;
 const PLAYLIST_TITLE = "World's Best Clip of the Week"
-const USER_NAME = "Admin";
 
 // Variables
 var ConfiguredTermArray;
@@ -68,9 +67,40 @@ window.onerror = function (msg, url, line, col, error) {
 };
 
 $(document).ready(function () {
+    // tool-tips
+    $(document).on("click", ".tooltip", function () {
+        var name = $(this).attr("name");
+        $(this).tooltip(
+            {
+                items: ".tooltip",
+                content: function () {
+                    return TOOL_TIPS['index'][name];//$(this).data('description');
+                },
+                close: function (event, ui) {
+                    var me = this;
+                    ui.tooltip.hover(
+                        function () {
+                            $(this).stop(true).fadeTo(400, 1);
+                        },
+                        function () {
+                            $(this).fadeOut("400", function () {
+                                $(this).remove();
+                            });
+                        }
+                    );
+                    ui.tooltip.on("remove", function () {
+                        $(me).tooltip("destroy");
+                    });
+                },
+            }
+        );
+        $(this).tooltip("open");
+    });
+
+
     // executes when HTML-Document is loaded and DOM is ready
     $("#fetch").click(fetchResults);
-    loadTermsAndColors(USER_NAME);
+    loadTermsAndColors(urlParams['username']);
     $("#collapse").click(function () {
         if ($(this).hasClass("expanded")) {
             $("#userSpace").slideUp("slow", function () {
@@ -179,24 +209,38 @@ function loadTermsAndColors(user) {
                     if (cols[0].trim() == '')
                         continue;
 
-                    // color
-                    if (cols[1].indexOf('#') < 0)
-                        cols[1] = '#' + cols[1];
-                    ConfiguredColorArray.push(cols[1]);
-                    $("<style>")
-                        .prop("type", "text/css")
-                        .html("\
-                        ." + cols[0].replace(/[^\w]/gi, '') + " {\
-                            font-weight: bold; \
-                            color: " + cols[1] + ";\
-                        }")
-                        .appendTo("head");
+                    //enabled
+                    var enabled = false;
+                    if (cols[2] > 0)
+                        enabled = true;
+
+
+                    if (enabled) {
+                        // color
+                        if (cols[1].indexOf('#') < 0)
+                            cols[1] = '#' + cols[1];
+                        ConfiguredColorArray.push(cols[1]);
+                        $("<style>")
+                            .prop("type", "text/css")
+                            .html("\
+                            ." + cols[0].replace(/[^\w]/gi, '') + " {\
+                                font-weight: bold; \
+                                color: " + cols[1] + ";\
+                            }")
+                            .appendTo("head");
+                    }
 
                     // term
-                    ConfiguredTermArray.push(cols[0].replace(/&nbsp;/g, ' '));
+                    if (enabled) {
+                        ConfiguredTermArray.push(cols[0].replace(/&nbsp;/g, ' '));
+                        var list = $("<li class=" + cols[0].replace(/[^\w]/gi, '') + "></li>");
+                        list.text(cols[0].replace(/&nbsp;/g, ' '));
+                    } else {
+                        var list = $("<li class='disabled'></li>");
+                        list.text("(disabled): " + cols[0].replace(/&nbsp;/g, ' '));
+                    }
+
                     $("#list_starting_terms .loading").fadeOut(500);
-                    var list = $("<li class=" + cols[0].replace(/[^\w]/gi, '') + "></li>");
-                    list.text(cols[0].replace(/&nbsp;/g, ' '));
                     $("#list_starting_terms").append(list);
                     $("#fetch").prop("disabled", false);
                     $("#fetch").prop("title", "");
@@ -503,7 +547,7 @@ function fetchResults() {
     $("#collapse").click();
 
     if (!ConfiguredColorArray || !ConfiguredTermArray) {
-        displayMessage("Unable to load terms for user " + USER_NAME + ".", BAD);
+        displayMessage("Unable to load terms for user " + urlParams['username'] + ".", BAD);
         return false;
     }
 
@@ -575,6 +619,9 @@ function getVideoStats(id, currFetchID) {
     $("#statsSpace").slideDown( "slow", function() {
         // Animation complete.
         $(this).fadeIn(500);
+        $("#stats_group .loading").hide();
+        $("#stats > .error").fadeIn(500);
+        $("#columnchart").hide();
     });
 
     if (!id) {
@@ -622,13 +669,15 @@ function getVideoStats(id, currFetchID) {
             favoriteCount = $("<p>Favorites: " + favoriteCount + "</p>");
             commentCount = $("<p>Comments: " + commentCount + "</p>");
             var videoStats = $("<div id='div_video_stats'></div>");
-            videoStats.append(viewCount).append(dislikeCount).append(favoriteCount).append(commentCount);
+            videoStats.append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
 
             // add to DOM
             $("#stats > .error").fadeOut(500);
             $("#stats_group").append(title).append(description).append(image)
             $("#stats_group").append(videoStats);
             $("#stats_group .loading").fadeOut(500);
+            $("#columnchart").fadeIn(500);
+            $("#columnchart .loading").show();
             executeAsync(function () { loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20, currFetchID) });
 
             // draw column chart
@@ -736,10 +785,13 @@ function loadComments(count, url, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
-    $("#commentSpace").slideDown("slow", function () {
-        // Animation complete.
-        $(this).fadeIn(500);
-    });
+    if (!$("#commentSpace").is(":visible")) {
+        $("#commentSpace").slideDown("slow", function () {
+            // Animation complete.
+            $(this).fadeIn(500);
+            $("#commentSpace .error").fadeIn(500);
+        });
+    }
 
     $.ajax({
         url: url,
@@ -766,8 +818,8 @@ function loadComments(count, url, currFetchID) {
   
             nextUrl = getNextPageUrl(data);
             //console.log(nextUrl);
+            $("#commentSpace > .error").fadeOut(500);
             $.each(data.feed.entry, function (key, val) {
-                $("#commentSpace > .error").fadeOut(500);
                 var comment = $("<li class='comment'></li>");
                 var body = $("<div class='commentBody'></div>");
 
@@ -906,10 +958,13 @@ function parseComment(comment, currFetchID, author) {
     if (currFetchID != fetchID)
         return;
     
-    $("#termSpace").slideDown("slow", function () {
-        // Animation complete.
-        $(this).fadeIn(500);
-    });
+    if (!$("#termSpace").is(":visible")) {
+        $("#termSpace").slideDown("slow", function () {
+            // Animation complete.
+            $(this).fadeIn(500);
+            $("#termSpace > .error").fadeIn(500);
+        });
+    }
 
     if (!loaded) {
         termStats = Array(ConfiguredTermArray.length);
@@ -948,11 +1003,8 @@ function parseComment(comment, currFetchID, author) {
             res = s + "<span class='" + ConfiguredTermArray[i] + " highlight'>" + t + "</span>" + v;    
             comment = res.toLowerCase();
             $("#termResults_list ." + ConfiguredTermArray[i]).remove();
-            $("#termResults_list .loading").fadeOut(500);
             $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + data.getValue(i, 1) + "</li>");
-            $("#termSpace > .error").fadeOut(500);
-            $("#chartSection").fadeIn(500);
-            $("#termResults").fadeIn(500);
+            $("#termResults_list .loading").fadeOut(500);
 
 
             if (voters.indexOf(author) < 0) {
@@ -1061,6 +1113,13 @@ function loadChart() {
             x++;
         }
     }
+
+    if (nonNullData.getNumberOfRows() > 0) {
+        $("#termSpace > .error").fadeOut(500);
+        $("#chartSection").fadeIn(500);
+        $("#termResults").fadeIn(500);
+    }
+
 
     //console.log("chart update");
 
