@@ -1,0 +1,99 @@
+﻿#backgorund_grid {
+    width: 100%;
+    min-width: 1000px;
+    overflow: hidden;
+    min-height: 500px; 
+    position: absolute; 
+    top: 0; 
+    right: 0;
+    left: 0;
+    bottom: 100px;
+}
+
+
+#backgorund_grid .col {
+    overflow: hidden;
+    width: 100px;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: inline-block;
+    -webkit-user-select: none; /* Safari, Chrome */
+    -khtml-user-select: none; /* Konqueror */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE */
+    user-select: none; /* CSS3 */
+    
+}
+
+#backgorund_grid .row {
+    overflow: hidden;
+    width: 1000px;
+    height: 10%;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    display: block;
+    -webkit-user-select: none; /* Safari, Chrome */
+    -khtml-user-select: none; /* Konqueror */
+    -moz-user-select: none; /* Firefox */
+    -ms-user-select: none; /* IE */
+    user-select: none; /* CSS3 */
+    background: #D2D2D2;
+}
+
+
+#form {
+    background-color: rgba(255, 255, 255, 0.9);
+    position: absolute;
+    top: 0;
+    right: 0;
+    left: 0;
+    bottom: 0;
+    height: 200px;
+    z-index: 100;
+    width: 500px;
+    padding: 10px;
+    margin: auto;
+    border-radius: 20px;
+    -webkit-border-radius: 20px;
+    -moz-border-radius: 20px;
+}
+
+.front, .back, .card {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    //background: url("/common/images/loading.gif");
+    background-size: 100%;
+    background-position:top,left;
+    background-repeat: no-repeat;
+}
+
+
+#form > * {
+    float: left;
+}
+
+#label_password {
+    clear: left;
+}
+
+#login {
+    clear: left;
+}
+
+label {
+    margin: 10px 40px 10px 0;
+}
+
+button {
+    margin: 10px 0 10px 40px;
+}
+
+#body {
+    height: 800px;
+}

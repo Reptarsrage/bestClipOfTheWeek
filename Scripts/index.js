@@ -55,7 +55,8 @@ window.onerror = function (msg, url, line, col, error) {
 
     // You can view the information in an alert to see things working like this:
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+    displayMessage("An error occured on the page. Please try a hard refresh (CTRL + F5). If you experience any further issues you can <a href='mailto:justinprobb@gmail.com'>contact me</a> for support.", BAD);
+    fetchID++; // stop all events
 
     // TODO: Report this error via ajax so you can keep track
     //       of what pages have JS issues
@@ -122,11 +123,39 @@ $(document).ready(function () {
     toggleComments($("#checkbox_comments"), false);
     
 });
+
+displayMessage("Authorizing...", OKAY);
+
+google.load("visualization", "1", {
+    packages: ["corechart", 'table']
+});
+
+google.load("visualization", "1.1", { packages: ["bar"] });
+
+google.setOnLoadCallback(function () {
+    displayMessage("Authorize - Success", GOOD);
+    data = new google.visualization.DataTable();
+});
+
+function onJSClientLoad() {
+    gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
+    gapi.client.load('plus', 'v1');
+    gapi.client.load('youtube', 'v3').then(function () {
+        populateBestOfTheWeek();
+    });
+}
+
+
+////////////////////////////////// FUNCTIONS ////////////////////////////////
+
 function loadTermsAndColors(user) {
     // get terms and colors
+    $("#fetch").prop("disabled", true);
+    $("#fetch").prop("title", "Please wait for terms to be loaded");
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "GET",
+        timeout: 5000,
         data: {
             username: user
         },
@@ -163,36 +192,17 @@ function loadTermsAndColors(user) {
                     ConfiguredTermArray.push(cols[0]);
                     $("#list_starting_terms .loading").fadeOut(500);
                     $("#list_starting_terms").append($("<li class=" + cols[0] + ">" + cols[0] + "</li>"));
+                    $("#fetch").prop("disabled", false);
+                    $("#fetch").prop("title", "");
                 }
             }
         },
-        error: function (reason) {
-            console.log("Error: " + reason);
+        error: function (x, t, m) {
+            console.log("Error: " + t);
             $("#list_starting_terms .loading").fadeOut(500);
             $("#list_starting_terms .error").fadeIn(500);
             displayMessage("Unable to load terms for user " + user + ".", BAD);
         },
-    });
-}
-
-displayMessage("Authorizing...", OKAY);
-
-google.load("visualization", "1", {
-    packages: ["corechart", 'table']
-});
-
-google.load("visualization", "1.1", {packages:["bar"]});
-
-google.setOnLoadCallback(function () {
-    displayMessage("Authorize - Success", GOOD);
-    data = new google.visualization.DataTable();
-});
-
-function onJSClientLoad() {
-    gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
-    gapi.client.load('plus', 'v1');
-    gapi.client.load('youtube', 'v3').then(function () {
-        populateBestOfTheWeek();
     });
 }
 
@@ -281,7 +291,14 @@ function requestVideosInPlaylist(playlistId, pageToken) {
                 date = new Date(item.snippet.publishedAt);
                 title = item.snippet.title;
                 pos = item.snippet.position;
-                url = item.snippet.thumbnails.default.url;
+
+                if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("default")) {
+                    url = item.snippet.thumbnails.default.url;
+                } else if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("high")) {
+                    url = item.snippet.thumbnails.high.url;
+                } else {
+                    url = "";
+                }
                 id = item.snippet.resourceId.videoId;
 
                 if (title.length > 80) {

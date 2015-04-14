@@ -31,6 +31,17 @@ body {
   min-height:100%;
 }
 
+button:disabled {
+    color: gray;
+    border: none;
+}
+
+button:disabled:hover {
+    color: gray;
+    border: none;
+    pointer-events: none;
+}
+
 .good {
     background-color: #99FF66;
 }
@@ -146,14 +157,6 @@ h3 {
     font-weight: normal;
     border: none;
     clear: both;
-}
-
-/* body */
-#body {
-    width: 100%;
-    min-height: 500px;
-    height:100%;
-    padding-bottom:60px;   /* Height of the footer */
 }
 
 

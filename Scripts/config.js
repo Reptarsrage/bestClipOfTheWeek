@@ -82,6 +82,7 @@ function getData(user) {
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "GET",
+        timeout: 5000,
         data: {
             username: user
         },
@@ -98,6 +99,7 @@ function postData(user, term, color, enabled) {
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "POST",
+        timeout: 5000,
         data: {
             method: 'POST',
             username: user,
@@ -117,6 +119,7 @@ function deleteData(user, term) {
     $.ajax({
         url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
         type: "POST",
+        timeout: 5000,
         data: {
             method: 'DELETE',
             username: user,
