@@ -159,10 +159,8 @@ $(document).ready(function () {
 displayMessage("Authorizing...", OKAY);
 
 google.load("visualization", "1", {
-    packages: ["corechart", 'table']
+    packages: ["corechart", 'table', "bar"]
 });
-
-google.load("visualization", "1", { packages: ["bar"] }); // used to be 1.1, not sure what changed
 
 google.setOnLoadCallback(function () {
     displayMessage("Authorize - Success", GOOD);
