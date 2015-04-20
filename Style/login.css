@@ -1,4 +1,12 @@
-﻿#backgorund_grid {
+﻿/*
+ * Justin Robb
+ * 4/20/15
+ * Best Clip of the Week Application
+ * Login page style
+ */
+
+
+#backgorund_grid {
     width: 100%;
     overflow: hidden;
     height: 100%; 

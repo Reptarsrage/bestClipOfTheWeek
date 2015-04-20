@@ -201,7 +201,7 @@ h3 {
 #footer_overlay {
     height: 100%;
     width: 100%;
-    background: url('images/bg.png');
+    background: url('/common/images/bg.png');
     padding: 10px 0 10px 0;
     overflow: hidden;
 }
@@ -278,7 +278,7 @@ h3 {
     box-shadow: 1px 1px 0 #3078DB, 2px 2px 0 #3078DB, 3px 3px 3px rgba(0, 0, 0, 0.35);
 }
 #cssmenu > ul {
-  background: url('images/bg.png');
+  background: url('/common/images/bg.png');
 }
 #cssmenu > ul > li {
   float: left;
@@ -355,7 +355,7 @@ h3 {
   text-transform: uppercase;
   text-decoration: none;
   color: #3078DB;
-  background: url('images/bg.png');
+  background: url('/common/images/bg.png');
 }
 #cssmenu.small-screen #menu-button.menu-opened {
   color: #444444;

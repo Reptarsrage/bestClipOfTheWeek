@@ -162,7 +162,7 @@ google.load("visualization", "1", {
     packages: ["corechart", 'table']
 });
 
-google.load("visualization", "1.1", { packages: ["bar"] });
+google.load("visualization", "1", { packages: ["bar"] }); // used to be 1.1, not sure what changed
 
 google.setOnLoadCallback(function () {
     displayMessage("Authorize - Success", GOOD);

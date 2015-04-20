@@ -1,3 +1,22 @@
+/*
+ * Justin Robb
+ * 4/20/2015
+ * bestClipOfTheWeek
+ * Script to create the Terms table
+ */
+
+
+ /*
+  * The Terms table stores the search term information for all users. Users can add, remove and edit their terms.
+  *
+  * Columns:
+  *		TermID - varchar - A unique identifier for the term
+  *		UserID - int - the unique ID of the user, as it appears in the Users table.
+  *		Term - varchar - The stored term, which is a string literal used for the search through youtube comments. Max length of 20 chars.
+  *		Color - tinytext - The color to associate with the term. Expects a valid hex color. 
+  *		Enabled - bit - A single bit to toggle if the term should be enabled, meaning used in the search results. 1 = enabled, 0 = disabled.
+  */ 
+
 CREATE TABLE `Terms` (
   `TermID` int(11) NOT NULL AUTO_INCREMENT,
   `UserID` int(11) NOT NULL,
@@ -9,6 +28,7 @@ CREATE TABLE `Terms` (
 ) ENGINE=InnoDB AUTO_INCREMENT=140 DEFAULT CHARSET=utf8;
 
 
+/* example using UserIDs 1, 15
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (27,1,'Alpha','#ff0000',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (28,1,'Bravo','#ff8000',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (29,1,'Charlie','#fff700',1);
@@ -35,33 +55,6 @@ insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (49,1,'Wh
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (50,1,'X-ray','#bf1d11',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (51,1,'Yankee','#c78783',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (52,1,'Zulu','#737373',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (87,13,'Alpha1','#ff0000',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (89,2,'Alpha','#ff0000',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (90,2,'Bravo','#ff8000',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (91,2,'Charlie','#fff700',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (92,2,'Delta','#d0ff00',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (93,2,'Echo','#00ff6e',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (94,2,'Foxtrot','#00fff2',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (95,2,'Golf','#009dff',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (96,2,'Hotel','#0040ff',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (97,2,'India','#8400ff',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (98,2,'Juliet','#d400ff',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (99,2,'Kilo','#ff00ee',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (100,2,'Lima','#ff005d',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (101,2,'Mike','#9e2b55',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (102,2,'November','#9e2b87',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (103,2,'Oscar','#872b9e',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (104,2,'Papa','#3a2b9e',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (105,2,'Quebec','#2b709e',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (106,2,'Romeo','#2b9e94',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (107,2,'Sierra','#2b9e4d',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (108,2,'Tango','#689e2b',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (109,2,'Uniform','#a9ab4b',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (110,2,'Victor','#bf8e11',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (111,2,'Whiskey','#bf5a11',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (112,2,'X-ray','#bf1d11',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (113,2,'Yankee','#c78783',1);
-insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (114,2,'Zulu','#737373',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (115,15,'Alpha','#ff0000',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (116,15,'Bravo','#ff8000',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (117,15,'Charlie','#fff700',1);
@@ -87,4 +80,4 @@ insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (136,15,'
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (137,15,'Whiskey','#bf5a11',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (138,15,'X-ray','#bf1d11',1);
 insert into `Terms`(`TermID`,`UserID`,`Term`,`Color`,`Enabled`) values (139,15,'Yankee','#c78783',1);
-
+*/

@@ -1,4 +1,11 @@
-﻿const TOOL_TIPS = {
+﻿/*
+ * Justin Robb
+ * 4/10/15
+ * Best Clip of the Week Application
+ * Tool tip storage
+ */
+
+const TOOL_TIPS = {
     index: {
         choose: "Provide the url to the video you wish to use. Kindly ensure the url you provide is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>).<br>" +
         "The website will parse the Jesus out of the comments for this video and tally up the results based on your provided terms.<br>Once you're ready to have your mind blown, press 'Fetch Results'.",

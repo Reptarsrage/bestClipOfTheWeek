@@ -1,4 +1,13 @@
-(function($) {
+/*
+ * Justin Robb
+ * 4/20/15
+ * Best Clip of the Week Application
+ * Top header/menu bar
+ */
+
+
+// http://cssmenumaker.com/menu/responsive-menu-bar
+(function ($) {
 
   $.fn.menumaker = function(options) {
       
@@ -119,9 +128,9 @@ if (foundActive === false) {
 }
 
 defaultPosition = indicatorPosition = activeElement.position().left + activeElement.width()/2 - 5;
-console.log(activeElement);
-console.log(activeElement.position().left);
-console.log(activeElement.width());
+//console.log(activeElement);
+//console.log(activeElement.position().left);
+//console.log(activeElement.width());
 indicator.css("left", indicatorPosition);
 
 $("#cssmenu > ul > li").hover(function() {
