@@ -3,7 +3,7 @@ Best Clip of the Week (v0.1.0beta)
 Hosted here: http://bestclipoftheweek.x10host.com/
 Note that I've disabled the sign up feature for now. If you would like permission to login to the site please send me an email.
 
-Description
+Description:
 
 	This is my attempt to tally the results of StoneMountain64's Best Clip of the Week videos.
 
@@ -15,31 +15,31 @@ Description
             
         
 Credits:
-	API's:
-	
-		https://developers.google.com/chart/   Jquery library quite a revolutionary and free library.
-		https://developers.google.com/youtube/analytics/   Jquery UI library a pretty damn usefull for them tooltips.
-		https://developers.google.com/youtube/v3/   JSColor a SICK color chooser.
-		https://developers.google.com/+/api/   nnattawat for that ballin' flip animation.
-	
-	Images:
-	
-		http://stackoverflow.com/questions/14446677/how-to-make-3-corner-rounded-triangle-in-css   Murray Smith for the most perfect triangle ever conceived.
-		https://www.iconfinder.com/icons/401329/help_info_information_support_tip_tooltip_icon   Michal Kučera for a fancy tool-tip image.
-		http://pixshark.com/spinner-gif-transparent-background.htm   This site for not the best loading image, but certainly the easiest to find.
-	
-	Special Thanks:
-	
-		https://jquery.com/   Jquery library quite a revolutionary and free library.
-		https://jqueryui.com/   Jquery UI library which was pretty damn usefull for them tooltips.
-		http://jscolor.com/   JSColor a SICK color chooser.
-		http://nnattawat.github.io/flip/   nnattawat for that ballin' flip animation.
-		https://www.openshift.com/   OpenShift for hosting my SQL server and PHP service (Heroku sucks!!).
-		https://x10hosting.com/   x10hosting.com/ for hosting my site for free.
-		http://cssmenumaker.com/menu/responsive-menu-bar   CSS Menu Maker for that stupidly classy header bar.
-		http://www.w3schools.com/   W3Scools my sensei.
-		http://phpfiddle.org/   phpfiddle for an easy solution to php programming.
-		https://www.youtube.com/channel/UCN-v-Xn9S7oYk0X2v1jx1Qg   StoneMountain64 for kickin ass and taking names.
+API's:
+
+   https://developers.google.com/chart/   Jquery library quite a revolutionary and free library.
+   https://developers.google.com/youtube/analytics/   Jquery UI library a pretty damn usefull for them tooltips.
+   https://developers.google.com/youtube/v3/   JSColor a SICK color chooser.
+   https://developers.google.com/+/api/   nnattawat for that ballin' flip animation.
+
+Images:
+
+   http://stackoverflow.com/questions/14446677/how-to-make-3-corner-rounded-triangle-in-css   Murray Smith for the most perfect triangle ever conceived.
+   https://www.iconfinder.com/icons/401329/help_info_information_support_tip_tooltip_icon   Michal Kučera for a fancy tool-tip image.
+   http://pixshark.com/spinner-gif-transparent-background.htm   This site for not the best loading image, but certainly the easiest to find.
+
+Special Thanks:
+
+   https://jquery.com/   Jquery library quite a revolutionary and free library.
+   https://jqueryui.com/   Jquery UI library which was pretty damn usefull for them tooltips.
+   http://jscolor.com/   JSColor a SICK color chooser.
+   http://nnattawat.github.io/flip/   nnattawat for that ballin' flip animation.
+   https://www.openshift.com/   OpenShift for hosting my SQL server and PHP service (Heroku sucks!!).
+   https://x10hosting.com/   x10hosting.com/ for hosting my site for free.
+   http://cssmenumaker.com/menu/responsive-menu-bar   CSS Menu Maker for that stupidly classy header bar.
+   http://www.w3schools.com/   W3Scools my sensei.
+   http://phpfiddle.org/   phpfiddle for an easy solution to php programming.
+   https://www.youtube.com/channel/UCN-v-Xn9S7oYk0X2v1jx1Qg   StoneMountain64 for kickin ass and taking names.
 
             
         
