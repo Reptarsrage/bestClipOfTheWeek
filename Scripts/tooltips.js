@@ -46,4 +46,33 @@ const TOOL_TIPS = {
     configuration:
 	"In this console you can add, delete and configure the terms used by the program. Each user has a different set of terms. Feel free to customize yours!",
     },
+
+    comments: {
+        title: "Provide the url to the video you wish to use. Kindly ensure the url you provide is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>).<br>" +
+        "The website will look through the comments for this video and give you a list of commenters.<br>Once you're ready to have your mind blown, press 'Fetch Results'.",
+        stats: "In this area you can view basic stats about the video.<br />If you would like to choose another video you can re-expand the search area above.",
+        commenters: "Here you you can view a list of users who commented on your video. This list is in order and contains no duplicates.<br>" +
+            "The count in the title is the number of comments (not including replies to comments) loaded for this video. As the program loads more comments this number will update.",
+        recommended: "Feel free to use any of these recommended videos for your search.<br />" +
+	    "All of these videos are 'Best Clip of the Week' Videos from YouTube user StoneMountain64 (the Beast, the Legend).",
+
+        terms: "The Terms to look for inside of the comments. These will be tallied up and displayed.<br>Use the Configuration tab to add and remove search terms if the default ones don't yank your chain.",
+
+    },
+
+    quick: {
+        title: "Provide the url to the video you wish to use. Kindly ensure the url you provide is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>).<br>" +
+        "The website will parse the Jesus out of the comments (but not show any charts) for this video and tally up the results based on your provided terms.<br>Once you're ready to have your mind blown, press 'Fetch Results'.",
+        stats: "In this area you can view basic stats about the video as well as the results of the vote.<br />If you would like to choose another video you can re-expand the search area above.",
+        results: "This area shows the counts of the various search terms found within the video comments." +
+            "<br>Use the Configuration tab to add and remove search terms if the default ones don't yank your chain.",
+        recommended: "Feel free to use any of these recommended videos for your search.<br />" +
+	    "All of these videos are 'Best Clip of the Week' Videos from YouTube user StoneMountain64 (the Beast, the Legend).",
+
+        terms: "The Terms to look for inside of the comments. These will be tallied up and displayed.<br>Use the Configuration tab to add and remove search terms if the default ones don't yank your chain.",
+        comments: "Here you can view all the comments for the video. If you go through them you can see the terms that were counted as votes, " +
+            "and the ones that weren't.<br>You can also view a list of users who voted (Who cares about the ones that didn't amiright?). This list is in order and contains no duplicates.<br>" +
+            "The count in the title is the number of comments (not including replies to comments) loaded for this video. As the program loads more comments this number will update.",
+
+    }
 };

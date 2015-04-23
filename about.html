@@ -78,6 +78,8 @@
         <div id='cssmenu'>
             <ul>
                 <li><a id="a_index">Search Youtube</a></li>
+                <li><a id="a_quick">Quick Search (no charts)</a></li>
+                <li><a id="a_comments">Commenters</a></li>
                 <li><a id="a_config">Configure search terms</a></li>
                 <li class='active'><a id="a_about">About</a></li>
             </ul>
@@ -154,6 +156,8 @@
         $(document).ready(function () {
             $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
             $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
+            $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
+            $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
         });
     </script>
 </body>
