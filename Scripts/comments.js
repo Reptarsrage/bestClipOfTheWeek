@@ -90,10 +90,10 @@ $(document).ready(function () {
         }
     });
 
-    $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
-    $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
-    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
-    $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
+    $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
 
     // clean up
     $("input[type='checkbox']").prop('disabled', false);

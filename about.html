@@ -69,7 +69,7 @@
     </script>
 
 
-
+    <script type="text/javascript" src="/Scripts/tooltips.js"></script>
     <script type="text/javascript" src="/Scripts/header.js"></script>
 </head>
 <body>
@@ -87,7 +87,7 @@
     </div>
 
     <div id="body">
-        <h1>Best Clip of the Week (v0.1.0beta)</h1>
+        <h1>Best Clip of the Week <span id="version"></span></h1>
         <div class="section">
             <hr />
             <h2>Description</h2>
@@ -154,6 +154,7 @@
 
     <script>
         $(document).ready(function () {
+            $("#version").html(VERSION);
             $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
             $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
             $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);

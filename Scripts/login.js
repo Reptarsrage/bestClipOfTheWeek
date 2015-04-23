@@ -102,7 +102,7 @@ function displayMessage(message, good) {
         $('#result').fadeTo(1000, 1);
         var token = message;
         var username = $("#userid").val().trim();
-        window.location = "index.html?username=" + username + "&token=" + token;
+        window.location = "index.html?username=" + username + "&token=" + token + "&version=" + VERSION;
 
     } else if (good == BAD) {
         $('#result').attr("class", "bad");

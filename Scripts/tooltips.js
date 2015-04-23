@@ -5,6 +5,8 @@
  * Tool tip storage
  */
 
+const VERSION = "v0.2.0(beta)";
+
 const TOOL_TIPS = {
     index: {
         choose: "Provide the url to the video you wish to use. Kindly ensure the url you provide is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>).<br>" +
