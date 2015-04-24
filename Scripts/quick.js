@@ -522,9 +522,11 @@ function getVideoStats(id, currFetchID) {
             return;
         }
     }, function (reason) {
-        $("#statsSpace .loading").fadeOut(500);
-        $("#statsSpace .error").fadeIn(500);
-        displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
+        //$("#statsSpace .loading").fadeOut(500);
+        //$("#statsSpace .error").fadeIn(500);
+        // displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
+        console.log('Error loading stats: ' + reason.result.error.message);
+        getVideoStats(id, currFetchID)
     });
 }
 
@@ -548,18 +550,16 @@ function loadComments(count, url, currFetchID) {
     $.ajax({
         url: url,
         dataType: "jsonp",
-        async: true,
-        cache: false,
+        timeout: 5000,
         error: function(jqXHR, textStatus, errorThrown) {
             if (currFetchID != fetchID)
                 return;
 
-            console.log('error');
+            console.log('Error retrieving comments');
             console.log(errorThrown);
             console.log(jqXHR);
-            $("#commentSpace > .loading").fadeOut(500);
-            $("#commentSpace > .error").fadeIn(500);
-            displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
+            // try again
+            loadComments(count, url, currFetchID);
         },
         success: function (data) {
             if (currFetchID != fetchID)
@@ -682,14 +682,18 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
             if (typeof page !== 'undefined' && page != pageToken)
                 executeAsync(function () { appendComments(commentParent, id, count, page, currFetchID) });
         } else {
-            var comment = $("<li class='error comment'>Error loading reply.</li>");
-            commentParent.append(comment);
-            displayMessage('Issue retrieving replies.', BAD);
+            //var comment = $("<li class='error comment'>Error loading reply.</li>");
+            //commentParent.append(comment);
+            //displayMessage('Issue retrieving replies.', BAD);
+            console.log('Error loading replies, no items returned for id=' + id);
+            appendComments(commentParent, id, count, pageToken, currFetchID);
         }
     }, function (reason) {
-        var comment = $("<li class='error comment'>Error loading replies: " + reason.result.error.message + "</li>");
-        commentParent.append(comment);
-        displayMessage('Issue retrieving replies.', BAD);
+        //var comment = $("<li class='error comment'>Error loading replies: " + reason.result.error.message + "</li>");
+        //commentParent.append(comment);
+        //displayMessage('Issue retrieving replies.', BAD);
+        console.log('Error loading replies: ' + reason.result.error.message);
+        appendComments(commentParent, id, count, pageToken, currFetchID);
     });
 }
 

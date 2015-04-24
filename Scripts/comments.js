@@ -417,8 +417,7 @@ function loadComments(count, url, currFetchID) {
     $.ajax({
         url: url,
         dataType: "jsonp",
-        async: true,
-        cache: false,
+        timeout: 5000,
         error: function(jqXHR, textStatus, errorThrown) {
             if (currFetchID != fetchID)
                 return;
@@ -426,7 +425,8 @@ function loadComments(count, url, currFetchID) {
             console.log('error');
             console.log(errorThrown);
             console.log(jqXHR);
-            displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
+            // try again
+            loadComments(count, url, currFetchID);
         },
         success: function (data) {
             if (currFetchID != fetchID)

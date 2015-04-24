@@ -716,7 +716,6 @@ function getVideoStats(id, currFetchID) {
 
             var options = {
                 backgroundColor: '#ECECEC',
-                fontName: 'Segoe UI',
                 animation: {
                     startup: true,
                     easing: 'out',
@@ -761,8 +760,10 @@ function getVideoStats(id, currFetchID) {
             displayMessage("No results found for video with ID='" + id + "'.", OKAY);
         }
     }, function (reason) {
-        displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
-        $("#statsSpace .error").fadeIn(500);
+        //displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
+        // $("#statsSpace .error").fadeIn(500);
+        console.log('Error loading stats: ' + reason.result.error.message);
+        getVideoStats(id, currFetchID)
     });
 }
 
@@ -796,18 +797,15 @@ function loadComments(count, url, currFetchID) {
     $.ajax({
         url: url,
         dataType: "jsonp",
-        async: true,
-        cache: false,
         error: function(jqXHR, textStatus, errorThrown) {
             if (currFetchID != fetchID)
                 return;
 
-            console.log('error');
+            console.log('Error loading comments');
             console.log(errorThrown);
             console.log(jqXHR);
-            displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
-            $("#commentSpace > .error").fadeIn(500);
-            $("input[type='checkbox']").prop('disabled', true);
+            // try again
+            loadComments(count, url, currFetchID)
         },
         success: function (data) {
             if (currFetchID != fetchID)
@@ -817,7 +815,6 @@ function loadComments(count, url, currFetchID) {
                 return;
   
             nextUrl = getNextPageUrl(data);
-            //console.log(nextUrl);
             $("#commentSpace > .error").fadeOut(500);
             $.each(data.feed.entry, function (key, val) {
                 var comment = $("<li class='comment'></li>");
@@ -943,14 +940,16 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
             if (typeof page !== 'undefined' && page != pageToken)
                 executeAsync(function () { appendComments(commentParent, id, count, page, currFetchID) });
         } else {
-            var comment = $("<li class='error comment'>Error loading replies.</li>");
-            commentParent.append(comment);
-            displayMessage('Issue retrieving replies.', BAD);
+            //var comment = $("<li class='error comment'>Error loading replies.</li>");
+            //commentParent.append(comment);
+            console.log('Error loading replies, no items returned for id=' + id);
+            appendComments(commentParent, id, count, pageToken, currFetchID)
         }
     }, function (reason) {
-        var comment = $("<li class='error comment'>Error loading replies: " + reason.result.error.message + "</li>");
-        commentParent.append(comment);
-        displayMessage('Issue retrieving replies.', BAD);
+        //var comment = $("<li class='error comment'>Error loading replies: " + reason.result.error.message + "</li>");
+        //commentParent.append(comment);
+        console.log('Error loading replies: ' + reason.result.error.message);
+        appendComments(commentParent, id, count, pageToken, currFetchID)
     });
 }
 
@@ -1127,13 +1126,11 @@ function loadChart() {
 
     var options = {
         colors: pieColors,
-        fontName: 'Segoe UI',
         theme: 'maximized',
         backgroundColor: '#ECECEC',
         pieSliceText: 'label',
         pieSliceTextStyle: {
             color: 'black',
-            fontName: 'Segoe UI',
             fontSize: '24pt',
         },
     };
@@ -1160,7 +1157,6 @@ function loadChart() {
             duration: TIMER_DELAY,
             easing: 'out'
         },
-        fontName: 'Segoe UI',
         legend: {
             position: 'none',
         },
@@ -1168,7 +1164,6 @@ function loadChart() {
             highContrast: false,
             textStyle: {
                 color: 'black',
-                fontName: 'Segoe UI',
                 fontSize: '24pt',
             }
         }

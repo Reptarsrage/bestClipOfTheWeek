@@ -5,7 +5,7 @@
  * Tool tip storage
  */
 
-const VERSION = "v0.2.2(beta)";
+const VERSION = "v0.2.3(beta)";
 
 const TOOL_TIPS = {
     index: {
