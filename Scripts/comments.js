@@ -383,7 +383,7 @@ function getVideoStats(id, currFetchID) {
             $("#stats_group").append(title).append(description).append(image)
             $("#stats_group").append(videoStats);
             $("#stats_group .loading").fadeOut(500);
-            executeAsync(function () { loadComments(1, "http://gdata.youtube.com/feeds/api/videos/" + id + "/comments?v=2&alt=json&max-results=" + 20, currFetchID) });
+            executeAsync(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
         } else {
             // no results
@@ -397,17 +397,6 @@ function getVideoStats(id, currFetchID) {
         $("#stats .error").fadeIn(500);
         displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
     });
-}
-
-function getNextPageUrl(data) {
-    var url = ""
-
-    $.each(data.feed.link, function (key, val) {
-        if (val.hasOwnProperty("rel") && val.rel == "next")
-            url = val.href;
-    });
-
-    return url;
 }
 
 function loadComments(count, url, currFetchID) {
@@ -432,42 +421,44 @@ function loadComments(count, url, currFetchID) {
             if (currFetchID != fetchID)
                 return;
 
-            if (!data.feed.hasOwnProperty("entry") && count == 1) {
-                displayMessage("Woops! Error retrieving comments. (" + errorThrown + ")", BAD);
-                return;
-            } else if (!data.feed.hasOwnProperty("entry")) {
+            if (data["error"]) {
+                console.log('Error loading comments');
+                console.log(data.error.code);
+                console.log(data.error.message);
+                displayMessage("Woops! Error retrieving comments. (" + data.error.message + ")", BAD);
                 return;
             }
   
-            nextUrl = getNextPageUrl(data);
-            $.each(data.feed.entry, function (key, val) {
-                var googleID;
-                if (val.hasOwnProperty('yt$googlePlusUserId'))
-                    googleID = val.yt$googlePlusUserId.$t;
+            nextUrl = "";
+            if (data["nextPageToken"] && data["nextPageToken"].length > 0) {
+                nextUrl = url;
+                if (nextUrl.indexOf("pageToken") > 0) {
+                    nextUrl = nextUrl.replace(/pageToken=.*$/, "pageToken=" + data["nextPageToken"]);
+                } else {
+                    nextUrl += "&pageToken=" + data["nextPageToken"];
+                }
+            }
 
-                var replyCt = 0;
-                var commentID = "N/A";
+            if (nextUrl != "")
+                executeAsync(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
 
-                if (googleID)
-                    replyCt = val.yt$replyCount.$t;
+            $.each(data["items"], function (key, val) {
+                var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
+                var replyCt = val.snippet.totalReplyCount;
+                var commentID = val.id;
 
-                if (replyCt > 0)
-                    commentID = val.id.$t.split("comment:")[1];
-
-                parseComment(val.content.$t, currFetchID, val.author[0].name.$t);
+                parseComment(val.snippet.topLevelComment.snippet.textDisplay, currFetchID, val.snippet.topLevelComment.snippet.authorDisplayName);
 
                 // find replies
-                if (commentID != "N/A") {
-                    appendComments(commentID, 1, "", currFetchID);
+                if (replyCt > 0) {
+                    appendComments(val.snippet.topLevelComment.snippet.textDisplay, commentID, 1, "", currFetchID);
                 }
 
                 $("#h2_comments").html(count);
                 count++;
             });
 
-            if (nextUrl != "")
-                executeAsync(function () { loadComments(count, nextUrl, currFetchID) });
-            else {
+            if (!nextUrl) {
                 displayMessage('Completed query.', GOOD);
                 endTime = new Date().getTime();
                 var time = (endTime - startTime) / 1000.00;
@@ -482,30 +473,38 @@ function appendComments(id, count, pageToken, currFetchID) {
         return;
 
     if (pageToken == "")
-        url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments";
+        url = "https://www.googleapis.com/youtube/v3/comments?part=snippet&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&parentId=" + id;
     else
-        url = "https://www.googleapis.com/plus/v1/activities/" + id + "/comments?" + "pageToken=" + pageToken;
+        url = "https://www.googleapis.com/youtube/v3/comments?part=snippet&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&parentId=" + id + "&pageToken=" + pageToken;
 
-    gapi.client.request({ 'path': url }).then(function (resp) {
-        if (currFetchID != fetchID)
-            return;
+    $.ajax({
+        url: url,
+        dataType: "jsonp",
+        error: function (jqXHR, textStatus, errorThrown) {
+            if (currFetchID != fetchID)
+                return;
 
-        var page = JSON.parse(resp.body).nextPageToken;
+            console.log('Error loading replies: ' + reason.result.error.message);
+            console.log(errorThrown);
+            console.log(jqXHR);
+            displayMessage('Issue retrieving replies.', BAD);
+        },
+        success: function (data) {
+            if (currFetchID != fetchID)
+                return;
 
-        if (JSON.parse(resp.body).hasOwnProperty("items")) {
-            var items = JSON.parse(resp.body).items
-            $.each(items, function (key, val) {
-                parseComment(val.object.content, currFetchID, val.actor.displayName);
+            var nextPageToken = "";
+
+            if (data["nextPageToken"]) {
+                nextPageToken = data["nextPageToken"];
+                executeAsync(function () { appendComments(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+            }
+
+            $.each(data["items"], function (key, val) {
+                parseComment(val.snippet.textDisplay, currFetchID, val.snippet.authorDisplayName);
                 count++;
             });
-
-            if (typeof page !== 'undefined' && page != pageToken)
-                executeAsync(function () { appendComments(id, count, page, currFetchID) });
-        } else {
-            displayMessage('Issue retrieving replies.', BAD);
         }
-    }, function (reason) {
-        displayMessage('Issue retrieving replies.', BAD);
     });
 }
 

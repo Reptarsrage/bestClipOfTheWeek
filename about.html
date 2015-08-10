@@ -15,9 +15,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/Style/common.css?v=0.2.3(beta)">
+    <link rel="stylesheet" href="/Style/common.css?v=0.2.4(beta)">
 
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js?v=0.2.3(beta)"></script>
+    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js?v=0.2.4(beta)"></script>
 
     <!-- check login -->
     <script>
@@ -34,7 +34,7 @@
 
         //check for token
         if (!urlParams['token'] || !urlParams['username'])
-            window.location = "login.html?v=0.2.3(beta)";
+            window.location = "login.html?v=0.2.4(beta)";
 
         // authorize
         var username = urlParams['username'];
@@ -53,25 +53,25 @@
             },
             success: function (msg) {
                 if (!msg) {
-                    window.location = "login.html?v=0.2.3(beta)";
+                    window.location = "login.html?v=0.2.4(beta)";
                 }
                 // msg.status
                 // msg.responseText
                 // msg. statusText
                 if (msg.hasOwnProperty("status")) {
                     if (msg.status != 200)
-                        window.location = "login.html?v=0.2.3(beta)";
+                        window.location = "login.html?v=0.2.4(beta)";
                 }
             },
             error: function (reason) {
-                window.location = "login.html?v=0.2.3(beta)";
+                window.location = "login.html?v=0.2.4(beta)";
             },
         });
     </script>
 
 
-    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.3(beta)"></script>
-    <script type="text/javascript" src="/Scripts/header.js?v=0.2.3(beta)"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.4(beta)"></script>
+    <script type="text/javascript" src="/Scripts/header.js?v=0.2.4(beta)"></script>
 </head>
 <body>
     <!--DUPLICATED ACCROSS PAGES-->
@@ -156,10 +156,10 @@
     <script>
         $(document).ready(function () {
             $("#version").html(VERSION);
-            $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
-            $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
-            $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
-            $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token']);
+            $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+            $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+            $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+            $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
         });
     </script>
 </body>
