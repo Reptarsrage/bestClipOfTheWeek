@@ -167,15 +167,8 @@ google.load("visualization", "1", {
 google.setOnLoadCallback(function () {
     displayMessage("Authorize - Success", GOOD);
     data = new google.visualization.DataTable();
+    populateBestOfTheWeek();
 });
-
-function onJSClientLoad() {
-    gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
-    gapi.client.load('plus', 'v1');
-    gapi.client.load('youtube', 'v3').then(function () {
-        populateBestOfTheWeek();
-    });
-}
 
 
 ////////////////////////////////// FUNCTIONS ////////////////////////////////
@@ -256,86 +249,30 @@ function loadTermsAndColors(user) {
     });
 }
 
-function executeAsync(func) {
-    setTimeout(func, 0);
-}
-
 function populateBestOfTheWeek() {
     var select = $("#select_bestOfTheWeek");
 
-    var request = gapi.client.youtube.channels.list({
-        forUsername: 'StoneMountain64',
-        part: 'id'
-    });
-    request.execute(function (response) {
-        channelID = response.result.items[0].id;//relatedPlaylists.uploads;
-        requestVideoPlaylist(channelID);
-
-    }, function (reason) {
+    Utility.getBestClipOfTheWeekPlaylistID(function success(id) {
+        requestVideosInPlaylist(id);
+    }, function error(x, t, m) {
         select.append("<li>Error retrieving videos</li>");
         select.prop('disabled', true);
     });
 }
 
-
-// Retrieve the list of videos in the specified playlist.
-function requestVideoPlaylist(channelID, pageToken) {
-    var requestOptions = {
-        channelId: channelID,
-        part: 'snippet',
-        maxResults: 20
-    };
-    if (pageToken) {
-        requestOptions.pageToken = pageToken;
-    }
-    var request = gapi.client.youtube.playlists.list(requestOptions);
-    request.execute(function (response) {
-        // Only show pagination buttons if there is a pagination token for the
-        // next or previous page of results.
-        nextPageToken = response.result.nextPageToken;
-        var playlistItems = response.result.items;
-        if (playlistItems) {
-            $.each(playlistItems, function (index, item) {
-                var title = item.snippet.title;
-                var id = item.id;
-                if (title == PLAYLIST_TITLE) {
-                    videoHistoryStats = new Array();
-                    requestVideosInPlaylist(id);
-                    return;
-                }
-            });
-        }
-        if (nextPageToken)
-            requestVideoPlaylist(channelID, nextPageToken);
-
-    }, function (reason) {
-        select.append("<option value='Error'>Error retrieving videos</option>");
-        select.prop('disabled', true);
-    });
-}
-
-
 // Retrieve the list of videos in the specified playlist.
 function requestVideosInPlaylist(playlistId, pageToken) {
-    var requestOptions = {
-        playlistId: playlistId,
-        part: 'snippet',
-        maxResults: 20
-    };
+    var url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" + playlistId + "&maxResults=20"
+
     if (pageToken) {
-        requestOptions.pageToken = pageToken;
+        url += "&pageToken=" + pageToken;
     }
-    var request = gapi.client.youtube.playlistItems.list(requestOptions);
-    request.execute(function (response) {
-        if (response.hasOwnProperty("code") && response.code != 200) {
-            $("#select_bestOfTheWeek .loading").fadeOut(500);
-            $("#select_bestOfTheWeek .error").fadeIn(500);
-            return;
-        }
+    Utility.makeAsyncYouTubeAjaxRequest(url, null,
+       function success(response) {
 
-        nextPageToken = response.result.nextPageToken;
+        nextPageToken = response.nextPageToken;
 
-        var playlistItems = response.result.items;
+        var playlistItems = response.items;
         if (playlistItems) {
             $.each(playlistItems, function (index, item) {
                 date = new Date(item.snippet.publishedAt);
@@ -374,7 +311,7 @@ function requestVideosInPlaylist(playlistId, pageToken) {
 
         if (nextPageToken)
             requestVideosInPlaylist(playlistId, nextPageToken);
-    }, function (reason) {
+    }, function error(x,t,m) {
         $("#select_bestOfTheWeek .loading").fadeOut(500);
         $("#select_bestOfTheWeek .error").fadeIn(500);
         return;
@@ -438,14 +375,14 @@ function chartTimeUpdate(currFetchID) {
     } else if (lastCount == overallCount) {
         timerCount++;
         //console.log("tick");
-        setTimeout(chartTimeUpdate, TIMER_DELAY, currFetchID);
+        Utility.delayAfter(function () { chartTimeUpdate(currFetchID) }, TIMER_DELAY);
         return;
     } else {
         lastCount = overallCount;
         timerCount = 0;
         //console.log("UPDATE!");
         loadChart();
-        setTimeout(chartTimeUpdate, TIMER_DELAY, currFetchID);
+        Utility.delayAfter(function() {chartTimeUpdate(currFetchID)}, TIMER_DELAY);
     }
 }
 
@@ -562,7 +499,7 @@ function fetchResults() {
     displayMessage('Processing query...please wait', OKAY);
     $("#results").fadeIn(500);
     var id = grabVideoId();
-    executeAsync(function () { getVideoStats(id, fetchID) });
+    Utility.delayAfter(function () { getVideoStats(id, fetchID) });
     chartTimeUpdate(fetchID);
 }
 
@@ -570,23 +507,21 @@ function addVideoStatsToArray(id, title, shorthand, dateadded) {
     if (id.trim() == '')
         return false;
 
-    // See https://developers.google.com/youtube/v3/docs/videos/list
-    var request = gapi.client.youtube.videos.list({
-        part: 'statistics',
-        id: id
-    });
-    request.execute(function (response) {
-        if (response.pageInfo.totalResults > 0) {
+    var url = "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=" + id + "&maxResults=1"
+
+    Utility.makeAsyncYouTubeAjaxRequest(url, null,
+       function success(response) {
+        if (response.pageInfo.totalResults > 0 && response.items.length > 0) {
             // stats
-            viewCount = response.result.items[0].statistics.viewCount;
-            likeCount = response.result.items[0].statistics.likeCount;
-            commentCount = response.result.items[0].statistics.commentCount;
+            viewCount =response.items[0].statistics.viewCount;
+            likeCount =response.items[0].statistics.likeCount;
+            commentCount =response.items[0].statistics.commentCount;
             videoHistoryStats.push([title, viewCount, commentCount, likeCount, shorthand, dateadded]);
             return true;
         } else {
             return false;
         }
-    }, function(reason) {
+    }, function error(x,t,m) {
         return false;
     });
     return true;
@@ -634,27 +569,25 @@ function getVideoStats(id, currFetchID) {
 
     var title, description, thumbUrl, thumbW, thumbH, viewCount, likeCount, dislikeCount, favoriteCount, commentCount;
 
-    // See https://developers.google.com/youtube/v3/docs/videos/list
-    var request = gapi.client.youtube.videos.list({
-        part: 'statistics, snippet',
-        id: id
-    });
-    request.execute(function (response) {
-        if (response.pageInfo.totalResults > 0) {
+    var url = "https://www.googleapis.com/youtube/v3/videos?part=statistics,snippet&id=" + id + "&maxResults=1"
+
+    Utility.makeAsyncYouTubeAjaxRequest(url, null,
+       function success(response) {
+        if (response.pageInfo.totalResults > 0 && response.items.length > 0) {
             // snippet
-            title = response.result.items[0].snippet.title;
-            description = response.result.items[0].snippet.description;
-            thumbUrl = response.result.items[0].snippet.thumbnails.high.url;
-            thumbW = response.result.items[0].snippet.thumbnails.high.width;
-            thumbH = response.result.items[0].snippet.thumbnails.high.height;
+            title =response.items[0].snippet.title;
+            description =response.items[0].snippet.description;
+            thumbUrl =response.items[0].snippet.thumbnails.high.url;
+            thumbW =response.items[0].snippet.thumbnails.high.width;
+            thumbH =response.items[0].snippet.thumbnails.high.height;
 
 
             // stats
-            viewCount = response.result.items[0].statistics.viewCount;
-            likeCount = response.result.items[0].statistics.likeCount;
-            dislikeCount = response.result.items[0].statistics.dislikeCount;
-            favoriteCount = response.result.items[0].statistics.favoriteCount;
-            commentCount = response.result.items[0].statistics.commentCount;
+            viewCount =response.items[0].statistics.viewCount;
+            likeCount =response.items[0].statistics.likeCount;
+            dislikeCount =response.items[0].statistics.dislikeCount;
+            favoriteCount =response.items[0].statistics.favoriteCount;
+            commentCount =response.items[0].statistics.commentCount;
 
             // construct html
             maxValue = commentCount * BAR_CHART_MAX_RATIO;
@@ -678,7 +611,7 @@ function getVideoStats(id, currFetchID) {
             $("#stats_group .loading").fadeOut(500);
             $("#columnchart").fadeIn(500);
             $("#columnchart .loading").show();
-            executeAsync(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&videoId=" + id + "&maxResults=" + 20, currFetchID) });
+            Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
             // draw column chart
             var nonNullData = new google.visualization.DataTable();
@@ -701,7 +634,7 @@ function getVideoStats(id, currFetchID) {
 
 
             for (pos = 0; pos < videoHistoryStats.length; pos++) {
-                if (videoHistoryStats[pos][0] == response.result.items[0].snippet.title)
+                if (videoHistoryStats[pos][0] ==response.items[0].snippet.title)
                     break;
             }
             high = Math.min(pos + 4, videoHistoryStats.length - 1);
@@ -759,10 +692,10 @@ function getVideoStats(id, currFetchID) {
             $("#statsSpace .error").fadeIn(500);
             displayMessage("No results found for video with ID='" + id + "'.", OKAY);
         }
-    }, function (reason) {
+    }, function error(x,t,m) {
         //displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
         // $("#statsSpace .error").fadeIn(500);
-        console.log('Error loading stats: ' + reason.result.error.message);
+        console.log('Error loading stats: ' + x.status + ". " + m + ".");
         getVideoStats(id, currFetchID)
     });
 }
@@ -779,102 +712,89 @@ function loadComments(count, url, currFetchID) {
         });
     }
 
-    $.ajax({
-        url: url,
-        dataType: "jsonp",
-        error: function(jqXHR, textStatus, errorThrown) {
-            if (currFetchID != fetchID)
-                return;
-
-            console.log('Error loading comments');
-            console.log(errorThrown);
-            console.log(jqXHR);
-            // try again
-            loadComments(count, url, currFetchID)
-        },
-        success: function (data) {
-            if (currFetchID != fetchID)
-                return;
-
-            if (data["error"]) {
-                console.log('Error loading comments');
-                console.log(data.error.code);
-                console.log(data.error.message);
-                return;
-            }
+    Utility.makeAsyncYouTubeAjaxRequest(url, null, 
+         function success(data) {
+             if (currFetchID != fetchID)
+                 return;
   
-            nextUrl = "";
-            if (data["nextPageToken"] && data["nextPageToken"].length > 0) {
-                nextUrl = url;
-                if (nextUrl.indexOf("pageToken") > 0) {
-                    nextUrl = nextUrl.replace(/pageToken=.*$/, "pageToken=" + data["nextPageToken"]);
-                } else {
-                    nextUrl += "&pageToken=" + data["nextPageToken"];
-                }
-            } 
+             nextUrl = "";
+             if (data["nextPageToken"] && data["nextPageToken"].length > 0) {
+                 nextUrl = url;
+                 if (nextUrl.indexOf("pageToken") > 0) {
+                     nextUrl = nextUrl.replace(/pageToken=.*$/, "pageToken=" + data["nextPageToken"]);
+                 } else {
+                     nextUrl += "&pageToken=" + data["nextPageToken"];
+                 }
+             } 
 
-            if (nextUrl) {
-                executeAsync(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
-            }
+             if (nextUrl) {
+                 Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
+             }
 
-            $("#commentSpace > .error").fadeOut(500);
-            $.each(data["items"], function (key, val) {
-                var comment = $("<li class='comment'></li>");
-                var body = $("<div class='commentBody'></div>");
+             $("#commentSpace > .error").fadeOut(500);
+             $.each(data["items"], function (key, val) {
+                 var comment = $("<li class='comment'></li>");
+                 var body = $("<div class='commentBody'></div>");
 
-                var author = $("<h2 class='author'></h2>");
-                var authorName = val.snippet.topLevelComment.snippet.authorDisplayName;
-                author.html(authorName);
+                 var author = $("<h2 class='author'></h2>");
+                 var authorName = val.snippet.topLevelComment.snippet.authorDisplayName;
+                 author.html(authorName);
 
-                // comment id used for google + reply retrieval: val.id.$t.split("comment:")[1]
-                // google+ id: val.yt$googlePlusUserId.$t
-                // reply count: val.yt$replyCount.$t
-
-
-                var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
-                var replyCt = val.snippet.totalReplyCount;
-                var commentID = val.id;
+                 // comment id used for google + reply retrieval: val.id.$t.split("comment:")[1]
+                 // google+ id: val.yt$googlePlusUserId.$t
+                 // reply count: val.yt$replyCount.$t
 
 
-                var userData = $("<div class='commentData'></div>");
-                userData.html("<p> reply number: " + count + "</p>" +
-                            "<p> Google+:<a href='" + googleID + "'></a></p>" +
-                            "<p> replyCt: " + replyCt + "</p>" +
-                            "<p> commentID: " + commentID + "</p>");
+                 var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
+                 var replyCt = val.snippet.totalReplyCount;
+                 var commentID = val.id;
 
-                var content = $("<div class='content'></div>");
-                content.html(parseComment(val.snippet.topLevelComment.snippet.textDisplay, currFetchID, authorName));
 
-                // find replies
-                if (replyCt > 0) {
-                    appendComments(comment, commentID, 1, "", currFetchID);
-                }
+                 var userData = $("<div class='commentData'></div>");
+                 userData.html("<p> reply number: " + count + "</p>" +
+                             "<p> Google+:<a href='" + googleID + "'></a></p>" +
+                             "<p> replyCt: " + replyCt + "</p>" +
+                             "<p> commentID: " + commentID + "</p>");
 
-                body.append(author).append(content).append(userData);
-                body.hover(function () {
-                    // in
-                    $(this).find("span.highlight").css("font-size", "24pt");
-                }, function () {
-                    // out
-                    $(this).find("span.highlight").css("font-size", "12pt");
-                });
+                 var content = $("<div class='content'></div>");
+                 content.html(parseComment(val.snippet.topLevelComment.snippet.textDisplay, currFetchID, authorName));
 
-                comment.append(body);
-                $("#comments > .error").fadeOut(500);
-                commentHTML.append(comment);
-                $("#h2_comments").html(count);
-                count++;
+                 // find replies
+                 if (replyCt > 0) {
+                     appendComments(comment, commentID, 1, "", currFetchID);
+                 }
 
-            });
+                 body.append(author).append(content).append(userData);
+                 body.hover(function () {
+                     // in
+                     $(this).find("span.highlight").css("font-size", "24pt");
+                 }, function () {
+                     // out
+                     $(this).find("span.highlight").css("font-size", "12pt");
+                 });
 
-            if (!nextUrl) {
-                displayMessage('Completed query.', GOOD);
-                endTime = new Date().getTime();
-                var time = (endTime - startTime) / 1000.00;
-                console.log('Execution time: ' + time + " seconds");
-            }
-        }
-    });
+                 comment.append(body);
+                 $("#comments > .error").fadeOut(500);
+                 commentHTML.append(comment);
+                 $("#h2_comments").html(count);
+                 count++;
+
+             });
+
+             if (!nextUrl) {
+                 displayMessage('Completed query.', GOOD);
+                 endTime = new Date().getTime();
+                 var time = (endTime - startTime) / 1000.00;
+                 console.log('Execution time: ' + time + " seconds");
+             }
+         }, function error(x,t,m) {
+             if (currFetchID != fetchID)
+                 return;
+
+             console.log('Error loading comments');
+             // try again
+             loadComments(count, url, currFetchID)
+         });
 }
 
 function appendComments(commentParent, id, count, pageToken, currFetchID) {
@@ -882,39 +802,20 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
         return;
 
     if (pageToken == "")
-        url = "https://www.googleapis.com/youtube/v3/comments?part=snippet&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&parentId=" + id;
+        url = "https://www.googleapis.com/youtube/v3/comments?part=snippet&parentId=" + id;
     else
-        url = "https://www.googleapis.com/youtube/v3/comments?part=snippet&key=AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE&parentId=" + id + "&pageToken=" + pageToken;
+        url = "https://www.googleapis.com/youtube/v3/comments?part=snippet&parentId=" + id + "&pageToken=" + pageToken;
 
-    $.ajax({
-        url: url,
-        dataType: "jsonp",
-        error: function (jqXHR, textStatus, errorThrown) {
+    Utility.makeAsyncYouTubeAjaxRequest(url, null, 
+         function success(data) {
             if (currFetchID != fetchID)
                 return;
-
-            console.log('Error loading comment replies');
-            console.log(errorThrown);
-            console.log(jqXHR);
-            // try again
-            appendComments(commentParent, id, count, pageToken, currFetchID)
-        },
-        success: function (data) {
-            if (currFetchID != fetchID)
-                return;
-
-            if (data["error"]) {
-                console.log('Error loading comments');
-                console.log(data.error.code);
-                console.log(data.error.message);
-                return;
-            }
 
             var nextPageToken = "";
 
             if (data["nextPageToken"]) {
                 nextPageToken = data["nextPageToken"];
-                executeAsync(function () { appendComments(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+                Utility.delayAfter(function () { appendComments(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
             }
 
             $.each(data["items"], function (key, val) {
@@ -948,8 +849,14 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
                 commentParent.append(comment);
                 count++;
             });
-        }
-    });
+         }, function error(x,t,m) {
+             if (currFetchID != fetchID)
+                 return;
+
+             console.log('Error loading comment replies');
+             // try again
+             appendComments(commentParent, id, count, pageToken, currFetchID)
+         });
 }
 
 function parseComment(comment, currFetchID, author) {

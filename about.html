@@ -15,9 +15,10 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/Style/common.css?v=0.2.4(beta)">
+    <link rel="stylesheet" href="/Style/common.css?v=0.2.4.1(beta)">
 
-    <script type="text/javascript" src="//ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js?v=0.2.4(beta)"></script>
+    <script src="Scripts/jquery-1.11.3.min.js"></script>
+    <script src="Scripts/jquery-ui.min.js"></script>
 
     <!-- check login -->
     <script>
@@ -34,7 +35,7 @@
 
         //check for token
         if (!urlParams['token'] || !urlParams['username'])
-            window.location = "login.html?v=0.2.4(beta)";
+            window.location = "login.html?v=0.2.4.1(beta)";
 
         // authorize
         var username = urlParams['username'];
@@ -53,25 +54,24 @@
             },
             success: function (msg) {
                 if (!msg) {
-                    window.location = "login.html?v=0.2.4(beta)";
+                    window.location = "login.html?v=0.2.4.1(beta)";
                 }
                 // msg.status
                 // msg.responseText
                 // msg. statusText
                 if (msg.hasOwnProperty("status")) {
                     if (msg.status != 200)
-                        window.location = "login.html?v=0.2.4(beta)";
+                        window.location = "login.html?v=0.2.4.1(beta)";
                 }
             },
             error: function (reason) {
-                window.location = "login.html?v=0.2.4(beta)";
+                window.location = "login.html?v=0.2.4.1(beta)";
             },
         });
     </script>
 
-
-    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.4(beta)"></script>
-    <script type="text/javascript" src="/Scripts/header.js?v=0.2.4(beta)"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.4.1(beta)"></script>
+    <script type="text/javascript" src="/Scripts/header.js?v=0.2.4.1(beta)"></script>
 </head>
 <body>
     <!--DUPLICATED ACCROSS PAGES-->

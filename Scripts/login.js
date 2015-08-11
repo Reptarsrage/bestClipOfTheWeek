@@ -25,6 +25,9 @@ var backgroundComplete = false;
 var backgroundImgQueue;
 
 $(document).ready(function () {
+
+    fillBackground();
+
     $("#login").click(function () {
         disable();
         if ($("#result").text().trim() != "")
@@ -38,7 +41,7 @@ $(document).ready(function () {
         signup();
     });
 
-    setTimeout(function () {
+    Utility.delayAfter(function () {
         $("#userid").focus();
     }, 0);
 
@@ -159,86 +162,74 @@ function signup() { /*function to check userid & password*/
     return true;
 }
 
-// FANCY BACKGROUD
-function onJSClientLoad() {
-    gapi.client.setApiKey('AIzaSyB_LOatFV88Yptvdv_ot_yvoQ9MZDKgdzE');
-    gapi.client.load('youtube', 'v3').then(function () {
-        fillBackground();
-    });
-}
-
 function fillBackground() {
     backgroundInitialize();
+    var url = "https://www.googleapis.com/youtube/v3/channels?part=id&forUsername=StoneMountain64&maxResults=1";
 
-    var request = gapi.client.youtube.channels.list({
-        forUsername: 'StoneMountain64',
-        part: 'id'
-    });
-    request.execute(function (response) {
-        channelID = response.result.items[0].id;//relatedPlaylists.uploads;
-        requestVideoPlaylist(channelID);
-
-    }, function (reason) {
-        // error
+    Utility.makeAsyncYouTubeAjaxRequest(url, null, function success(resp) {
+        if (resp.items && resp.items.length > 0) {
+            channelID = resp.items[0].id;
+            requestVideoPlaylist(channelID);
+        } else {
+            console.log("Error: No channel found.");
+            Utility.delayAfter(function () { fillBackground(); }, 1000);
+        }
+    }, function error(x, t, m) {
+        console.log("Error: " + t + ". " + m + ".");
+        Utility.delayAfter(function () { fillBackground(); }, 1000);
     });
 }
 
 
 // Retrieve the list of videos in the specified playlist.
 function requestVideoPlaylist(channelID, pageToken) {
-    var requestOptions = {
-        channelId: channelID,
-        part: 'snippet',
-        maxResults: 20
-    };
-    if (pageToken) {
-        requestOptions.pageToken = pageToken;
-    }
-    var request = gapi.client.youtube.playlists.list(requestOptions);
-    request.execute(function (response) {
-        // Only show pagination buttons if there is a pagination token for the
-        // next or previous page of results.
-        nextPageToken = response.result.nextPageToken;
-        var playlistItems = response.result.items;
-        if (playlistItems) {
-            $.each(playlistItems, function (index, item) {
-                var title = item.snippet.title;
-                var id = item.id;
-                if (title == PLAYLIST_TITLE) {
-                    requestVideosInPlaylist(id);
-                    return;
-                }
-            });
-        }
-        if (nextPageToken)
-            requestVideoPlaylist(channelID, nextPageToken);
+    var url = "https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=" + channelID + "&maxResults=20"
 
-    }, function (reason) {
-        //errror 
-    });
+    if (pageToken) {
+        url += "&pageToken="+pageToken;
+    }
+    
+    Utility.makeAsyncYouTubeAjaxRequest(url, null,
+        function success(response) {
+            // Only show pagination buttons if there is a pagination token for the
+            // next or previous page of results.
+            nextPageToken = response.nextPageToken;
+            var playlistItems = response.items;
+            if (playlistItems) {
+                $.each(playlistItems, function (index, item) {
+                    var title = item.snippet.title;
+                    var id = item.id;
+                    if (title == PLAYLIST_TITLE) {
+                        requestVideosInPlaylist(id);
+                        return;
+                    }
+                });
+            }
+            if (nextPageToken) {
+                requestVideoPlaylist(channelID, nextPageToken);
+            }
+        },
+        function error(x, t, m) {
+            console.log("Error: " + t + ". " + m + ".");
+            Utility.delayAfter(function () { requestVideoPlaylist(channelID, pageToken); }, 1000);
+        });
 }
 
 
 // Retrieve the list of videos in the specified playlist.
 function requestVideosInPlaylist(playlistId, pageToken) {
-    var requestOptions = {
-        playlistId: playlistId,
-        part: 'snippet',
-        maxResults: 20
-    };
+    var url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" + playlistId + "&maxResults=20"
+
+
     if (pageToken) {
-        requestOptions.pageToken = pageToken;
+        url += "&pageToken=" + pageToken;
     }
-    var request = gapi.client.youtube.playlistItems.list(requestOptions);
-    request.execute(function (response) {
-        if (response.hasOwnProperty("code") && response.code != 200) {
-            // error
-            return;
-        }
+    Utility.makeAsyncYouTubeAjaxRequest(url, null,
+       function success(response) {
 
-        nextPageToken = response.result.nextPageToken;
+        nextPageToken = response.nextPageToken;
 
-        var playlistItems = response.result.items;
+        var playlistItems = response.items;
         if (playlistItems) {
             $.each(playlistItems, function (index, item) {
                 if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("default")) {
@@ -250,15 +241,16 @@ function requestVideosInPlaylist(playlistId, pageToken) {
                 }
                 if (url.length > 0) {
                     backgroundImgArray.push(url);
-                    //displayBackgroundImage();
                 }
             });
         }
 
         if (nextPageToken)
             requestVideosInPlaylist(playlistId, nextPageToken);
-    }, function (reason) {
-       // error
+    }, function error(x, t, m) {
+        // error
+        console.log("Error: " + x.status + ". " + m + ".");
+        Utility.delayAfter(function () { requestVideosInPlaylist(playlistId, pageToken); }, 1000);
     });
 }
 
@@ -268,9 +260,9 @@ function backgroundUpdate() {
     displayBackgroundImage();
 
     if (backgroundComplete) {
-        setTimeout(backgroundUpdate, Math.floor(Math.random() * 200) + MIN_TIMER_DELAY);
+        Utility.delayAfter(backgroundUpdate, Math.floor(Math.random() * 200) + MIN_TIMER_DELAY);
     } else {
-        setTimeout(backgroundUpdate, RAPID_TIMER_DELAY);
+        Utility.delayAfter(backgroundUpdate, RAPID_TIMER_DELAY);
     }
     
 }
