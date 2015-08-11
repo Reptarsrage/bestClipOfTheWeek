@@ -5,70 +5,27 @@
  * Term configuration page
  */
 
-// Constants
-const GOOD = 0;
-const BAD = 1;
-const OKAY = 2
-//const urlParams['username'] = "Admin";
-
 // Variables
 var lastAdded = null;
 var lastRemoved = null;
 
 window.onerror = function (msg, url, line, col, error) {
-    // Note that col & error are new to the HTML 5 spec and may not be 
-    // supported in every browser.  It worked for me in Chrome.
     var extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
-
-    // You can view the information in an alert to see things working like this:
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
     displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
-
-    // TODO: Report this error via ajax so you can keep track
-    //       of what pages have JS issues
-
     var suppressErrorAlert = true;
-    // If you return true, then error alerts (like in older versions of 
-    // Internet Explorer) will be suppressed.
     return suppressErrorAlert;
 };
 
 $(document).ready(function () {
     // tool-tips
-    $(document).on("click", ".tooltip", function () {
-        var name = $(this).attr("name");
-        $(this).tooltip(
-            {
-                items: ".tooltip",
-                content: function () {
-                    return TOOL_TIPS['config'][name];//$(this).data('description');
-                },
-                close: function (event, ui) {
-                    var me = this;
-                    ui.tooltip.hover(
-                        function () {
-                            $(this).stop(true).fadeTo(400, 1);
-                        },
-                        function () {
-                            $(this).fadeOut("400", function () {
-                                $(this).remove();
-                            });
-                        }
-                    );
-                    ui.tooltip.on("remove", function () {
-                        $(me).tooltip("destroy");
-                    });
-                },
-            }
-        );
-        $(this).tooltip("open");
-    });
+    Utility.configureTooltipForPage('config');
 
     $("#table_config").fadeOut(500);
     $("#table_config tbody").empty();
     $(".loading").fadeIn(500);
-    executeAsync(function () { handleEvent('GET', null) });
+    Utility.delayAfter(function () { handleEvent('GET', null) });
 
     $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
     $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
@@ -229,7 +186,7 @@ function createTableRow(row, buttonType, before) {
     if (case_delete) {
         cols = row.split(" ");
     } else {
-        cols = ["", getRandomColor(), "1"];
+        cols = ["", Utility.getRandomColor(), "1"];
         row_dom.addClass("tr_add");
     }
     if (cols.length == 3) {
@@ -272,7 +229,7 @@ function createTableRow(row, buttonType, before) {
 
                 // clear all inputs
                 parent.find(".input_term").val("");
-                parent.find(".color").val(getRandomColor());
+                parent.find(".color").val(Utility.getRandomColor());
                 parent.find(".checkpox_enabled").prop('checked', true);
                 $(this).prop('disabled', false).addClass('disabled');
                 $(this).removeClass('disabled');
@@ -377,17 +334,4 @@ function createTableRow(row, buttonType, before) {
     }
 
     lastAdded = row_dom;
-}
-
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
-}
-
-function executeAsync(func) {
-    setTimeout(func, 0);
 }

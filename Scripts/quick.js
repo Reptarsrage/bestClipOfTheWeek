@@ -5,13 +5,6 @@
  * Index (home) page
  */
 
-
-// Constants
-const GOOD = 0;
-const BAD = 1;
-const OKAY = 2
-const PLAYLIST_TITLE = "World's Best Clip of the Week"
-
 // Variables
 var ConfiguredTermArray;
 var ConfiguredColorArray;
@@ -25,61 +18,39 @@ var voters = new Array();
 
 
 window.onerror = function (msg, url, line, col, error) {
-    // Note that col & error are new to the HTML 5 spec and may not be 
-    // supported in every browser.  It worked for me in Chrome.
     var extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
-
-    // You can view the information in an alert to see things working like this:
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    displayMessage("An error occured on the page. Please try a hard refresh (CTRL + F5). If you experience any further issues please contact me for support (link in footer).", BAD);
-    fetchID++; // stop all events
-
-    // TODO: Report this error via ajax so you can keep track
-    //       of what pages have JS issues
-
+    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+    fetchID++;
     var suppressErrorAlert = true;
-    // If you return true, then error alerts (like in older versions of 
-    // Internet Explorer) will be suppressed.
     return suppressErrorAlert;
 };
 
 $(document).ready(function () {
-    displayMessage("Authorizing...", OKAY);
     // tool-tips
-    $(document).on("click", ".tooltip", function () {
-        var name = $(this).attr("name");
-        $(this).tooltip(
-            {
-                items: ".tooltip",
-                content: function () {
-                    return TOOL_TIPS['quick'][name];//$(this).data('description');
-                },
-                close: function (event, ui) {
-                    var me = this;
-                    ui.tooltip.hover(
-                        function () {
-                            $(this).stop(true).fadeTo(400, 1);
-                        },
-                        function () {
-                            $(this).fadeOut("400", function () {
-                                $(this).remove();
-                            });
-                        }
-                    );
-                    ui.tooltip.on("remove", function () {
-                        $(me).tooltip("destroy");
-                    });
-                },
-            }
-        );
-        $(this).tooltip("open");
-    });
+    Utility.configureTooltipForPage('quick');
 
 
     // executes when HTML-Document is loaded and DOM is ready
     $("#fetch").click(fetchResults);
-    loadTermsAndColors(urlParams['username']);
+
+    // get terms and colors
+    $("#fetch").prop("disabled", true);
+    $("#fetch").prop("title", "Please wait for terms to be loaded");
+    Utility.loadTermsAndColors(urlParams['username'], $("#list_starting_terms"), function success(ConfiguredColorArray, ConfiguredTermArray) {
+        self.ConfiguredColorArray = ConfiguredColorArray;
+        self.ConfiguredTermArray = ConfiguredTermArray;
+        $("#list_starting_terms .loading").fadeOut(500);
+        $("#fetch").prop("disabled", false);
+        $("#fetch").prop("title", "");
+    }, function error(resp) {
+        $("#list_starting_terms .loading").fadeOut(500);
+        $("#list_starting_terms .error").fadeIn(500);
+        Utility.displayMessage("Unable to load terms for user " + user + ".", BAD);
+    });
+
+    // bind actions
     $("#collapse").click(function () {
         if ($(this).hasClass("expanded")) {
             $("#userSpace").slideUp("slow", function () {
@@ -127,148 +98,20 @@ $(document).ready(function () {
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
 
-    // done
-    displayMessage("Authorize - Success", GOOD);
-    populateBestOfTheWeek();
+    //  populate list
+    Utility.populateBestOfTheWeek($("#select_bestOfTheWeek"),
+    function success(videoHistoryStats) {
+        $("#select_bestOfTheWeek .loading").fadeOut(500);
+    },
+    function error(x, t, m) {
+        $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
+        $("#select_bestOfTheWeek .loading").fadeOut(500);
+        $("#select_bestOfTheWeek .error").fadeIn(500);
+    });
 });
 
 
 ////////////////////////////////// FUNCTIONS ////////////////////////////////
-
-function loadTermsAndColors(user) {
-    // get terms and colors
-    $("#fetch").prop("disabled", true);
-    $("#fetch").prop("title", "Please wait for terms to be loaded");
-    $.ajax({
-        url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
-        type: "GET",
-        timeout: 5000,
-        cache: false,
-        data: {
-            username: user,
-            token: urlParams['token']
-        },
-        success: function (resp) {
-            if (resp.hasOwnProperty("status")) {
-                // error?
-                console.log("Error: " + resp.status);
-                $("#list_starting_terms .loading").fadeOut(500);
-                $("#list_starting_terms .error").fadeIn(500);
-                displayMessage("Unable to load terms for user "+user+".", BAD);
-            } else {
-                ConfiguredColorArray = new Array();
-                ConfiguredTermArray = new Array();
-                var rows = resp.split("<br/>");
-                for (i = 0; i < rows.length; i++) {
-                    cols = rows[i].split(" ");
-                    if (cols[0].trim() == '')
-                        continue;
-
-                    //enabled
-                    var enabled = false;
-                    if (cols[2] > 0)
-                        enabled = true;
-
-
-                    if (enabled) {
-                        // color
-                        if (cols[1].indexOf('#') < 0)
-                            cols[1] = '#' + cols[1];
-                        ConfiguredColorArray.push(cols[1]);
-                        $("<style>")
-                            .prop("type", "text/css")
-                            .html("\
-                            ." + cols[0].replace(/[^\w]/gi, '') + " {\
-                                font-weight: bold; \
-                                color: " + cols[1] + ";\
-                            }")
-                            .appendTo("head");
-                    }
-
-                    // term
-                    if (enabled) {
-                        ConfiguredTermArray.push(cols[0].replace(/&nbsp;/g, ' '));
-                        var list = $("<li class=" + cols[0].replace(/[^\w]/gi, '') + "></li>");
-                        list.text(cols[0].replace(/&nbsp;/g, ' '));
-                    } else {
-                        var list = $("<li class='disabled'></li>");
-                        list.text("(disabled): " + cols[0].replace(/&nbsp;/g, ' '));
-                    }
-
-                    $("#list_starting_terms .loading").fadeOut(500);
-                    $("#list_starting_terms").append(list);
-                    $("#fetch").prop("disabled", false);
-                    $("#fetch").prop("title", "");
-                }
-            }
-        },
-        error: function (x, t, m) {
-            console.log("Error: " + t);
-            $("#list_starting_terms .loading").fadeOut(500);
-            $("#list_starting_terms .error").fadeIn(500);
-            displayMessage("Unable to load terms for user " + user + ".", BAD);
-        },
-    });
-}
-
-function populateBestOfTheWeek() {
-    Utility.getBestClipOfTheWeekPlaylistID(function success(id) {
-        requestVideosInPlaylist(id);
-    }, function error(x,t,m) {
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
-        $("#select_bestOfTheWeek .error").fadeIn(500);
-    });
-}
-
-// Retrieve the list of videos in the specified playlist.
-function requestVideosInPlaylist(playlistId, pageToken) {
-    var url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" + playlistId + "&maxResults=20"
-
-    if (pageToken) {
-        url += "&pageToken=" + pageToken;
-    }
-    Utility.makeAsyncYouTubeAjaxRequest(url, null,
-       function success(response) {
-
-        nextPageToken = response.nextPageToken;
-
-        var playlistItems = response.items;
-        if (playlistItems) {
-            $.each(playlistItems, function (index, item) {
-                date = new Date(item.snippet.publishedAt);
-                title = item.snippet.title;
-                pos = item.snippet.position;
-
-                if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("default")) {
-                    url = item.snippet.thumbnails.default.url;
-                } else if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("high")) {
-                    url = item.snippet.thumbnails.high.url;
-                } else {
-                    url = "";
-                }
-                id = item.snippet.resourceId.videoId;
-
-                if (title.length > 80) {
-                    title = title.substring(0, 77) + "...";
-                }
-
-
-                content = $("<li class='option' onclick='addUrlToInput(\"https://www.youtube.com/watch?v=" + id + "\", this)' title='" + item.snippet.title + "'></li>");
-                content.append($("<img class='option_thumb' src='" + url + "' alt='" + pos + "' \>"));
-                content.append($("<h3 class='option_title' >" + title + "<br><p class='option_date'>Date added: " + date.toLocaleDateString() + "</p></h3>"));
-                $("#select_bestOfTheWeek .loading").fadeOut(500);
-                $("#select_bestOfTheWeek").append(content);
-            });
-        }
-
-        if (nextPageToken)
-            requestVideosInPlaylist(playlistId, nextPageToken);
-    }, function error(x,t,m) {
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
-        $("#select_bestOfTheWeek .error").fadeIn(500);
-        return;
-    });
-}
 
 function addUrlToInput(url, elt) {
     if ($(elt).hasClass("selected")) {
@@ -320,22 +163,6 @@ function toggleVoters(cb, manual) {
     }
 }
 
-// Helper method to display a message on the page.
-function displayMessage(message, good) {
-    $('#message').text(message);
-
-    if (good == GOOD) {
-        $('#message').attr("class", "good");
-        $('#message').fadeOut(500);
-    } else if (good == BAD) {
-        $('#message').attr("class", "bad");
-        $('#message').fadeIn(500);
-    } else {
-        $('#message').attr("class", "okay");
-        $('#message').fadeIn(500);
-    }
-}
-
 function fetchResults() {
     // clean up
     $("#termResults_list").children().filter(":not(.loading)").remove();
@@ -346,10 +173,10 @@ function fetchResults() {
     $("#voters").children().filter(":not(.error)").remove();
 
     // start off hiding errors, will be shown as they crop up
-    $(".error").fadeOut(500);
+    $(".error :not(#userSpace .error)").fadeOut(500);
 
     // starting off showing all loading images, will hide as they load
-    $(".loading").fadeIn(500);
+    $(".loading :not(#userSpace .loading)").fadeIn(500);
     
     // hide all sections (will show one at a time as it completes
     $("#commentSpace").fadeOut(500);
@@ -369,7 +196,7 @@ function fetchResults() {
 
     if (!ConfiguredColorArray || !ConfiguredTermArray) {
         // TODO: load a default set of terms
-        displayMessage("Unable to load terms for user " + urlParams['username'] + ".", BAD);
+        Utility.displayMessage("Unable to load terms for user " + urlParams['username'] + ".", BAD);
         return false;
     }
 
@@ -378,9 +205,9 @@ function fetchResults() {
     fetchID++;
     startTime = new Date().getTime();
 
-    displayMessage('Processing query...please wait', OKAY);
-    var id = grabVideoId();
-    Utility.delayAfter(function () { getVideoStats(id, fetchID) });
+    Utility.displayMessage('Processing query...please wait', OKAY);
+    var id = Utility.grabVideoId();
+    Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 500);
 }
 
 function getVideoStats(id, currFetchID) {
@@ -393,7 +220,7 @@ function getVideoStats(id, currFetchID) {
         // no results
         $("#statsSpace .loading").fadeOut(500);
         $("#statsSpace .error").fadeIn(500);
-        displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+        Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
         return;
     }
 
@@ -445,7 +272,7 @@ function getVideoStats(id, currFetchID) {
             // no results
             $("#statsSpace .loading").fadeOut(500);
             $("#statsSpace .error").fadeIn(500);
-            displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+            Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
             return;
         }
     }, function error(x,t,m) {
@@ -497,7 +324,7 @@ function loadComments(count, url, currFetchID) {
 
                 // find replies
                 if (replyCt > 0) {
-                    appendComments(comment, commentID, 1, "", currFetchID);
+                    loadCommentReplies(comment, commentID, 1, "", currFetchID);
                 }
 
                 body.append(author).append(content);
@@ -518,7 +345,7 @@ function loadComments(count, url, currFetchID) {
             });
 
             if (!nextUrl) {
-                displayMessage('Completed query.', GOOD);
+                Utility.displayMessage('Completed query.', GOOD);
                 endTime = new Date().getTime();
                 var time = (endTime - startTime) / 1000.00;
                 console.log('Execution time: ' + time + " seconds");
@@ -539,7 +366,7 @@ function loadComments(count, url, currFetchID) {
           });
 }
 
-function appendComments(commentParent, id, count, pageToken, currFetchID) {
+function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
@@ -564,7 +391,7 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
 
             if (data["nextPageToken"]) {
                 nextPageToken = data["nextPageToken"];
-                Utility.delayAfter(function () { appendComments(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+                Utility.delayAfter(function () { loadCommentReplies(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
             }
 
             $.each(data["items"], function (key, val) {
@@ -596,7 +423,7 @@ function appendComments(commentParent, id, count, pageToken, currFetchID) {
                  return;
 
              console.log('Error loading replies.');
-             appendComments(commentParent, id, count, pageToken, currFetchID);
+             loadCommentReplies(commentParent, id, count, pageToken, currFetchID);
         });
 }
 
@@ -639,7 +466,7 @@ function parseComment(comment, currFetchID, author) {
             if (voters.indexOf(author) < 0) {
                 voters.push(author);
                 $("#voters .error").fadeOut(500);
-                addToSortedList("voters", author);
+                Utility.addToSortedList("voters", author);
             }
         }
     }
@@ -672,51 +499,4 @@ function parseComment(comment, currFetchID, author) {
 
     overallCount++;
     return res;
-}
-
-
-function addToSortedList(listID, elt) {
-    var name = elt;
-    if (name != '') {
-        var toinsert = true;
-        $("#" + listID + " > li").each(function () {
-            var item = $(this).html();
-            if (name.toUpperCase() < item.toUpperCase()) {
-                if (toinsert) {
-                    $(this).before('<li>' + name + '</li>');
-                    toinsert = false;
-                }
-            }
-        });
-        if (toinsert) {
-            $("#" + listID).append('<li>' + name + '</li>');
-        }
-    }
-}
-
-
-function grabVideoId() {
-    //https://www.youtube.com/watch?v=zPQZ8psBwO4
-    var url = $("#input_video").val();
-    var i = -1;
-    var res;
-    if ((i = url.indexOf("v=")) > -1) {
-        // looks promising
-        var nextParamIndex = url.indexOf("&");
-        if (nextParamIndex > -1) {
-            res = url.substring(i + 2, nextParamIndex);
-        } else {
-            res = url.substring(i + 2, url.length);
-        }
-    }
-    return res;
-}
-
-function getRandomColor() {
-    var letters = '0123456789ABCDEF'.split('');
-    var color = '#';
-    for (var i = 0; i < 6; i++ ) {
-        color += letters[Math.floor(Math.random() * 16)];
-    }
-    return color;
 }

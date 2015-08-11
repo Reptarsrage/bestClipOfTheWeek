@@ -19,67 +19,22 @@
     <meta http-equiv='expires' content='0'>
     <meta http-equiv='pragma' content='no-cache'>
 
-    <link type="text/css" rel="stylesheet" href="/Style/jquery-ui.min.css?v=0.2.4.1(beta)">
-    <link type="text/css" rel="stylesheet" href="/Style/common.css?v=0.2.4.1(beta)">
-    <link type="text/css" rel="stylesheet" href="/Style/comments.css?v=0.2.4.1(beta)">
+    <link type="text/css" rel="stylesheet" href="/Style/jquery-ui.min.css?v=0.2.4.2(beta)">
+    <link type="text/css" rel="stylesheet" href="/Style/common.css?v=0.2.4.2(beta)">
+    <link type="text/css" rel="stylesheet" href="/Style/comments.css?v=0.2.4.2(beta)">
 
     <script src="Scripts/jquery-1.11.3.min.js"></script>
     <script src="Scripts/jquery-ui.min.js"></script>
-
+    <script src="Scripts/validateLogin.js"></script>
     <!-- check login -->
     <script>
-        var urlParams;
-        var match,
-        pl = /\+/g,  // Regex for replacing addition symbol with a space
-        search = /([^&=]+)=?([^&]*)/g,
-        decode = function (s) { return decodeURIComponent(s.replace(pl, " ")); },
-        query = window.location.search.substring(1);
-
-        urlParams = {};
-        while (match = search.exec(query))
-            urlParams[decode(match[1])] = decode(match[2]);
-
-        //check for token
-        if (!urlParams['token'] || !urlParams['username'])
-            window.location = "login.html?v=0.2.4.1(beta)";
-
-        // authorize
-        var username = urlParams['username'];
-        var token = urlParams['token'];
-
-        $.ajax({
-            url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
-            async: false,
-            cache: false,
-            type: "GET",
-            timeout: 5000,
-            data: {
-                username: username,
-                token: token,
-                authorize: 'authorize'
-            },
-            success: function (msg) {
-                if (!msg) {
-                    window.location = "login.html?v=0.2.4.1(beta)";
-                }
-                // msg.status
-                // msg.responseText
-                // msg. statusText
-                if (msg.hasOwnProperty("status")) {
-                    if (msg.status != 200)
-                        window.location = "login.html?v=0.2.4.1(beta)";
-                } 
-            },
-            error: function (reason) {
-                window.location = "login.html?v=0.2.4.1(beta)";
-            },
-        });
+        validateLogin();
     </script>
 
-    <script src="Scripts/utility.js?v=0.2.4.1(beta)"></script>
-    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.4.1(beta)"></script>
-    <script type="text/javascript" src="/Scripts/header.js?v=0.2.4.1(beta)"></script>
-    <script type="text/javascript" src="/Scripts/comments.js?v=0.2.4.1(beta)"></script>
+    <script src="Scripts/utility.js?v=0.2.4.2(beta)"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.4.2(beta)"></script>
+    <script type="text/javascript" src="/Scripts/header.js?v=0.2.4.2(beta)"></script>
+    <script type="text/javascript" src="/Scripts/comments.js?v=0.2.4.2(beta)"></script>
 </head>
 <body>
     <!--DUPLICATED ACCROSS PAGES-->

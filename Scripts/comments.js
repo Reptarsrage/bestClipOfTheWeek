@@ -5,13 +5,6 @@
  * Index (home) page
  */
 
-
-// Constants
-const GOOD = 0;
-const BAD = 1;
-const OKAY = 2
-const PLAYLIST_TITLE = "World's Best Clip of the Week"
-
 // Variables
 var startTime, endTime;
 var overallCount = 0;
@@ -20,57 +13,18 @@ var voters = new Array();
 
 
 window.onerror = function (msg, url, line, col, error) {
-    // Note that col & error are new to the HTML 5 spec and may not be 
-    // supported in every browser.  It worked for me in Chrome.
     var extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
-
-    // You can view the information in an alert to see things working like this:
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    displayMessage("An error occured on the page. Please try a hard refresh (CTRL + F5). If you experience any further issues please contact me for support (link in footer).", BAD);
-    fetchID++; // stop all events
-
-    // TODO: Report this error via ajax so you can keep track
-    //       of what pages have JS issues
-
+    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+    fetchID++;
     var suppressErrorAlert = true;
-    // If you return true, then error alerts (like in older versions of 
-    // Internet Explorer) will be suppressed.
     return suppressErrorAlert;
 };
 
 $(document).ready(function () {
-    displayMessage("Authorizing...", OKAY);
-
     // tool-tips
-    $(document).on("click", ".tooltip", function () {
-        var name = $(this).attr("name");
-        $(this).tooltip(
-            {
-                items: ".tooltip",
-                content: function () {
-                    return TOOL_TIPS['comments'][name];//$(this).data('description');
-                },
-                close: function (event, ui) {
-                    var me = this;
-                    ui.tooltip.hover(
-                        function () {
-                            $(this).stop(true).fadeTo(400, 1);
-                        },
-                        function () {
-                            $(this).fadeOut("400", function () {
-                                $(this).remove();
-                            });
-                        }
-                    );
-                    ui.tooltip.on("remove", function () {
-                        $(me).tooltip("destroy");
-                    });
-                },
-            }
-        );
-        $(this).tooltip("open");
-    });
+    Utility.configureTooltipForPage('comments');
 
 
     // executes when HTML-Document is loaded and DOM is ready
@@ -115,75 +69,20 @@ $(document).ready(function () {
     overallCount = 0;
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
-
-    // DONE
-    displayMessage("Authorize - Success", GOOD);
-    populateBestOfTheWeek();
+    
+    //  populate list
+    Utility.populateBestOfTheWeek($("#select_bestOfTheWeek"),
+    function success(videoHistoryStats) {
+        $("#select_bestOfTheWeek .loading").fadeOut(500);
+    },
+    function error(x, t, m) {
+        $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
+        $("#select_bestOfTheWeek .loading").fadeOut(500);
+        $("#select_bestOfTheWeek .error").fadeIn(500);
+    });
 });
 
 ////////////////////////////////// FUNCTIONS ////////////////////////////////
-function executeAsync(func) {
-    setTimeout(func, 0);
-}
-
-function populateBestOfTheWeek() {
-    Utility.getBestClipOfTheWeekPlaylistID(function success(id) {
-        requestVideosInPlaylist(id);
-    }, function error(x,t,m) {
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
-        $("#select_bestOfTheWeek .error").fadeIn(500);
-    });
-}
-
-// Retrieve the list of videos in the specified playlist.
-function requestVideosInPlaylist(playlistId, pageToken) {
-    var url = "https://www.googleapis.com/youtube/v3/playlistItems?part=snippet&playlistId=" + playlistId + "&maxResults=20"
-
-    if (pageToken) {
-        url += "&pageToken=" + pageToken;
-    }
-    Utility.makeAsyncYouTubeAjaxRequest(url, null,
-       function success(response) {
-
-        nextPageToken = response.nextPageToken;
-
-        var playlistItems = response.items;
-        if (playlistItems) {
-            $.each(playlistItems, function (index, item) {
-                date = new Date(item.snippet.publishedAt);
-                title = item.snippet.title;
-                pos = item.snippet.position;
-
-                if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("default")) {
-                    url = item.snippet.thumbnails.default.url;
-                } else if (item.snippet.thumbnails && item.snippet.thumbnails.hasOwnProperty("high")) {
-                    url = item.snippet.thumbnails.high.url;
-                } else {
-                    url = "";
-                }
-                id = item.snippet.resourceId.videoId;
-
-                if (title.length > 80) {
-                    title = title.substring(0, 77) + "...";
-                }
-
-
-                content = $("<li class='option' onclick='addUrlToInput(\"https://www.youtube.com/watch?v=" + id + "\", this)' title='" + item.snippet.title + "'></li>");
-                content.append($("<img class='option_thumb' src='" + url + "' alt='" + pos + "' \>"));
-                content.append($("<h3 class='option_title' >" + title + "<br><p class='option_date'>Date added: " + date.toLocaleDateString() + "</p></h3>"));
-                $("#select_bestOfTheWeek .loading").fadeOut(500);
-                $("#select_bestOfTheWeek").append(content);
-            });
-        }
-
-        if (nextPageToken)
-            requestVideosInPlaylist(playlistId, nextPageToken);
-    }, function error(x,t,m) {
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
-        $("#select_bestOfTheWeek .error").fadeIn(500);
-        return;
-    });
-}
 
 function addUrlToInput(url, elt) {
     if ($(elt).hasClass("selected")) {
@@ -212,22 +111,6 @@ function toggleVoters(cb, manual) {
     }
 }
 
-// Helper method to display a message on the page.
-function displayMessage(message, good) {
-    $('#message').text(message);
-
-    if (good == GOOD) {
-        $('#message').attr("class", "good");
-        $('#message').fadeOut(500);
-    } else if (good == BAD) {
-        $('#message').attr("class", "bad");
-        $('#message').fadeIn(500);
-    } else {
-        $('#message').attr("class", "okay");
-        $('#message').fadeIn(500);
-    }
-}
-
 function fetchResults() {
     // clean up
     $("input[type='checkbox']").prop('disabled', false);
@@ -236,11 +119,11 @@ function fetchResults() {
     $("#stats_group").children().filter(":not(.error, .loading)").remove();
 
     // start off hiding errors, will be shown as they crop up
-    $(".error").fadeOut(500);
+    $(".error :not(#userSpace .error)").fadeOut(500);
     $("#voters .error").fadeIn(500);
 
     // starting off showing all loading images, will hide as they load
-    $(".loading").fadeIn(500);
+    $(".loading :not(#userSpace .loading)").fadeIn(500);
     
     // hide all sections (will show one at a time as it completes
     $("#results").fadeOut(500);
@@ -257,9 +140,9 @@ function fetchResults() {
     fetchID++;
     startTime = new Date().getTime();
 
-    displayMessage('Processing query...please wait', OKAY);
-    var id = grabVideoId();
-    executeAsync(function () { getVideoStats(id, fetchID) });
+    Utility.displayMessage('Processing query...please wait', OKAY);
+    var id = Utility.grabVideoId();
+    Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 500);
 }
 
 function getVideoStats(id, currFetchID) {
@@ -270,7 +153,7 @@ function getVideoStats(id, currFetchID) {
         // no results
         $("#stats .loading").fadeOut(500);
         $("#stats .error").fadeIn(500);
-        displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+        Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
         return;
     }
 
@@ -316,19 +199,19 @@ function getVideoStats(id, currFetchID) {
             $("#stats_group").append(title).append(description).append(image)
             $("#stats_group").append(videoStats);
             $("#stats_group .loading").fadeOut(500);
-            executeAsync(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
+            Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
         } else {
             // no results
             $("#stats .loading").fadeOut(500);
             $("#stats .error").fadeIn(500);
-            displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+            Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
             return;
         }
     }, function (x,t,m) {
         $("#stats .loading").fadeOut(500);
         $("#stats .error").fadeIn(500);
-        displayMessage('Error loading stats', BAD);
+        Utility.displayMessage('Error loading stats', BAD);
     });
 }
 
@@ -352,7 +235,7 @@ function loadComments(count, url, currFetchID) {
             }
 
             if (nextUrl != "")
-                executeAsync(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
+                Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
 
             $.each(data["items"], function (key, val) {
                 var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
@@ -363,7 +246,7 @@ function loadComments(count, url, currFetchID) {
 
                 // find replies
                 if (replyCt > 0) {
-                    appendComments(val.snippet.topLevelComment.snippet.textDisplay, commentID, 1, "", currFetchID);
+                    loadCommentReplies(val.snippet.topLevelComment.snippet.textDisplay, commentID, 1, "", currFetchID);
                 }
 
                 $("#h2_comments").html(count);
@@ -371,7 +254,7 @@ function loadComments(count, url, currFetchID) {
             });
 
             if (!nextUrl) {
-                displayMessage('Completed query.', GOOD);
+                Utility.displayMessage('Completed query.', GOOD);
                 endTime = new Date().getTime();
                 var time = (endTime - startTime) / 1000.00;
                 console.log('Execution time: ' + time + " seconds");
@@ -380,14 +263,14 @@ function loadComments(count, url, currFetchID) {
                if (currFetchID != fetchID)
                    return;
 
-               displayMessage('Issue retrieving comments.', BAD);
+               Utility.displayMessage('Issue retrieving comments.', BAD);
 
                // try again
                loadComments(count, url, currFetchID);
         });
 }
 
-function appendComments(id, count, pageToken, currFetchID) {
+function loadCommentReplies(id, count, pageToken, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
@@ -405,7 +288,7 @@ function appendComments(id, count, pageToken, currFetchID) {
 
             if (data["nextPageToken"]) {
                 nextPageToken = data["nextPageToken"];
-                executeAsync(function () { appendComments(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+                Utility.delayAfter(function () { loadCommentReplies(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
             }
 
             $.each(data["items"], function (key, val) {
@@ -416,7 +299,7 @@ function appendComments(id, count, pageToken, currFetchID) {
             if (currFetchID != fetchID)
                 return;
 
-            displayMessage('Issue retrieving replies.', BAD);
+            Utility.displayMessage('Issue retrieving replies.', BAD);
     });
 }
 
@@ -427,46 +310,8 @@ function parseComment(comment, currFetchID, author) {
     if (voters.indexOf(author) < 0) {
         voters.push(author);
         $("#voters .error").fadeOut(500);
-        addToSortedList("voters", author);
+        Utility.addToSortedList("voters", author);
     }
 
     overallCount++;
-}
-
-
-function addToSortedList(listID, elt) {
-    var name = elt;
-    if (name != '') {
-        var toinsert = true;
-        $("#" + listID + " > li").each(function () {
-            var item = $(this).html();
-            if (name.toUpperCase() < item.toUpperCase()) {
-                if (toinsert) {
-                    $(this).before('<li>' + name + '</li>');
-                    toinsert = false;
-                }
-            }
-        });
-        if (toinsert) {
-            $("#" + listID).append('<li>' + name + '</li>');
-        }
-    }
-}
-
-
-function grabVideoId() {
-    //https://www.youtube.com/watch?v=zPQZ8psBwO4
-    var url = $("#input_video").val();
-    var i = -1;
-    var res;
-    if ((i = url.indexOf("v=")) > -1) {
-        // looks promising
-        var nextParamIndex = url.indexOf("&");
-        if (nextParamIndex > -1) {
-            res = url.substring(i + 2, nextParamIndex);
-        } else {
-            res = url.substring(i + 2, url.length);
-        }
-    }
-    return res;
 }
