@@ -4,9 +4,7 @@ const BAD = 1;
 const OKAY = 2
 const VERSION_NUMBER = "0.2.4.2(beta)"
 const PLAYLIST_TITLE = "World's Best Clip of the Week"
-const TIMER_DELAY = 2500;
-const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
-const BAR_CHART_MAX_RATIO = 0.5;
+
 
 var Utility = {
 

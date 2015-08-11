@@ -5,12 +5,7 @@
  * Login page
  */
 
-
-// Constants
-const GOOD = 0;
-const BAD = 1;
-const OKAY = 2
-const PLAYLIST_TITLE = "World's Best Clip of the Week"
+//constants
 const TIMER_DELAY = 500;
 const MIN_TIMER_DELAY = 300;
 const RAPID_TIMER_DELAY = 50;

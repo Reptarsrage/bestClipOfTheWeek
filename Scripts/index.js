@@ -5,6 +5,11 @@
  * Index (home) page
  */
 
+// Constants
+const TIMER_DELAY = 2500;
+const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
+const BAR_CHART_MAX_RATIO = 0.5;
+
 // Variables
 var ConfiguredTermArray;
 var ConfiguredColorArray;
@@ -23,6 +28,7 @@ var maxValue = 500;
 var fetchID = 0;
 var voters = new Array();
 var videoHistoryStats;
+var retryCt = 25;
 
 window.addEventListener('resize', function (event) {
     // resizing, so redraw charts
@@ -75,7 +81,7 @@ $(document).ready(function () {
     }, function error(resp) {
         $("#list_starting_terms .loading").fadeOut(500);
         $("#list_starting_terms .error").fadeIn(500);
-        Utility.displayMessage("Unable to load terms for user " + user + ".", BAD);
+        Utility.displayMessage("Unable to load terms for user " + urlParams['username'] + ".", BAD);
     });
 
     // bind actions
@@ -133,6 +139,7 @@ $(document).ready(function () {
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
+    retryCt = 25;
     
 });
 
@@ -211,17 +218,17 @@ function chartTimeUpdate(currFetchID) {
         overallCount = 0;
         lastCount = 0;
         timerCount = 0;
-        //console.log("TIMEOUT!");
+        // TIMEOUT!
         return;
     } else if (lastCount == overallCount) {
         timerCount++;
-        //console.log("tick");
+        // tick
         Utility.delayAfter(function () { chartTimeUpdate(currFetchID) }, TIMER_DELAY);
         return;
     } else {
         lastCount = overallCount;
         timerCount = 0;
-        //console.log("UPDATE!");
+        // UPDATE!
         loadChart();
         Utility.delayAfter(function() {chartTimeUpdate(currFetchID)}, TIMER_DELAY);
     }
@@ -282,9 +289,8 @@ function fetchResults() {
     // hide all sections (will show one at a time as it completes
     $("#commentSpace").fadeOut(500);
     $("#termSpace").fadeOut(500);
+    $("#statSpace").fadeOut(500);
     $("#results").fadeOut(500);
-    $("#chartSection").fadeOut(500);
-    $("#termResults").fadeOut(500);
 
     //reset
     loaded = false;
@@ -299,6 +305,7 @@ function fetchResults() {
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
+    retryCt = 25;
 
     // Start
     $("#collapse").click();
@@ -330,15 +337,14 @@ function getVideoStats(id, currFetchID) {
     $("#statsSpace").slideDown( "slow", function() {
         // Animation complete.
         $(this).fadeIn(500);
-        $("#stats_group .loading").hide();
-        $("#stats > .error").fadeIn(500);
-        $("#columnchart").hide();
     });
 
     if (!id) {
         // no results
-        $("#statsSpace .error").fadeIn(500);
         Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+        $("#statsSpace .error").fadeIn(500);
+        $("#stats_group").hide();
+        $("#columnchart").hide();
         return;
     }
 
@@ -381,12 +387,10 @@ function getVideoStats(id, currFetchID) {
             videoStats.append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
 
             // add to DOM
-            $("#stats > .error").fadeOut(500);
+            $("#stats_group .loading").fadeOut(500);
             $("#stats_group").append(title).append(description).append(image)
             $("#stats_group").append(videoStats);
-            $("#stats_group .loading").fadeOut(500);
-            $("#columnchart").fadeIn(500);
-            $("#columnchart .loading").show();
+            
             Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
             // draw column chart
@@ -465,14 +469,16 @@ function getVideoStats(id, currFetchID) {
 
         } else {
             // no results
-            $("#statsSpace .error").fadeIn(500);
             Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+            $("#statsSpace .error").fadeIn(500);
+            $("#stats_group").hide();
+            $("#columnchart").hide();
         }
     }, function error(x,t,m) {
-        //Utility.displayMessage('Error loading stats: ' + reason.result.error.message, BAD);
-        // $("#statsSpace .error").fadeIn(500);
-        console.log('Error loading stats: ' + x.status + ". " + m + ".");
-        getVideoStats(id, currFetchID)
+        $("#statsSpace .error").fadeIn(500);
+        $("#stats_group").hide();
+        $("#columnchart").hide();
+        Utility.displayMessage('Error loading stats: ' + x.status + ". " + m + ".", BAD);
     });
 }
 
@@ -484,7 +490,7 @@ function loadComments(count, url, currFetchID) {
         $("#commentSpace").slideDown("slow", function () {
             // Animation complete.
             $(this).fadeIn(500);
-            $("#commentSpace .error").fadeIn(500);
+            $("#comments > .error").fadeIn(500);
         });
     }
 
@@ -549,8 +555,8 @@ function loadComments(count, url, currFetchID) {
                      $(this).find("span.highlight").css("font-size", "12pt");
                  });
 
-                 comment.append(body);
                  $("#comments > .error").fadeOut(500);
+                 comment.append(body);
                  commentHTML.append(comment);
                  $("#h2_comments").html(count);
                  count++;
@@ -643,7 +649,10 @@ function parseComment(comment, currFetchID, author) {
         $("#termSpace").slideDown("slow", function () {
             // Animation complete.
             $(this).fadeIn(500);
-            $("#termSpace > .error").fadeIn(500);
+            $("#chartSection").fadeIn(500);
+            $("#piechart").fadeIn(500);
+            $("#barchart").fadeIn(500);
+            $("#termResults").fadeIn(500);
         });
     }
 
@@ -685,7 +694,7 @@ function parseComment(comment, currFetchID, author) {
             comment = res.toLowerCase();
             $("#termResults_list ." + ConfiguredTermArray[i]).remove();
             $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + data.getValue(i, 1) + "</li>");
-            $("#termResults_list .loading").fadeOut(500);
+            $("#termResults .loading").fadeOut(500);
 
 
             if (voters.indexOf(author) < 0) {
@@ -748,17 +757,7 @@ function loadChart() {
         }
     }
 
-    if (nonNullData.getNumberOfRows() > 0) {
-        $("#termSpace > .error").fadeOut(500);
-        $("#chartSection").fadeIn(500);
-        $("#termResults").fadeIn(500);
-    }
-
-
-    //console.log("chart update");
-
     // PIE
-
     var options = {
         colors: pieColors,
         theme: 'maximized',
