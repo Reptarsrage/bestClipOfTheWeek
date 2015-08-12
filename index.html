@@ -58,7 +58,7 @@
                 <h3 id="h3_recommended">Recommended: <img name="recommended" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                 <div id="select_bestOfTheWeek">
                     <div class="loading">
-                        <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+                        
                     </div>
                     <div class='error'>Error retrieving recommended videos.</div>
                 </div>
@@ -67,7 +67,7 @@
                 <h3 id="h3_starting_terms">Terms: <img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                 <div id="list_starting_terms">
                     <div class="loading">
-                        <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+                        
                     </div>
                     <div class='error'>Error retrieving terms.</div>
                 </div>
@@ -86,12 +86,13 @@
                     <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https&colon;&sol;&sol;www&period;youtube&period;com&sol;watch&quest;<b class='error'>v&equals;1M5vGlvic&lowbar;o</b>)</h3>
                     <div id="stats_group">
                         <div class="loading">
-                            <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+
                         </div>
                     </div>
                     <div id="columnchart">
                         <div class="loading">
-                            <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+                        </div>
+                        <div id="columnchartSVGContainer" class="svgContainer">
                         </div>
                     </div>
                 </div>
@@ -104,32 +105,32 @@
                 <div id="chartSection">
                     <div id="piechart">
                         <div class="loading">
-                            <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+                        </div>
+                        <div id="piechartSVGContainer" class="svgContainer">
                         </div>
                     </div>
                     <div id="barchart">
                         <div class="loading">
-                            <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+                        </div>
+                        <div id="barchartSVGContainer" class="svgContainer">
                         </div>
                     </div>
-                </div>
-                <div id="termResults">
-                    <h3>Terms:<img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
-                    <div id="termResults_list">
-                        <div class="loading">
-                            <!--<img class="loading-image" src="common/images/loading.gif" alt="Loading..." />-->
+                    <div id="termResults">
+                        <h3>Terms:<img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
+                        <div id="termResults_list">
+                            <div class="loading">
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-
             <div id="commentSpace" class="section">
                 <hr />
                 <h2>Comments (<span id="h2_comments">0</span>):<img name="comments" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
                 <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
                 <h3 class='error'>Unable to load comments for your video.</h3>
-  
+
                 <ul hidden="hidden" id="comments">
                     <li class="error">No comments</li>
                 </ul>
@@ -138,7 +139,6 @@
                 </ol>
             </div>
         </div>
-    </div>
 
     <!--DUPLICATED ACCROSS PAGES-->
     <div id="footer">

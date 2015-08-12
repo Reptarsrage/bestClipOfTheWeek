@@ -109,14 +109,6 @@ $(document).ready(function () {
     $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
     $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
 
-    // clean up
-    $("#termResults_list").children().filter(":not(.loading, .error)").remove();
-    $("input[type='checkbox']").prop('disabled', false);
-    $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
-    $("#comments").children().filter(":not(.error)").remove();
-    $("#h2_comments").html('0');
-    $("#voters").children().filter(":not(.error)").remove();
-
     // start off hiding errors, will be shown as they crop up
     $(".error").hide();
     $(".loading").show();
@@ -163,7 +155,7 @@ google.setOnLoadCallback(function () {
         listElt.fadeIn(1000);
     },
     function error(x, t, m) {
-        $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
+        $("#select_bestOfTheWeek").find(":not(.error, .loading)").remove();
         $("#select_bestOfTheWeek .loading").fadeOut(1000);
         $("#select_bestOfTheWeek .error").fadeIn(1000);
     });
@@ -217,9 +209,40 @@ function drawChart(chartType, containerID, dataTable, options) {
     }
 
     console.log("update " + containerID);
-    $("#" + containerID + " .loading").fadeOut(1000);
+    $("#" + containerID).parent().find(".loading").fadeOut(1000);
     chart.draw(dataTable, options);
 
+
+    // sort
+    var mylist = ConfiguredTermArray.slice();
+    if (mylist && mylist.length > 1) {
+        mylist.sort(function (a, b) {
+            anum = a[1]
+            bnum = b[1]
+
+            if (anum != bnum)
+                return bnum - anum;
+            else
+                return a[0].toUpperCase().localeCompare(b[0].toUpperCase());
+        })
+
+        $("#termResults_list .loading").fadeOut(1000);
+        $("#termResults_list").find("li").filter(":not(.loading, .error)").remove();
+
+        $.each(mylist, function (idx, itm) {
+            if (itm[1] > 0) {
+                $("#termResults_list").append("<li class='" + itm[0] + "'>" + itm[0] + ": " + itm[1] + "</li>");
+            }
+        });
+
+        $("#termResults_list").append("<li class='remove'>&nbsp;</li>");
+
+        $.each(mylist, function (idx, itm) {
+            if (itm[1] == 0) {
+                $("#termResults_list").append("<li class='remove'>" + itm[0] + ": " + itm[1] + "</li>");
+            }
+        });
+    }
 }
 
 function chartTimeUpdate(currFetchID) {
@@ -252,7 +275,7 @@ function toggleComments(cb, manual) {
 
     if (cb.prop('checked')) {
         $("#comments").append(commentHTML);
-        $("#comments").fadeIn(1000);
+        $("#comments").show("slide", { direction: "left" }, 500);
         $(".commentBody").hover(function () {
             // in
             $(this).find("span.highlight").css("font-size", "24pt");
@@ -261,8 +284,11 @@ function toggleComments(cb, manual) {
             $(this).find("span.highlight").css("font-size", "12pt");
         });
     } else {
-        $("#comments").fadeOut(1000);
-        $("#comments").empty();
+        $("input[type='checkbox']").prop('disabled', true);
+        $("#comments").hide("slide", { direction: "left" }, 500, function () {
+            $("#comments").find("*").filter(":not(.error, .loading)").remove();
+            $("input[type='checkbox']").prop('disabled', false);
+        });
     }
 }
 
@@ -274,34 +300,33 @@ function toggleVoters(cb, manual) {
     }
 
     if (cb.prop('checked')) {
-        $("#voters").fadeIn(1000);
+        $("#voters").show("slide", { direction: "left" }, 500);
     } else {
-        $("#voters").fadeOut(1000);
+        $("#voters").hide("slide", { direction: "left" }, 500);
     }
 }
 
 function fetchResults() {
     // clean up
-    $("#termResults_list").children().filter(":not(.loading)").remove();
+    $("#termResults_list").find("*").filter(":not(.loading, .error, .svgContainer)").remove();
     $("input[type='checkbox']").prop('disabled', false);
-    $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
-    $("#comments").children().filter(":not(.error)").remove();
+    $("#stats_group").find("*").filter(":not(.error, #columnchart, .loading, .svgContainer)").remove();
+    $("#columnchart").find("*").filter(":not(.error, .loading, .svgContainer)").remove();
+    $("#comments").find("*").filter(":not(.error, .svgContainer)").remove();
+    $("#voters").find("*").filter(":not(.error, .svgContainer)").remove();
     $("#h2_comments").html('0');
-    $("#voters").children().filter(":not(.error)").remove();
+    $("#stats_group").css("background-image", "url()");
 
     // start off hiding errors, will be shown as they crop up
-    $(".error").filter(":not(#userSpace .error)").fadeOut(1000);
+    $(".error").filter(":not(#userSpace .error)").hide();
 
     // starting off showing all loading images, will hide as they load
-    $(".loading").filter(":not(#userSpace .loading)").fadeIn(1000);
+    $(".loading").filter(":not(#userSpace .loading)").show();
 
     // hide all sections (will show one at a time as it completes
-    $("#commentSpace").slideUp(1000, function () {
-        $("#termSpace").slideUp(1000, function () {
-            $("#statSpace").slideUp(1000, function () {
-            });
-        });
-    });
+    $("#commentSpace").slideUp(500);
+    $("#termSpace").slideUp(500);
+    $("#statSpace").slideUp(500);
 
     //reset
     loaded = false;
@@ -326,10 +351,8 @@ function fetchResults() {
         return false;
     }
 
-    if (!$("#results").is(":visible")) {
-        $("#results").slideDown(1000);
-    }
-
+    $("#results").slideDown(500);
+    
     fetchID++;
     startTime = new Date().getTime();
 
@@ -343,7 +366,7 @@ function getVideoStats(id, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
-    $("#statsSpace").slideDown(1000, function () {
+    $("#statsSpace").slideDown(500, function () {
         // Animation complete.
     });
 
@@ -381,7 +404,6 @@ function getVideoStats(id, currFetchID) {
                commentCount = response.items[0].statistics.commentCount;
 
                // construct html
-               maxValue = commentCount * BAR_CHART_MAX_RATIO;
                var image = $("<div id='img_overlay'></div>");
 
                title = $("<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>");
@@ -478,7 +500,7 @@ function getVideoStats(id, currFetchID) {
                        position: 'none',
                    },
                };
-               drawChart('columnchart', 'columnchart', nonNullData, google.charts.Bar.convertOptions(options));
+               drawChart('columnchart', 'columnchartSVGContainer', nonNullData, google.charts.Bar.convertOptions(options));
 
            } else {
                // no results
@@ -504,9 +526,9 @@ function loadComments(count, url, currFetchID) {
         return;
 
     if (!$("#commentSpace").is(":visible")) {
-        $("#commentSpace").slideDown(1000, function () {
+        $("#commentSpace").slideDown(500, function () {
             // Animation complete.
-            $("#comments .error").filter(":not(#comments > .error)").show();
+            $("#commentSpace .error").filter(":not(#commentSpace > .error)").show();
         });
     }
 
@@ -592,14 +614,15 @@ function loadComments(count, url, currFetchID) {
              // try again
              retryCt--;
              if (retryCt > 0) {
-                 loadComments(count, url, currFetchID);
+                 Utility.delayAfter(function () { loadComments(count, url, currFetchID) }, 500);
              } else {
                  // give up
                  $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #chartSection, #termResults").fadeOut(1000);
-                 $("#termSpace .error, #commentSpace > .error").fadeIn(1000);
+                 $("#termSpace .error, #commentSpace > .error").fadeIn(1000, function() {
+                    $("#h2_comments").html('Error');
+                 });
                  $("input[type='checkbox']").prop('checked', false);
                  $("input[type='checkbox']").prop('disabled', true);
-                 $("#h2_comments").html('Error');
                  fetchID++;
                  Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
              }
@@ -668,11 +691,12 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
              if (retryCt > 0) {
                  loadCommentReplies(commentParent, id, count, pageToken, currFetchID);
              } else {
-                 $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #chartSection, #termResults").fadeOut(1000);
-                 $("#termSpace .error, #commentSpace > .error").fadeIn(1000);
+                 $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #chartSection, #termResults, #voters, #comments").fadeOut(1000);
+                 $("#termSpace .error, #commentSpace > .error").fadeIn(1000, function() {
+                    $("#h2_comments").html('Error');
+                 });
                  $("input[type='checkbox']").prop('checked', false);
                  $("input[type='checkbox']").prop('disabled', true);
-                 $("#h2_comments").html('Error');
                  fetchID++;
                  Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
              }
@@ -684,7 +708,7 @@ function parseComment(comment, currFetchID, author) {
         return;
 
     if (!$("#termSpace").is(":visible")) {
-        $("#termSpace").slideDown(1000, function () {
+        $("#termSpace").slideDown(500, function () {
             // Animation complete.
             $(this).fadeIn(1000);
             $("#chartSection").show();
@@ -695,20 +719,16 @@ function parseComment(comment, currFetchID, author) {
     }
 
     if (!loaded) {
-        termStats = Array(ConfiguredTermArray.length);
-
         data.addColumn('string', 'Video');
         data.addColumn('number', 'Votes');
 
         // Add rows
         data.addRows(ConfiguredTermArray.length);
         for (i = 0; i < ConfiguredTermArray.length; i++) {
-            // terms
-            termStats[i] = 0
 
             // data
-            data.setCell(i, 0, ConfiguredTermArray[i]);
-            data.setCell(i, 1, null);
+            data.setCell(i, 0, ConfiguredTermArray[i][0]);
+            data.setCell(i, 1, ConfiguredTermArray[i][1]);
         }
         loaded = true;
     }
@@ -720,21 +740,17 @@ function parseComment(comment, currFetchID, author) {
     comment = comment.toLowerCase();
 
     for (i = 0; i < ConfiguredTermArray.length; i++) {
-        if ((index = comment.indexOf(ConfiguredTermArray[i].toLowerCase())) > -1) {
-            data.setCell(i, 1, data.getValue(i, 1) + 1);
-            termStats[i]++;
+        var key = ConfiguredTermArray[i][0];
+        if ((index = comment.indexOf(key.toLowerCase())) >= 0) {
+            ConfiguredTermArray[i][1]++;
+            data.setCell(i, 1, ConfiguredTermArray[i][1]);
 
             s = res.substring(0, index);
-            t = res.substring(index, index + ConfiguredTermArray[i].length);
-            v = res.substring(index + ConfiguredTermArray[i].length, res.length + 1);
+            t = res.substring(index, index + key.length);
+            v = res.substring(index + key.length, res.length + 1);
 
-            res = s + "<span class='" + ConfiguredTermArray[i] + " highlight'>" + t + "</span>" + v;
+            res = s + "<span class='" + key + " highlight'>" + t + "</span>" + v;
             comment = res.toLowerCase();
-
-            $("#termResults_list .loading").fadeOut(1000);
-            $("#termResults_list ." + ConfiguredTermArray[i]).remove();
-            $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + data.getValue(i, 1) + "</li>");
-
 
             if (voters.indexOf(author) < 0) {
                 voters.push(author);
@@ -744,33 +760,6 @@ function parseComment(comment, currFetchID, author) {
         }
     }
 
-    $("#termResults .remove").remove();
-    /*
-    // sort
-    var mylist = $('#termResults_list');
-    var listitems = mylist.children('li').filter(":not(.loading, .error)").get();
-    var numberPattern = /\d+/g;
-    listitems.sort(function (a, b) {
-        anum = parseInt($(a).text().match(numberPattern)[0]);
-        bnum = parseInt($(b).text().match(numberPattern)[0]);
-
-        if (anum != bnum)
-            return bnum - anum;
-        else
-            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
-    })
-    $.each(listitems, function (idx, itm) { mylist.append(itm); });
-
-    //// add the rest
-    $("#termResults_list").append("<li class='remove' style='color: gray'>&nbsp</li>");
-    for (i = 0; i < ConfiguredTermArray.length; i++) {
-        if (termStats[i] == 0) {
-            var li = $("<li class='remove' style='color: gray'></li>");
-            li.text(ConfiguredTermArray[i] + ": 0");
-            $("#termResults_list").append(li);
-        }
-    }
-    */
     overallCount++;
     return res;
 }
@@ -785,6 +774,11 @@ function loadChart() {
     nonNullData.addColumn('string', 'Video');
     nonNullData.addColumn('number', 'Votes');
     nonNullData.addColumn({ type: 'string', role: 'style' });
+    nonNullData.addColumn({ type: 'string', role: 'annotation' });
+    var total = 0;
+    for (i = 0; i < data.getNumberOfRows() ; i++) {
+        total += data.getValue(i, 1);
+    }
 
     var x = 0;
     for (i = 0; i < data.getNumberOfRows() ; i++) {
@@ -794,6 +788,7 @@ function loadChart() {
             nonNullData.setCell(x, 0, data.getValue(i, 0));
             nonNullData.setCell(x, 1, data.getValue(i, 1));
             nonNullData.setCell(x, 2, 'color: ' + ConfiguredColorArray[i]);
+            nonNullData.setCell(x, 3, ((data.getValue(i, 1) / total) * 100).toFixed(2) + "%");
             pieColors[x] = ConfiguredColorArray[i];
             x++;
         }
@@ -812,32 +807,32 @@ function loadChart() {
     };
 
 
-    drawChart('piechart', 'piechart', nonNullData, options);
+    Utility.delayAfter(function () { drawChart('piechart', 'piechart', nonNullData, options); }, 1000);
 
     // BAR
-    var options = {
+    var baroptions = {
         theme: 'maximized',
         chartArea: {
             backgroundColor: '#ECECEC',
         },
         hAxis: {
             title: 'Votes',
-            minValue: 0,
-            //maxValue: maxValue,
+            position: 'none',
         },
         vAxis: {
             title: 'Video',
-            position: 'in',
+            position: 'none',
         },
         animation: {
-            duration: TIMER_DELAY,
-            easing: 'out'
+            duration: 500,
+            easing: 'linear'
         },
         legend: {
             position: 'none',
         },
+        axisTitlesPosition: 'none',
         annotations: {
-            highContrast: false,
+            highContrast: true,
             textStyle: {
                 color: 'black',
                 fontSize: '24pt',
@@ -845,5 +840,5 @@ function loadChart() {
         }
     };
 
-    drawChart('barchart', 'barchart', nonNullData, options);
+    drawChart('barchart', 'barchart', nonNullData, baroptions);
 }

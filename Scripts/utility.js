@@ -157,7 +157,7 @@ var Utility = {
 
                         // term
                         if (enabled) {
-                            ConfiguredTermArray.push(cols[0].replace(/&nbsp;/g, ' '));
+                            ConfiguredTermArray.push([cols[0].replace(/&nbsp;/g, ' '), 0]);
                             var list = $("<li class=" + cols[0].replace(/[^\w]/gi, '') + "></li>");
                             list.text(cols[0].replace(/&nbsp;/g, ' '));
                         } else {

@@ -86,15 +86,17 @@ li {
      float: left;
      margin: 10px 0 0 10px;
 }
+
 #list_starting_terms {
     float: left;
     clear: left;
     margin: 10px 0 0 10px;
     padding: 0 0 0 0;
+    height: 300px;
+    width: 180px;
     overflow-y: scroll;
     overflow-x: visible;
-    width: 180px;
-    height: 300px;
+    position: relative;
 }
 
 #list_starting_terms ul {
@@ -111,6 +113,7 @@ li {
     margin: 0 0 0 20px;
     padding: 0;
     font-size: 14pt;
+    min-width: 180px;
 }
 
 #recommended {
@@ -182,22 +185,35 @@ li {
     margin: 0 0 0 10px;
 }
 
-
 /* Video stats space*/
 
-#div_video_stats {
-    min-width: 250px;
-    margin-left: 10px;
-    left: 300px;
-    vertical-align: bottom;
-    position: absolute;
-    bottom: 5px;
+#stats_group {
+    margin: 5px 20px 5px 0;
+    overflow: hidden;
+    position: relative;
+    float: left;
+    width: 45%;
+    height: 445px;
+    background-color: #ECECEC;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
 }
 
-#img_thumb { /* Big image */
-    float: left;
-    width: 300px;
-    height: 240px;
+#div_video_stats {
+    width: 180px;
+    left: 0;
+    vertical-align: bottom;
+    position: absolute;
+    bottom: 0;
+    margin: 0 10px 10px 10px;
+}
+
+#img_overlay { /* Big image */
+    position:absolute;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
 }
 
 #stats {
@@ -205,74 +221,41 @@ li {
 }
 
 #stats p {
-    font-size: 12px;
+    font-size: 18px;
     margin: 2px;
     margin-left: 10px;
     padding: 0;
+    color: white;
 }
 
 #stats h3 {
-    font-size: 14px;
-    margin: 0 0 5px 0;
+    font-size: 18pt;
+    margin: 10px 10px 0 10px;
     padding: 0;
-}
-
-#stats_group {
-    margin: -10px 0 5px 0;
     overflow: hidden;
-    position: relative;
-    padding: 10px;
-    float: left;
-    width: 45%;
-    height: 500px;
-    position: relative;
 }
 
-#columnchart {
-    float: left;
-    height: 450px;
-    min-width: 400px;
-    width: 50%;
-    margin-top: 5px 0 5px 0;
+#stats h3 :not(.error) {
+    color: white;
+}
+
+#stats h3 a {
+    color: white;
 }
 
 
 /* termSpace = chartsection and termresults */
 
-#chartSection {
-    width: 70%;
-    min-width: 750px; 
-    height: 450px;
-    float: left;
-    overflow-y: hidden;
-    padding: 0;
-}
-
-#piechart {
-    width: 49%;
-    min-width: 300px; 
-    height: 100%;
-    float: left;
-    padding: 0;
-    margin: 0;
-}
-
-#barchart {
-    width: 49%;
-    min-width: 300px;
-    height: 100%;
-    float: left;
-    padding: 0;
-    margin: 0 0 0 10px;
-}
-
 #termResults {
     overflow:hidden; 
-    height: 409px; 
+    height: 400px; 
     min-width: 200px;
     width: 25%;
-    margin: 0 auto 0 auto;
-    padding: 0 0 50px 0;
+    margin: 0 0 10px 0;
+    padding: 0 0 50px 10px;
+    position: relative;
+    float: right;
+    background-color: #ECECEC;
 }
 
 #termResults_list {
@@ -282,14 +265,13 @@ li {
     margin: 0 auto 0 auto;
     padding: 0;
     font-size: 14pt;
-    position: relative;
-    height: 500px;
 }
 
 #termResults_list li {
     padding: 0;
     margin: 0;
 }
+
 
 /* Comment Section
  
@@ -303,13 +285,18 @@ comment
 */
 
 #comments li {
-    margin: 10px;
-    margin-left: 40px;
+    margin: 10px 0 10px 0;
 }
+
 
 #comments, #voters {
     clear: both;
-    margin-top: 50px;
+    margin: 50px 0 0 10px;
+    padding: 0px;
+}
+
+#comments li li {
+    margin-left: 50px;
 }
 
 #commentSpace label {

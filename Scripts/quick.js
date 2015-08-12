@@ -78,14 +78,6 @@ $(document).ready(function () {
     $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
     $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
 
-    // clean up
-    $("#termResults_list").children().filter(":not(.loading, .error)").remove();
-    $("input[type='checkbox']").prop('disabled', false);
-    $("#stats_group").children().filter(":not(.error, .loading)").remove();
-    $("#comments").children().filter(":not(.error)").remove();
-    $("#h2_comments").html('0');
-    $("#voters").children().filter(":not(.error)").remove();
-
     // start off hiding errors, will be shown as they crop up
     $(".error").hide();
     $(".loading").show();
@@ -107,17 +99,16 @@ $(document).ready(function () {
     //  populate list
     Utility.populateBestOfTheWeek(
     function success(videoHistoryStats, listElt) {
-        $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
-            listElt.hide();
-            $("#select_bestOfTheWeek").append(listElt);
-            listElt.fadeIn(500);
-        });
+        self.videoHistoryStats = videoHistoryStats;
+        $("#select_bestOfTheWeek .loading").fadeOut(1000);
+        listElt.hide();
+        $("#select_bestOfTheWeek").append(listElt);
+        listElt.fadeIn(1000);
     },
     function error(x, t, m) {
-        $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
-        $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
-            $("#select_bestOfTheWeek .error").fadeIn(500);
-        });
+        $("#select_bestOfTheWeek").find(":not(.error, .loading)").remove();
+        $("#select_bestOfTheWeek .loading").fadeOut(1000);
+        $("#select_bestOfTheWeek .error").fadeIn(1000);
     });
 });
 
@@ -146,7 +137,7 @@ function toggleComments(cb, manual) {
 
     if (cb.prop('checked')) {
         $("#comments").append(commentHTML);
-        $("#comments").fadeIn(500);
+        $("#comments").show("slide", { direction: "left" }, 500);
         $(".commentBody").hover(function () {
             // in
             $(this).find("span.highlight").css("font-size", "24pt");
@@ -155,8 +146,10 @@ function toggleComments(cb, manual) {
             $(this).find("span.highlight").css("font-size", "12pt");
         });
     } else {
-        $("#comments").fadeOut(500, function () {
-            $("#comments").empty();
+        $("input[type='checkbox']").prop('disabled', true);
+        $("#comments").hide("slide", { direction: "left" }, 500, function () {
+            $("#comments").find("*").filter(":not(.error, .loading)").remove();
+            $("input[type='checkbox']").prop('disabled', false);
         });
     }
 }
@@ -169,34 +162,33 @@ function toggleVoters(cb, manual) {
     }
 
     if (cb.prop('checked')) {
-        $("#voters").fadeIn(500);
+        $("#voters").show("slide", { direction: "left" }, 500);
     } else {
-        $("#voters").fadeOut(500);
+        $("#voters").hide("slide", { direction: "left" }, 500);
     }
 }
 
 function fetchResults() {
     // clean up
-    $("#termResults_list").children().filter(":not(.loading, .error)").remove();
+    $("#termResults_list").find("*").filter(":not(.loading, .error, .svgContainer)").remove();
     $("input[type='checkbox']").prop('disabled', false);
-    $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
-    $("#comments").children().filter(":not(.error)").remove();
+    $("#stats_group").find("*").filter(":not(.error, #columnchart, .loading, .svgContainer)").remove();
+    $("#columnchart").find("*").filter(":not(.error, .loading, .svgContainer)").remove();
+    $("#comments").find("*").filter(":not(.error, .svgContainer)").remove();
+    $("#voters").find("*").filter(":not(.error, .svgContainer)").remove();
     $("#h2_comments").html('0');
-    $("#voters").children().filter(":not(.error)").remove();
+    $("#stats_group").css("background-image", "url()");
 
     // start off hiding errors, will be shown as they crop up
-    $(".error").filter(":not(#userSpace .error)").fadeOut(500);
+    $(".error").filter(":not(#userSpace .error)").hide();
 
     // starting off showing all loading images, will hide as they load
-    $(".loading").filter(":not(#userSpace .loading)").fadeIn(500);
+    $(".loading").filter(":not(#userSpace .loading)").show();
 
     // hide all sections (will show one at a time as it completes
-    $("#commentSpace").slideUp(500, function () {
-        $("#termSpace").slideUp(500, function () {
-            $("#statSpace").slideUp(500, function () {
-            });
-        });
-    });
+    $("#commentSpace").slideUp(500);
+    $("#termSpace").slideUp(500);
+    $("#statSpace").slideUp(500);
 
     //reset
     loaded = false;
@@ -235,19 +227,16 @@ function getVideoStats(id, currFetchID) {
 
     $("#statsSpace").slideDown("slow", function () {
         // Animation complete.
-        $("#stats_group").fadeIn(500);
-        $("#termResults").fadeIn(500);
     });
 
 
     if (!id) {
         // no results
         Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
-        $("#statsSpace .loading").fadeOut(500, function() {
-            $("#stats_group").hide();
-            $("#termResults").hide();
-            $("#statsSpace .error").fadeIn(500);
-        });
+        $("#statsSpace .loading").fadeOut(1000);
+        $("#stats_group").hide();
+        $("#termResults").hide();
+        $("#statsSpace .error").fadeIn(1000);
         return;
     }
 
@@ -275,7 +264,7 @@ function getVideoStats(id, currFetchID) {
             commentCount = response.items[0].statistics.commentCount;
 
             // construct html
-            var image = $("<img id='img_thumb' src='" + thumbUrl + "' alt='" + title + "'>");
+            var image = $("<div id='img_overlay'></div>");
 
             title = $("<h3><a href='https://www.youtube.com/watch?v=" + id + "'>" + title + "</a></h3>");
             description = $("<h3 class='hidden'>" + description + "</h3>");
@@ -289,29 +278,32 @@ function getVideoStats(id, currFetchID) {
             videoStats.append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
 
             // add to DOM
-            $("#stats_group .loading").fadeOut(500);
-            $("#stats_group").append(title).append(description).append(image)
-            $("#stats_group").append(videoStats);
+            $("#stats_group .loading").fadeOut(1000);
+            image.append(title);
+            image.append(videoStats);
+            image.hide();
+            $("#stats_group").append(image);
+            $("#stats_group").css('background-image', "url(" + thumbUrl + ")");
+            image.fadeIn(1000);
+
             Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
         } else {
             // no results
-            $("#statsSpace .loading").fadeOut(500, function () {
-                $("#stats_group").hide();
-                $("#termResults").hide();
-                $("#statsSpace .error").fadeIn(500);
-            });
             Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
-            return;
-        }
-    }, function error(x,t,m) {
-        $("#statsSpace .loading").fadeOut(500, function () {
+            $("#statsSpace .loading").fadeOut(1000);
             $("#stats_group").hide();
             $("#termResults").hide();
-            $("#statsSpace .error").fadeIn(500);
-        });
-        Utility.displayMessage('Error loading stats: ' + x.status + ". " + m, BAD);
-    });
+            $("#statsSpace .error").fadeIn(1000);
+            return;
+        }
+       }, function error(x, t, m) {
+           $("#statsSpace .loading").fadeOut(1000);
+           $("#stats_group").hide();
+           $("#termResults").hide();
+           $("#statsSpace .error").fadeIn(1000);
+           Utility.displayMessage('Error loading stats: ' + x.status + ". " + m, BAD);
+       });
 }
 
 function loadComments(count, url, currFetchID) {
@@ -319,9 +311,9 @@ function loadComments(count, url, currFetchID) {
         return;
 
     if (!$("#commentSpace").is(":visible")) {
-        $("#commentSpace").slideDown("slow", function () {
+        $("#commentSpace").slideDown(500, function () {
             // Animation complete.
-            $("#comments .error").filter(":not(#comments > .error)").show();
+            $("#commentSpace .error").filter(":not(#commentSpace > .error)").show();
         });
     }
 
@@ -395,19 +387,16 @@ function loadComments(count, url, currFetchID) {
 
               retryCt--;
               if (retryCt > 0) {
-                  loadComments(count, url, currFetchID);
+                  Utility.delayAfter(function () { loadComments(count, url, currFetchID) }, 500);
               } else {
                   // give up
-                  $("#statsSpace .loading, #commentSpace .loading, #commentSpace .error").fadeOut(500, function () {
-                      $("#commentSpace > .error").fadeIn(500);
+                  $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #termResults .loading").fadeOut(1000);
+                  $("#termSpace .error, #commentSpace > .error, #termResults .error").fadeIn(1000, function () {
+                      $("#h2_comments").html('Error');
+                      $("#termResults_list").find(":not(.error, .loading)").remove();
                   });
-                  
-                  if ($("#termResults_list").children().filter(":not(.loading, .error)").length == 0) {
-                      $("#termResults_list .error, #commentSpace > .error").fadeIn(500);
-                  }
                   $("input[type='checkbox']").prop('checked', false);
                   $("input[type='checkbox']").prop('disabled', true);
-                  $("#h2_comments").html('Error');
                   fetchID++;
                   Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
               }
@@ -469,14 +458,13 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
                  loadCommentReplies(commentParent, id, count, pageToken, currFetchID);
              } else {
                  // give up
-                 $("#statsSpace .loading, #commentSpace .loading, #commentSpace .error").fadeOut(500);
-                 $("#commentSpace > .error").fadeIn(500);
-                 if ($("#termResults_list").children().filter(":not(.loading, .error)").length == 0) {
-                     $("#termResults_list .error, #commentSpace > .error").fadeIn(500);
-                 }
+                 $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #termResults .loading").fadeOut(1000);
+                 $("#termSpace .error, #commentSpace > .error, #termResults .error").fadeIn(1000, function () {
+                     $("#h2_comments").html('Error');
+                     $("#termResults_list").find(":not(.error, .loading)").remove();
+                 });
                  $("input[type='checkbox']").prop('checked', false);
                  $("input[type='checkbox']").prop('disabled', true);
-                 $("#h2_comments").html('Error');
                  fetchID++;
                  Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
              }
@@ -506,17 +494,19 @@ function parseComment(comment, currFetchID, author) {
     comment = comment.toLowerCase();
 
     for (i = 0; i < ConfiguredTermArray.length; i++) {
-        if ((index = comment.indexOf(ConfiguredTermArray[i].toLowerCase())) > -1) {
+        key = ConfiguredTermArray[i][0];
+
+        if ((index = comment.indexOf(key.toLowerCase())) > -1) {
             termStats[i]++;
 
             s = res.substring(0, index);
-            t = res.substring(index, index + ConfiguredTermArray[i].length);
-            v = res.substring(index + ConfiguredTermArray[i].length, res.length + 1);
+            t = res.substring(index, index + key.length);
+            v = res.substring(index + key.length, res.length + 1);
 
-            res = s + "<span class='" + ConfiguredTermArray[i] + " highlight'>" + t + "</span>" + v;    
+            res = s + "<span class='" + key + " highlight'>" + t + "</span>" + v;
             comment = res.toLowerCase();
-            $("#termResults_list ." + ConfiguredTermArray[i]).remove();
-            $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + termStats[i] + "</li>");
+            $("#termResults_list ." + key).remove();
+            $("#termResults_list").append("<li class='" + key + "'>" + key + ": " + termStats[i] + "</li>");
             $("#termResults_list .loading").fadeOut(500);
 
 
