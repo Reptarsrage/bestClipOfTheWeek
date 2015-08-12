@@ -58,16 +58,16 @@
             <button id="fetch">Fetch Results</button>
             <div id="recommended">
                 <h3 id="h3_recommended">Recommended: <img name="recommended" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
-                <ol id="select_bestOfTheWeek">
-                    <li class="loading">
+                <div id="select_bestOfTheWeek">
+                    <div class="loading">
                         <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
-                    </li>
-                    <li class='error'>Error retrieving recommended videos.</li>
-                </ol>
+                    </div>
+                    <div class='error'>Error retrieving recommended videos.</div>
+                </div>
             </div>
         </div>
         <div id="collapse" class="expanded">
-            <img src="/common/images/arrow.png" alt="arrow"/>
+            <img src="/common/images/arrow.png" alt="arrow" />
         </div>
 
         <div id="results" class="section" hidden="hidden">
@@ -75,25 +75,25 @@
                 <hr />
                 <h2>Showing commenters for: <img name="stats" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <div id="stats">
-                    <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
+                    <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https&colon;&sol;&sol;www&period;youtube&period;com&sol;watch&quest;<b class='error'>v&equals;1M5vGlvic&lowbar;o</b>)</h3>
+                    <div class="loading">
+                        <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
+                    </div>
                     <div id="stats_group">
-                        <div class="loading">
-                            <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
-                        </div>
                     </div>
                 </div>
             </div>
-            <div class="section">
+            <div class="section" id="commentSpace">
                 <hr />
                 <h2>Commenters (<span id="h2_comments">0</span>):<img name="commenters" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who commented on this video</span></label>
-                <h3 class='error'>Unable to find comments for your video.</h3>
+                <h3 class='error'>Unable to load commenters for your video.</h3>
                 <ol hidden="hidden" id="voters">
                     <li class="error">No Commenters</li>
                 </ol>
             </div>
+        </div>
     </div>
-
     <!--DUPLICATED ACCROSS PAGES-->
     <div id="footer">
         <div id="footer_overlay">

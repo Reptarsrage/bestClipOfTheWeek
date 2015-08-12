@@ -55,21 +55,21 @@
             <button id="fetch">Fetch Results</button>
             <div id="recommended">
                 <h3 id="h3_recommended">Recommended: <img name="recommended" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
-                <ol id="select_bestOfTheWeek">
-                    <li class="loading">
+                <div id="select_bestOfTheWeek">
+                    <div class="loading">
                         <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
-                    </li>
-                    <li class='error'>Error retrieving recommended videos.</li>
-                </ol>
+                    </div>
+                    <div class='error'>Error retrieving recommended videos.</div>
+                </div>
             </div>
             <div id="startingterms">
                 <h3 id="h3_starting_terms">Terms: <img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
-                <ul id="list_starting_terms">
-                    <li class="loading">
+                <div id="list_starting_terms">
+                    <div class="loading">
                         <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
-                    </li>
-                    <li class='error'>Error retrieving terms.</li>
-                </ul>
+                    </div>
+                    <div class='error'>Error retrieving terms.</div>
+                </div>
             </div>
         </div>
         <div id="collapse" class="expanded">
@@ -81,7 +81,7 @@
                 <hr />
                 <h2>Showing stats for: <img name="stats" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <div id="stats">
-                    <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https://www.youtube.com/watch?<b>v=1M5vGlvic_o</b>)</h3>
+                    <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https&colon;&sol;&sol;www&period;youtube&period;com&sol;watch&quest;<b class='error'>v&equals;1M5vGlvic&lowbar;o</b>)</h3>
                     <div id="stats_group">
                         <div class="loading">
                             <img class="loading-image" src="common/images/loading.gif" alt="Loading..." />
@@ -104,7 +104,7 @@
                 <h2>Comments (<span id="h2_comments">0</span>):<img name="comments" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
                 <label><input onclick="toggleComments($('#checkbox_comments'), true)" type="checkbox" id="checkbox_comments" /><span>Show comments</span></label>
                 <label><input onclick="toggleVoters($('#checkbox_voters'), true)" type="checkbox" id="checkbox_voters" /><span>Show users who voted</span></label>
-                <h3 class='error'>Unable to find comments for your video.</h3>
+                <h3 class='error'>Unable to load comments for your video.</h3>
                 <ul hidden="hidden" id="comments">
                     <li class="error">No comments</li>
                 </ul>

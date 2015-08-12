@@ -15,6 +15,7 @@ var commentHTML = $("<div></div>");
 var overallCount = 0;
 var fetchID = 0;
 var voters = new Array();
+var retryCt = 25;
 
 
 window.onerror = function (msg, url, line, col, error) {
@@ -31,23 +32,28 @@ $(document).ready(function () {
     // tool-tips
     Utility.configureTooltipForPage('quick');
 
-
-    // executes when HTML-Document is loaded and DOM is ready
-    $("#fetch").click(fetchResults);
-
     // get terms and colors
     $("#fetch").prop("disabled", true);
     $("#fetch").prop("title", "Please wait for terms to be loaded");
-    Utility.loadTermsAndColors(urlParams['username'], $("#list_starting_terms"), function success(ConfiguredColorArray, ConfiguredTermArray) {
+    $("#fetch").click(fetchResults);
+
+
+    Utility.loadTermsAndColors(urlParams['username'], function success(ConfiguredColorArray, ConfiguredTermArray, listElt) {
         self.ConfiguredColorArray = ConfiguredColorArray;
         self.ConfiguredTermArray = ConfiguredTermArray;
-        $("#list_starting_terms .loading").fadeOut(500);
-        $("#fetch").prop("disabled", false);
-        $("#fetch").prop("title", "");
+        $("#list_starting_terms .loading").fadeOut(500, function () {
+            listElt.hide();
+            $("#list_starting_terms").append(listElt);
+            listElt.fadeIn(500, function () {
+                $("#fetch").prop("disabled", false);
+                $("#fetch").prop("title", "");
+            });
+        });
     }, function error(resp) {
-        $("#list_starting_terms .loading").fadeOut(500);
-        $("#list_starting_terms .error").fadeIn(500);
-        Utility.displayMessage("Unable to load terms for user " + user + ".", BAD);
+        $("#list_starting_terms .loading").fadeOut(500, function () {
+            $("#list_starting_terms .error").fadeIn(500);
+        });
+        Utility.displayMessage("Unable to load terms for user " + urlParams['username'] + ".", BAD);
     });
 
     // bind actions
@@ -61,7 +67,6 @@ $(document).ready(function () {
         } else {
             $("#userSpace").slideDown("slow", function () {
                 $("#userSpace").fadeIn(500);
-                $("#userSpace .loading").fadeOut(500);
                 $("#collapse").removeClass("collapsed");
                 $("#collapse").addClass("expanded");
             });
@@ -74,7 +79,7 @@ $(document).ready(function () {
     $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
 
     // clean up
-    $("#termResults_list").children().filter(":not(.loading)").remove();
+    $("#termResults_list").children().filter(":not(.loading, .error)").remove();
     $("input[type='checkbox']").prop('disabled', false);
     $("#stats_group").children().filter(":not(.error, .loading)").remove();
     $("#comments").children().filter(":not(.error)").remove();
@@ -82,12 +87,12 @@ $(document).ready(function () {
     $("#voters").children().filter(":not(.error)").remove();
 
     // start off hiding errors, will be shown as they crop up
-    $(".error").fadeOut(500);
-    $(".loading").fadeIn(500);
+    $(".error").hide();
+    $(".loading").show();
     
     // hide all sections (will show one at a time as it completes
-    $("#commentSpace").fadeOut(500);
-    $("#results").fadeOut(500);
+    $("#commentSpace").hide();
+    $("#results").hide();
 
     //reset
     loaded = false;
@@ -97,16 +102,22 @@ $(document).ready(function () {
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
+    retryCt = 25;
 
     //  populate list
-    Utility.populateBestOfTheWeek($("#select_bestOfTheWeek"),
-    function success(videoHistoryStats) {
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
+    Utility.populateBestOfTheWeek(
+    function success(videoHistoryStats, listElt) {
+        $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
+            listElt.hide();
+            $("#select_bestOfTheWeek").append(listElt);
+            listElt.fadeIn(500);
+        });
     },
     function error(x, t, m) {
         $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
-        $("#select_bestOfTheWeek .error").fadeIn(500);
+        $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
+            $("#select_bestOfTheWeek .error").fadeIn(500);
+        });
     });
 });
 
@@ -144,8 +155,9 @@ function toggleComments(cb, manual) {
             $(this).find("span.highlight").css("font-size", "12pt");
         });
     } else {
-        $("#comments").fadeOut(500);
-        $("#comments").empty();
+        $("#comments").fadeOut(500, function () {
+            $("#comments").empty();
+        });
     }
 }
 
@@ -165,22 +177,26 @@ function toggleVoters(cb, manual) {
 
 function fetchResults() {
     // clean up
-    $("#termResults_list").children().filter(":not(.loading)").remove();
+    $("#termResults_list").children().filter(":not(.loading, .error)").remove();
     $("input[type='checkbox']").prop('disabled', false);
-    $("#stats_group").children().filter(":not(.error, .loading)").remove();
+    $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
     $("#comments").children().filter(":not(.error)").remove();
     $("#h2_comments").html('0');
     $("#voters").children().filter(":not(.error)").remove();
 
     // start off hiding errors, will be shown as they crop up
-    $(".error :not(#userSpace .error)").fadeOut(500);
+    $(".error").filter(":not(#userSpace .error)").fadeOut(500);
 
     // starting off showing all loading images, will hide as they load
-    $(".loading :not(#userSpace .loading)").fadeIn(500);
-    
+    $(".loading").filter(":not(#userSpace .loading)").fadeIn(500);
+
     // hide all sections (will show one at a time as it completes
-    $("#commentSpace").fadeOut(500);
-    $("#results").fadeOut(500);
+    $("#commentSpace").slideUp(500, function () {
+        $("#termSpace").slideUp(500, function () {
+            $("#statSpace").slideUp(500, function () {
+            });
+        });
+    });
 
     //reset
     loaded = false;
@@ -190,6 +206,7 @@ function fetchResults() {
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
+    retryCt = 25;
 
     // Start
     $("#collapse").click();
@@ -200,27 +217,37 @@ function fetchResults() {
         return false;
     }
 
-    $("#results").slideDown("slow");
+    $("#results").slideDown(500, function () {
+        // Animation complete.
+    });
 
     fetchID++;
     startTime = new Date().getTime();
 
     Utility.displayMessage('Processing query...please wait', OKAY);
     var id = Utility.grabVideoId();
-    Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 500);
+    Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 1000);
 }
 
 function getVideoStats(id, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
-    $("#statsSpace").slideDown( "slow");
+    $("#statsSpace").slideDown("slow", function () {
+        // Animation complete.
+        $("#stats_group").fadeIn(500);
+        $("#termResults").fadeIn(500);
+    });
+
 
     if (!id) {
         // no results
-        $("#statsSpace .loading").fadeOut(500);
-        $("#statsSpace .error").fadeIn(500);
         Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
+        $("#statsSpace .loading").fadeOut(500, function() {
+            $("#stats_group").hide();
+            $("#termResults").hide();
+            $("#statsSpace .error").fadeIn(500);
+        });
         return;
     }
 
@@ -262,22 +289,28 @@ function getVideoStats(id, currFetchID) {
             videoStats.append(viewCount).append(likeCount).append(dislikeCount).append(favoriteCount).append(commentCount);
 
             // add to DOM
-            $("#stats > .error").fadeOut(500);
+            $("#stats_group .loading").fadeOut(500);
             $("#stats_group").append(title).append(description).append(image)
             $("#stats_group").append(videoStats);
-            $("#stats_group .loading").fadeOut(500);
             Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
         } else {
             // no results
-            $("#statsSpace .loading").fadeOut(500);
-            $("#statsSpace .error").fadeIn(500);
+            $("#statsSpace .loading").fadeOut(500, function () {
+                $("#stats_group").hide();
+                $("#termResults").hide();
+                $("#statsSpace .error").fadeIn(500);
+            });
             Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
             return;
         }
     }, function error(x,t,m) {
-        console.log('Error loading stats');
-        getVideoStats(id, currFetchID)
+        $("#statsSpace .loading").fadeOut(500, function () {
+            $("#stats_group").hide();
+            $("#termResults").hide();
+            $("#statsSpace .error").fadeIn(500);
+        });
+        Utility.displayMessage('Error loading stats: ' + x.status + ". " + m, BAD);
     });
 }
 
@@ -285,15 +318,18 @@ function loadComments(count, url, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
-    $("#commentSpace").slideDown("slow");
+    if (!$("#commentSpace").is(":visible")) {
+        $("#commentSpace").slideDown("slow", function () {
+            // Animation complete.
+            $("#comments .error").filter(":not(#comments > .error)").show();
+        });
+    }
 
     Utility.makeAsyncYouTubeAjaxRequest(url, null, 
           function success(data) {
             if (currFetchID != fetchID)
                 return;
 
-            $("#commentSpace > .loading").fadeOut(500);
-  
             nextUrl = "";
             if (data["nextPageToken"] && data["nextPageToken"].length > 0) {
                 nextUrl = url;
@@ -336,8 +372,9 @@ function loadComments(count, url, currFetchID) {
                     $(this).find("span.highlight").css("font-size", "12pt");
                 });
 
-                comment.append(body);
                 $("#comments > .error").fadeOut(500);
+
+                comment.append(body);
                 commentHTML.append(comment);
                 $("#h2_comments").html(count);
                 count++;
@@ -349,20 +386,31 @@ function loadComments(count, url, currFetchID) {
                 endTime = new Date().getTime();
                 var time = (endTime - startTime) / 1000.00;
                 console.log('Execution time: ' + time + " seconds");
-
-
-                if ($("#termResults_list .loading").is(":visible")) {
-                    $("#termResults_list .loading").fadeOut(500);
-                    $("#termResults_list .error").fadeIn(500);
-                }
             }
           }, function error(x,t,m) {
               if (currFetchID != fetchID)
                   return;
 
               console.log('Error retrieving comments');
-              // try again
-              loadComments(count, url, currFetchID);
+
+              retryCt--;
+              if (retryCt > 0) {
+                  loadComments(count, url, currFetchID);
+              } else {
+                  // give up
+                  $("#statsSpace .loading, #commentSpace .loading, #commentSpace .error").fadeOut(500, function () {
+                      $("#commentSpace > .error").fadeIn(500);
+                  });
+                  
+                  if ($("#termResults_list").children().filter(":not(.loading, .error)").length == 0) {
+                      $("#termResults_list .error, #commentSpace > .error").fadeIn(500);
+                  }
+                  $("input[type='checkbox']").prop('checked', false);
+                  $("input[type='checkbox']").prop('disabled', true);
+                  $("#h2_comments").html('Error');
+                  fetchID++;
+                  Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
+              }
           });
 }
 
@@ -378,14 +426,7 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
     Utility.makeAsyncYouTubeAjaxRequest(url, null, 
          function success(data) {
             if (currFetchID != fetchID)
-                return;
-
-            if (data["error"]) {
-                console.log('Error loading comments');
-                console.log(data.error.code);
-                console.log(data.error.message);
-                return;
-            }
+                return
 
             var nextPageToken = "";
 
@@ -422,8 +463,24 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
              if (currFetchID != fetchID)
                  return;
 
-             console.log('Error loading replies.');
-             loadCommentReplies(commentParent, id, count, pageToken, currFetchID);
+             console.log('Error loading comment replies.');
+             retryCt--;
+             if (retryCt > 0) {
+                 loadCommentReplies(commentParent, id, count, pageToken, currFetchID);
+             } else {
+                 // give up
+                 $("#statsSpace .loading, #commentSpace .loading, #commentSpace .error").fadeOut(500);
+                 $("#commentSpace > .error").fadeIn(500);
+                 if ($("#termResults_list").children().filter(":not(.loading, .error)").length == 0) {
+                     $("#termResults_list .error, #commentSpace > .error").fadeIn(500);
+                 }
+                 $("input[type='checkbox']").prop('checked', false);
+                 $("input[type='checkbox']").prop('disabled', true);
+                 $("#h2_comments").html('Error');
+                 fetchID++;
+                 Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
+             }
+             
         });
 }
 
@@ -472,6 +529,7 @@ function parseComment(comment, currFetchID, author) {
     }
 
     $("#termResults .remove").remove();
+    /*
     // sort
     var mylist = $('#termResults_list');
     var listitems = mylist.children('li').filter(":not(.loading, .error)").get();
@@ -496,7 +554,7 @@ function parseComment(comment, currFetchID, author) {
             $("#termResults_list").append(li);
         }
     }
-
+    */
     overallCount++;
     return res;
 }

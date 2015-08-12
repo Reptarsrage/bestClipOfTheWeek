@@ -181,6 +181,9 @@ h3 {
     clear: both;
 }
 
+b.error {
+    font-weight: bold;
+}
 
 /* Fancy footer */
 #footer {

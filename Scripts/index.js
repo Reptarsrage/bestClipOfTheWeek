@@ -63,24 +63,30 @@ window.onerror = function (msg, url, line, col, error) {
 };
 
 $(document).ready(function () {
-    // tool-tips
-    Utility.configureTooltipForPage('index');
-
-    // executes when HTML-Document is loaded and DOM is ready
-    $("#fetch").click(fetchResults);
-
     // get terms and colors
     $("#fetch").prop("disabled", true);
     $("#fetch").prop("title", "Please wait for terms to be loaded");
-    Utility.loadTermsAndColors(urlParams['username'], $("#list_starting_terms"), function success(ConfiguredColorArray, ConfiguredTermArray) {
+    $("#fetch").click(fetchResults);
+
+    // tool-tips
+    Utility.configureTooltipForPage('index');
+
+    // load user terms
+    Utility.loadTermsAndColors(urlParams['username'], function success(ConfiguredColorArray, ConfiguredTermArray, listElt) {
         self.ConfiguredColorArray = ConfiguredColorArray;
         self.ConfiguredTermArray = ConfiguredTermArray;
-        $("#list_starting_terms .loading").fadeOut(500);
-        $("#fetch").prop("disabled", false);
-        $("#fetch").prop("title", "");
+        $("#list_starting_terms .loading").fadeOut(500, function () {
+            listElt.hide();
+            $("#list_starting_terms").append(listElt);
+            listElt.fadeIn(500, function () {
+                $("#fetch").prop("disabled", false);
+                $("#fetch").prop("title", "");
+            });
+        });
     }, function error(resp) {
-        $("#list_starting_terms .loading").fadeOut(500);
-        $("#list_starting_terms .error").fadeIn(500);
+        $("#list_starting_terms .loading").fadeOut(500, function () {
+            $("#list_starting_terms .error").fadeIn(500);
+        });
         Utility.displayMessage("Unable to load terms for user " + urlParams['username'] + ".", BAD);
     });
 
@@ -95,7 +101,6 @@ $(document).ready(function () {
         } else {
             $("#userSpace").slideDown("slow", function () {
                 $("#userSpace").fadeIn(500);
-                $("#userSpace .loading").fadeOut(500);
                 $("#collapse").removeClass("collapsed");
                 $("#collapse").addClass("expanded");
             });
@@ -108,7 +113,7 @@ $(document).ready(function () {
     $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
 
     // clean up
-    $("#termResults_list").children().filter(":not(.loading)").remove();
+    $("#termResults_list").children().filter(":not(.loading, .error)").remove();
     $("input[type='checkbox']").prop('disabled', false);
     $("#stats_group").children().filter(":not(.error, #columnchart, .loading)").remove();
     $("#comments").children().filter(":not(.error)").remove();
@@ -116,15 +121,15 @@ $(document).ready(function () {
     $("#voters").children().filter(":not(.error)").remove();
 
     // start off hiding errors, will be shown as they crop up
-    $(".error").fadeOut(500);
-    $(".loading").fadeIn(500);
+    $(".error").hide();
+    $(".loading").show();
     
     // hide all sections (will show one at a time as it completes
-    $("#commentSpace").fadeOut(500);
-    $("#termSpace").fadeOut(500);
-    $("#results").fadeOut(500);
-    $("#chartSection").fadeOut(500);
-    $("#termResults").fadeOut(500);
+    $("#commentSpace").hide();
+    $("#termSpace").hide();
+    $("#results").hide();
+    $("#chartSection").hide();
+    $("#termResults").hide();
 
     //reset
     loaded = false;
@@ -151,15 +156,20 @@ google.load("visualization", "1", {
 
 google.setOnLoadCallback(function () {
     data = new google.visualization.DataTable();
-    Utility.populateBestOfTheWeek($("#select_bestOfTheWeek"),
-    function success(videoHistoryStats) {
+    Utility.populateBestOfTheWeek(
+    function success(videoHistoryStats, listElt) {
         self.videoHistoryStats = videoHistoryStats;
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
+        $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
+            listElt.hide();
+            $("#select_bestOfTheWeek").append(listElt);
+            listElt.fadeIn(500);
+        });
     },
     function error(x, t, m) {
         $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
-        $("#select_bestOfTheWeek .loading").fadeOut(500);
-        $("#select_bestOfTheWeek .error").fadeIn(500);
+        $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
+            $("#select_bestOfTheWeek .error").fadeIn(500);
+        });
     });
 });
 
@@ -209,8 +219,9 @@ function drawChart(chartType, containerID, dataTable, options) {
     if (chart == false) {
         return false;
     }
-    $("#" + containerID + " .loading").fadeOut(500);
+
     chart.draw(dataTable, options);
+    
 }
 
 function chartTimeUpdate(currFetchID) {
@@ -252,8 +263,9 @@ function toggleComments(cb, manual) {
             $(this).find("span.highlight").css("font-size", "12pt");
         });
     } else {
-        $("#comments").fadeOut(500);
-        $("#comments").empty();
+        $("#comments").fadeOut(500, function () {
+            $("#comments").empty();
+        });     
     }
 }
 
@@ -281,16 +293,18 @@ function fetchResults() {
     $("#voters").children().filter(":not(.error)").remove();
 
     // start off hiding errors, will be shown as they crop up
-    $(".error :not(#userSpace .error)").fadeOut(500);
+    $(".error").filter(":not(#userSpace .error)").fadeOut(500);
 
     // starting off showing all loading images, will hide as they load
-    $(".loading :not(#userSpace .loading)").fadeIn(500);
+    $(".loading").filter(":not(#userSpace .loading)").fadeIn(500);
     
     // hide all sections (will show one at a time as it completes
-    $("#commentSpace").fadeOut(500);
-    $("#termSpace").fadeOut(500);
-    $("#statSpace").fadeOut(500);
-    $("#results").fadeOut(500);
+    $("#commentSpace").slideUp(500, function () {
+        $("#termSpace").slideUp(500, function () {
+            $("#statSpace").slideUp(500, function () {
+            });
+        });
+    });
 
     //reset
     loaded = false;
@@ -315,36 +329,35 @@ function fetchResults() {
         return false;
     }
 
-    $("#results").slideDown("slow", function () {
-        // Animation complete.
-        $(this).fadeIn(500);
-    });
+    if (!$("#results").is(":visible")) {
+        $("#results").slideDown(500);
+    }
 
     fetchID++;
     startTime = new Date().getTime();
 
     Utility.displayMessage('Processing query...please wait', OKAY);
-    $("#results").fadeIn(500);
     var id = Utility.grabVideoId();
-    Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 500);
-    Utility.delayAfter(function () { chartTimeUpdate(fetchID); }, 500);
+    Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 1000);
+    Utility.delayAfter(function () { chartTimeUpdate(fetchID); }, 1000);
 }
 
 function getVideoStats(id, currFetchID) {
     if (currFetchID != fetchID)
         return;
 
-    $("#statsSpace").slideDown( "slow", function() {
+    $("#statsSpace").slideDown( 500, function() {
         // Animation complete.
-        $(this).fadeIn(500);
     });
 
     if (!id) {
         // no results
         Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
-        $("#statsSpace .error").fadeIn(500);
-        $("#stats_group").hide();
-        $("#columnchart").hide();
+        $("#statsSpace .loading").fadeOut(500, function () {
+            $("#stats_group").hide();
+            $("#columnchart").hide();
+            $("#statsSpace .error").fadeIn(500);
+        });
         return;
     }
 
@@ -470,15 +483,21 @@ function getVideoStats(id, currFetchID) {
         } else {
             // no results
             Utility.displayMessage("No results found for video with ID='" + id + "'.", OKAY);
-            $("#statsSpace .error").fadeIn(500);
-            $("#stats_group").hide();
-            $("#columnchart").hide();
+            $("#statsSpace .loading").fadeOut(500, function () {
+                $("#stats_group").hide();
+                $("#columnchart").hide();
+                $("#statsSpace .error").fadeIn(500);
+            });
+            return;
         }
     }, function error(x,t,m) {
-        $("#statsSpace .error").fadeIn(500);
-        $("#stats_group").hide();
-        $("#columnchart").hide();
-        Utility.displayMessage('Error loading stats: ' + x.status + ". " + m + ".", BAD);
+        $("#statsSpace .loading").fadeOut(500, function () {
+            $("#stats_group").hide();
+            $("#columnchart").hide();
+            $("#statsSpace .error").fadeIn(500);
+        });
+        fetchID++;
+        Utility.displayMessage('Error loading stats: ' + x.status + ". " + m, BAD);
     });
 }
 
@@ -489,8 +508,7 @@ function loadComments(count, url, currFetchID) {
     if (!$("#commentSpace").is(":visible")) {
         $("#commentSpace").slideDown("slow", function () {
             // Animation complete.
-            $(this).fadeIn(500);
-            $("#comments > .error").fadeIn(500);
+            $("#comments .error").filter(":not(#comments > .error)").show();
         });
     }
 
@@ -513,7 +531,6 @@ function loadComments(count, url, currFetchID) {
                  Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
              }
 
-             $("#commentSpace > .error").fadeOut(500);
              $.each(data["items"], function (key, val) {
                  var comment = $("<li class='comment'></li>");
                  var body = $("<div class='commentBody'></div>");
@@ -555,12 +572,12 @@ function loadComments(count, url, currFetchID) {
                      $(this).find("span.highlight").css("font-size", "12pt");
                  });
 
+
                  $("#comments > .error").fadeOut(500);
                  comment.append(body);
                  commentHTML.append(comment);
                  $("#h2_comments").html(count);
                  count++;
-
              });
 
              if (!nextUrl) {
@@ -575,7 +592,19 @@ function loadComments(count, url, currFetchID) {
 
              console.log('Error loading comments');
              // try again
-             loadComments(count, url, currFetchID)
+             retryCt--;
+             if (retryCt > 0) {
+                 loadComments(count, url, currFetchID);
+             } else {
+                 // give up
+                 $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #chartSection, #termResults").fadeOut(500);
+                 $("#termSpace .error, #commentSpace > .error").fadeIn(500);
+                 $("input[type='checkbox']").prop('checked', false);
+                 $("input[type='checkbox']").prop('disabled', true);
+                 $("#h2_comments").html('Error');
+                 fetchID++;
+                 Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
+             }
          });
 }
 
@@ -637,7 +666,18 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
 
              console.log('Error loading comment replies');
              // try again
-             loadCommentReplies(commentParent, id, count, pageToken, currFetchID)
+             retryCt--;
+             if (retryCt > 0) {
+                 loadCommentReplies(commentParent, id, count, pageToken, currFetchID);
+             } else {
+                 $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #chartSection, #termResults").fadeOut(500);
+                 $("#termSpace .error, #commentSpace > .error").fadeIn(500);
+                 $("input[type='checkbox']").prop('checked', false);
+                 $("input[type='checkbox']").prop('disabled', true);
+                 $("#h2_comments").html('Error');
+                 fetchID++;
+                 Utility.displayMessage('Error loading comments: ' + x.status + ". " + m, BAD);
+             }
          });
 }
 
@@ -649,7 +689,7 @@ function parseComment(comment, currFetchID, author) {
         $("#termSpace").slideDown("slow", function () {
             // Animation complete.
             $(this).fadeIn(500);
-            $("#chartSection").fadeIn(500);
+            $("#chartSection").show();
             $("#piechart").fadeIn(500);
             $("#barchart").fadeIn(500);
             $("#termResults").fadeIn(500);
@@ -680,7 +720,7 @@ function parseComment(comment, currFetchID, author) {
     var s, t, v;
 
     comment = comment.toLowerCase();
-
+    
     for (i = 0; i < ConfiguredTermArray.length; i++) {
         if ((index = comment.indexOf(ConfiguredTermArray[i].toLowerCase())) > -1) {
             data.setCell(i, 1, data.getValue(i, 1) + 1);
@@ -692,20 +732,23 @@ function parseComment(comment, currFetchID, author) {
 
             res = s + "<span class='" + ConfiguredTermArray[i] + " highlight'>" + t + "</span>" + v;    
             comment = res.toLowerCase();
+
+            $("#termResults_list .loading").fadeOut(500);
             $("#termResults_list ." + ConfiguredTermArray[i]).remove();
             $("#termResults_list").append("<li class='" + ConfiguredTermArray[i] + "'>" + ConfiguredTermArray[i] + ": " + data.getValue(i, 1) + "</li>");
-            $("#termResults .loading").fadeOut(500);
 
 
             if (voters.indexOf(author) < 0) {
                 voters.push(author);
-                $("#voters .error").fadeOut(500);
-                Utility.addToSortedList("voters", author);
+                $("#voters .error").fadeOut(500, function () {
+                    Utility.addToSortedList("voters", author);
+                });
             }
         }
     }
 
     $("#termResults .remove").remove();
+    /*
     // sort
     var mylist = $('#termResults_list');
     var listitems = mylist.children('li').filter(":not(.loading, .error)").get();
@@ -730,12 +773,14 @@ function parseComment(comment, currFetchID, author) {
             $("#termResults_list").append(li);
         }
     }
-
+    */
     overallCount++;
     return res;
 }
 
 function loadChart() {
+    console.log("load");
+
     // get only non zero vals
     var nonNullData = new google.visualization.DataTable();
     var pieColors = Array(ConfiguredTermArray.length);
@@ -803,6 +848,5 @@ function loadChart() {
         }
     };
 
-    drawChart('barchart', 'barchart', nonNullData, options);
-                
+    drawChart('barchart', 'barchart', nonNullData, options);           
 }

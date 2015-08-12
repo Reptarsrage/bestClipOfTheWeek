@@ -244,7 +244,7 @@ function requestVideosInPlaylist(playlistId, pageToken) {
             requestVideosInPlaylist(playlistId, nextPageToken);
     }, function error(x, t, m) {
         // error
-        console.log("Error: " + x.status + ". " + m + ".");
+        console.log("Error: " + x.status + ". " + m);
         Utility.delayAfter(function () { requestVideosInPlaylist(playlistId, pageToken); }, 1000);
     });
 }

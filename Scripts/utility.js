@@ -38,7 +38,7 @@ var Utility = {
                 success(response);
             },
             error: function (x, t, m) {
-                console.log(t + ': ' + x.status + ". " + m + ".");
+                console.log(t + ': ' + x.status + ". " + m);
                 error(x, t, m);
             }
         });
@@ -78,7 +78,7 @@ var Utility = {
                         requestVideoPlaylist(channelID, nextPageToken);
 
                 }, function (x,t,m) {
-                    console.log(t + ': ' + x.status + ". " + m + ".");
+                    console.log(t + ': ' + x.status + ". " + m);
                     error(x, t, m);
                 });
         }
@@ -91,22 +91,23 @@ var Utility = {
                 channelID = response.items[0].id;
                 requestVideoPlaylist(channelID);
             } else {
-                console.log(t + ': ' + x.status + ". " + m + ".");
+                console.log(t + ': ' + x.status + ". " + m);
                 error(x, t, m);
             }
         }, function (x, t, m) {
-            console.log(t + ': ' + x.status + ". " + m + ".");
+            console.log(t + ': ' + x.status + ". " + m);
             error(x, t, m);
         });
     },
 
-    loadTermsAndColors: function (user, listElt, success, error) {
-        if (!user || !listElt) {
+    loadTermsAndColors: function (user, success, error) {
+        if (!user) {
             console.log("Internal Error at loadTermsAndColors.");
             error("Internal Error");
             return;
         }
 
+        var listElt = $("<ul></ul>");
 
         // get terms and colors
         $.ajax({
@@ -167,17 +168,18 @@ var Utility = {
                         listElt.append(list);
                     }
                 }
-                success(ConfiguredColorArray, ConfiguredTermArray);
+                success(ConfiguredColorArray, ConfiguredTermArray, listElt);
             },
             error: function (x, t, m) {
-                console.log(t + ': ' + x.status + ". " + m + ".");
+                console.log(t + ': ' + x.status + ". " + m);
                 error()
             },
         });
     },
 
-    populateBestOfTheWeek: function (listElt, success, error) {
+    populateBestOfTheWeek: function (success, error) {
         var videoHistoryStats = new Array();
+        var listElt = $("<ol></ol>");
 
         var addVideoStatsToArray = function (id, title, shorthand, dateadded) {
             if (id.trim() == '')
@@ -236,11 +238,9 @@ var Utility = {
                                title = title.substring(0, 77) + "...";
                            }
 
-
                            content = $("<li class='option' onclick='addUrlToInput(\"https://www.youtube.com/watch?v=" + id + "\", this)' title='" + item.snippet.title + "'></li>");
                            content.append($("<img class='option_thumb' src='" + url + "' alt='" + pos + "' \>"));
                            content.append($("<h3 class='option_title' >" + title + "<br><p class='option_date'>Date added: " + date.toLocaleDateString() + "</p></h3>"));
-                           listElt.find(".loading").fadeOut(500);
                            listElt.append(content);
 
                            // add to stored list for column chart usage
@@ -249,13 +249,13 @@ var Utility = {
                                return;
                            }
                        });
+                       if (!pageToken) {
+                           success(videoHistoryStats, listElt);
+                       }
                    }
 
                    if (nextPageToken)
                        requestVideosInPlaylist(playlistId, nextPageToken);
-                   else {
-                       success(videoHistoryStats);
-                   }
                }, function(x, t, m) {
                    error(x, t, m);
                });
