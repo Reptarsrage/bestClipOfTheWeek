@@ -92,9 +92,11 @@ li {
         clear: left;
         margin: 10px 0 0 10px;
         padding: 0 0 0 0;
-        max-height: 300px;
+        height: 300px;
+        width: 180px;
         overflow-y: scroll;
         overflow-x: visible;
+        position: relative;
 }
 
 #list_starting_terms ul {
@@ -122,9 +124,9 @@ li {
 }
 
 /* recommended video selector */
-#select_bestOfTheWeek {
+#select_bestOfTheWeek{
     width: 780px;
-    max-height: 300px;
+    height: 300px;
     font-size: large;
     margin: 0 0 0 10px;
     float: left;
@@ -132,6 +134,7 @@ li {
     padding: 0;
     overflow-y: scroll;
     overflow-x: hidden;
+    position: relative;
 }
 
 #select_bestOfTheWeek .error {
@@ -232,6 +235,7 @@ li {
     min-width: 400px;
     width: 50%;
     margin-top: 5px 0 5px 0;
+    position: relative;
 }
 
 
@@ -253,6 +257,7 @@ li {
     float: left;
     padding: 0;
     margin: 0;
+    position: relative;
 }
 
 #barchart {
@@ -262,6 +267,7 @@ li {
     float: left;
     padding: 0;
     margin: 0 0 0 10px;
+    position: relative;
 }
 
 #termResults {
@@ -271,6 +277,7 @@ li {
     width: 25%;
     margin: 0 auto 0 auto;
     padding: 0 0 50px 0;
+    position: relative;
 }
 
 #termResults_list {

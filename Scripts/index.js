@@ -156,14 +156,15 @@ google.load("visualization", "1", {
 
 google.setOnLoadCallback(function () {
     data = new google.visualization.DataTable();
+
     Utility.populateBestOfTheWeek(
     function success(videoHistoryStats, listElt) {
         self.videoHistoryStats = videoHistoryStats;
         $("#select_bestOfTheWeek .loading").fadeOut(500, function () {
-            listElt.hide();
-            $("#select_bestOfTheWeek").append(listElt);
-            listElt.fadeIn(500);
         });
+        listElt.hide();
+        $("#select_bestOfTheWeek").append(listElt);
+        listElt.fadeIn(500);
     },
     function error(x, t, m) {
         $("#select_bestOfTheWeek").children().filter(":not(.error, .loading)").remove();
