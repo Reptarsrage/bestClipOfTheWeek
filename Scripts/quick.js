@@ -5,17 +5,22 @@
  * Index (home) page
  */
 
+// Constants
+const TIMER_DELAY = 1500;
+const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
+
+
 // Variables
 var ConfiguredTermArray;
 var ConfiguredColorArray;
 var startTime, endTime;
-var loaded = false;
-var termStats;
 var commentHTML = $("<div></div>");
 var overallCount = 0;
 var fetchID = 0;
 var voters = new Array();
 var retryCt = 25;
+var lastCount = 0;
+var timerCount = 0;
 
 
 window.onerror = function (msg, url, line, col, error) {
@@ -87,14 +92,14 @@ $(document).ready(function () {
     $("#results").hide();
 
     //reset
-    loaded = false;
-    termStats = null;
     commentHTML = $("<div></div>");
     overallCount = 0;
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
     retryCt = 25;
+    lastCount = 0;
+    timerCount = 0;
 
     //  populate list
     Utility.populateBestOfTheWeek(
@@ -114,6 +119,60 @@ $(document).ready(function () {
 
 
 ////////////////////////////////// FUNCTIONS ////////////////////////////////
+
+function termsTimeUpdate(currFetchID) {
+    if (currFetchID != fetchID || timerCount > MAX_TIMER_COUNT) {
+        overallCount = 0;
+        lastCount = 0;
+        timerCount = 0;
+        // TIMEOUT!
+        return;
+    } else if (lastCount == overallCount) {
+        timerCount++;
+        // tick
+        Utility.delayAfter(function () { termsTimeUpdate(currFetchID) }, TIMER_DELAY);
+        return;
+    } else {
+        lastCount = overallCount;
+        timerCount = 0;
+        // UPDATE!
+        updateTerms();
+        Utility.delayAfter(function () { termsTimeUpdate(currFetchID) }, TIMER_DELAY);
+    }
+}
+
+function updateTerms() {
+    // sort
+    var mylist = ConfiguredTermArray.slice();
+    if (mylist && mylist.length > 1) {
+        mylist.sort(function (a, b) {
+            anum = a[1]
+            bnum = b[1]
+
+            if (anum != bnum)
+                return bnum - anum;
+            else
+                return a[0].toUpperCase().localeCompare(b[0].toUpperCase());
+        })
+
+        $("#termResults_list .loading").fadeOut(1000);
+        $("#termResults_list").find("li").filter(":not(.loading, .error)").remove();
+
+        $.each(mylist, function (idx, itm) {
+            if (itm[1] > 0) {
+                $("#termResults_list").append("<li class='" + itm[0] + "'>" + itm[0] + ": " + itm[1] + "</li>");
+            }
+        });
+
+        $("#termResults_list").append("<li class='remove'>&nbsp;</li>");
+
+        $.each(mylist, function (idx, itm) {
+            if (itm[1] == 0) {
+                $("#termResults_list").append("<li class='remove'>" + itm[0] + ": " + itm[1] + "</li>");
+            }
+        });
+    }
+}
 
 function addUrlToInput(url, elt) {
     if ($(elt).hasClass("selected")) {
@@ -191,14 +250,14 @@ function fetchResults() {
     $("#statSpace").slideUp(500);
 
     //reset
-    loaded = false;
-    termStats = null;
     commentHTML = $("<div></div>");
     overallCount = 0;
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
     toggleComments($("#checkbox_comments"), false);
     retryCt = 25;
+    lastCount = 0;
+    timerCount = 0;
 
     // Start
     $("#collapse").click();
@@ -219,6 +278,7 @@ function fetchResults() {
     Utility.displayMessage('Processing query...please wait', OKAY);
     var id = Utility.grabVideoId();
     Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 1000);
+    Utility.delayAfter(function () { termsTimeUpdate(fetchID); }, 1000);
 }
 
 function getVideoStats(id, currFetchID) {
@@ -476,17 +536,6 @@ function parseComment(comment, currFetchID, author) {
     if (currFetchID != fetchID)
         return;
 
-    if (!loaded) {
-        termStats = Array(ConfiguredTermArray.length);
-
-        // Add rows
-        for (i = 0; i < ConfiguredTermArray.length; i++) {
-            // terms
-            termStats[i] = 0
-        }
-        loaded = true;
-    }
-
     var res = comment;
     var index = -1;
     var s, t, v;
@@ -497,7 +546,7 @@ function parseComment(comment, currFetchID, author) {
         key = ConfiguredTermArray[i][0];
 
         if ((index = comment.indexOf(key.toLowerCase())) > -1) {
-            termStats[i]++;
+            ConfiguredTermArray[i][1]++;
 
             s = res.substring(0, index);
             t = res.substring(index, index + key.length);
@@ -505,10 +554,6 @@ function parseComment(comment, currFetchID, author) {
 
             res = s + "<span class='" + key + " highlight'>" + t + "</span>" + v;
             comment = res.toLowerCase();
-            $("#termResults_list ." + key).remove();
-            $("#termResults_list").append("<li class='" + key + "'>" + key + ": " + termStats[i] + "</li>");
-            $("#termResults_list .loading").fadeOut(500);
-
 
             if (voters.indexOf(author) < 0) {
                 voters.push(author);
@@ -518,33 +563,6 @@ function parseComment(comment, currFetchID, author) {
         }
     }
 
-    $("#termResults .remove").remove();
-    /*
-    // sort
-    var mylist = $('#termResults_list');
-    var listitems = mylist.children('li').filter(":not(.loading, .error)").get();
-    var numberPattern = /\d+/g;
-    listitems.sort(function (a, b) {
-        anum = parseInt($(a).text().match(numberPattern)[0]);
-        bnum = parseInt($(b).text().match(numberPattern)[0]);
-
-        if (anum != bnum)
-            return bnum - anum;
-        else
-            return $(a).text().toUpperCase().localeCompare($(b).text().toUpperCase());
-    })
-    $.each(listitems, function (idx, itm) { mylist.append(itm); });
-
-    //// add the rest
-    $("#termResults_list").append("<li class='remove' style='color: gray'>&nbsp</li>");
-    for (i = 0; i < ConfiguredTermArray.length; i++) {
-        if (termStats[i] == 0) {
-            var li = $("<li class='remove' style='color: gray'></li>");
-            li.text(ConfiguredTermArray[i] + ": 0");
-            $("#termResults_list").append(li);
-        }
-    }
-    */
     overallCount++;
     return res;
 }

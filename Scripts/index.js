@@ -8,7 +8,6 @@
 // Constants
 const TIMER_DELAY = 2500;
 const MAX_TIMER_COUNT = 120 / (TIMER_DELAY / 1000);
-const BAR_CHART_MAX_RATIO = 0.5;
 
 // Variables
 var ConfiguredTermArray;
