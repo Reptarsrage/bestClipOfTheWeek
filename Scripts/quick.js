@@ -430,7 +430,9 @@ function loadComments(count, url, currFetchID) {
                 comment.append(body);
                 commentHTML.append(comment);
                 $("#h2_comments").html(count);
-                Utility.displayLoading('Processing query...please wait', count / totalComments);
+                if ($('#message h1').text().indexOf("Processing") >= 0) {
+                    Utility.displayLoading('Processing query...please wait', count / totalComments);
+                }
                 count++;
 
             });

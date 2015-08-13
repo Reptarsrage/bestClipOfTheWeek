@@ -265,7 +265,9 @@ function loadComments(count, url, currFetchID) {
                    if (replyCt > 0) {
                        loadCommentReplies(commentID, 1, "", currFetchID);
                    }
-                   Utility.displayLoading('Processing query...please wait', count / totalComments);
+                   if ($('#message h1').text().indexOf("Processing") >= 0) {
+                       Utility.displayLoading('Processing query...please wait', count / totalComments);
+                   }
                    count++;
                });
 
