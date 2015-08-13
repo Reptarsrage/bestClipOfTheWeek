@@ -12,7 +12,8 @@ var fetchID = 0;
 var voters = new Array();
 var retryCt = 25;
 var voteCount = 0;
-
+var selectedVideoId = "";
+var totalComments = 0;
 
 window.onerror = function (msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col;
@@ -67,6 +68,7 @@ $(document).ready(function () {
     toggleVoters($("#checkbox_voters"));
     retryCt = 25;
     voteCount = 0;
+    totalComments = 0;
 
     //  populate list
     Utility.populateBestOfTheWeek(
@@ -101,9 +103,9 @@ function addUrlToInput(url, elt) {
 
 function toggleVoters(cb) {
     if (cb.prop('checked')) {
-        $("#voters").show("slide", { direction: "left" }, 500);
+        $("#voters").fadeIn(500);
     } else {
-        $("#voters").hide("slide", { direction: "left" }, 500);
+        $("#voters").fadeOut(500);
     }
 }
 
@@ -129,6 +131,9 @@ function fetchResults() {
     voters = new Array();
     toggleVoters($("#checkbox_voters"));
     voteCount = 0;
+    selectedVideoId = "";
+    totalComments = 0;
+
 
     // Start
     $("#collapse").click();
@@ -138,8 +143,9 @@ function fetchResults() {
     fetchID++;
     startTime = new Date().getTime();
 
-    Utility.displayMessage('Processing query...please wait', OKAY);
+    Utility.displayLoading('Processing query...please wait', 0.01);
     var id = Utility.grabVideoId();
+    selectedVideoId = id;
     Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 1000);
 }
 
@@ -178,6 +184,7 @@ function getVideoStats(id, currFetchID) {
                dislikeCount = response.items[0].statistics.dislikeCount;
                favoriteCount = response.items[0].statistics.favoriteCount;
                commentCount = response.items[0].statistics.commentCount;
+               totalComments = commentCount;
 
                // construct html
                var image = $("<div id='img_overlay'></div>");
@@ -258,13 +265,16 @@ function loadComments(count, url, currFetchID) {
                    if (replyCt > 0) {
                        loadCommentReplies(commentID, 1, "", currFetchID);
                    }
+                   Utility.displayLoading('Processing query...please wait', count / totalComments);
                    count++;
                });
 
                if (!nextUrl) {
                    // get google+ comments if any exist
-                   Utility.getGooglePlusComments(function (comment, author) {
+                   Utility.displayLoading('Getting commenters from Google+...please wait', count / totalComments);
+                   Utility.getGooglePlusComments(selectedVideoId, function (comment, author) {
                        parseComment(comment, currFetchID, author);
+                       Utility.displayLoading('Getting commenters from Google+...please wait', count / totalComments);
                        count++;
                    }, function (x, t, m) {
                        console.log("Error loading google+ comments." + x + t + m);

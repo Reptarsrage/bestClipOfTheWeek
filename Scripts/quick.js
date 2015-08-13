@@ -21,7 +21,8 @@ var voters = new Array();
 var retryCt = 25;
 var lastCount = 0;
 var timerCount = 0;
-
+var selectedVideoId = "";
+var totalComments = 0;
 
 window.onerror = function (msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col;
@@ -100,6 +101,8 @@ $(document).ready(function () {
     retryCt = 25;
     lastCount = 0;
     timerCount = 0;
+    selectedVideoId = "";
+    totalComments = 0;
 
     //  populate list
     Utility.populateBestOfTheWeek(
@@ -196,7 +199,7 @@ function toggleComments(cb, manual) {
 
     if (cb.prop('checked')) {
         $("#comments").append(commentHTML);
-        $("#comments").show("slide", { direction: "left" }, 500);
+        $("#comments").show();
         $(".commentBody").hover(function () {
             // in
             $(this).find("span.highlight").css("font-size", "24pt");
@@ -205,11 +208,7 @@ function toggleComments(cb, manual) {
             $(this).find("span.highlight").css("font-size", "12pt");
         });
     } else {
-        $("input[type='checkbox']").prop('disabled', true);
-        $("#comments").hide("slide", { direction: "left" }, 500, function () {
-            $("#comments").find("*").filter(":not(.error, .loading)").remove();
-            $("input[type='checkbox']").prop('disabled', false);
-        });
+        $("#comments").hide();
     }
 }
 
@@ -221,9 +220,9 @@ function toggleVoters(cb, manual) {
     }
 
     if (cb.prop('checked')) {
-        $("#voters").show("slide", { direction: "left" }, 500);
+        $("#voters").show();
     } else {
-        $("#voters").hide("slide", { direction: "left" }, 500);
+        $("#voters").hide();
     }
 }
 
@@ -258,6 +257,7 @@ function fetchResults() {
     retryCt = 25;
     lastCount = 0;
     timerCount = 0;
+    $('#message').attr("class", "");
 
     // Start
     $("#collapse").click();
@@ -275,8 +275,9 @@ function fetchResults() {
     fetchID++;
     startTime = new Date().getTime();
 
-    Utility.displayMessage('Processing query...please wait', OKAY);
+    Utility.displayLoading('Processing query...please wait', 0.01);
     var id = Utility.grabVideoId();
+    selectedVideoId = id;
     Utility.delayAfter(function () { getVideoStats(id, fetchID); }, 1000);
     Utility.delayAfter(function () { termsTimeUpdate(fetchID); }, 1000);
 }
@@ -322,6 +323,7 @@ function getVideoStats(id, currFetchID) {
             dislikeCount = response.items[0].statistics.dislikeCount;
             favoriteCount = response.items[0].statistics.favoriteCount;
             commentCount = response.items[0].statistics.commentCount;
+            totalComments = commentCount;
 
             // construct html
             var image = $("<div id='img_overlay'></div>");
@@ -428,13 +430,15 @@ function loadComments(count, url, currFetchID) {
                 comment.append(body);
                 commentHTML.append(comment);
                 $("#h2_comments").html(count);
+                Utility.displayLoading('Processing query...please wait', count / totalComments);
                 count++;
 
             });
 
             if (!nextUrl) {
                 // get google+ comments if any exist
-                Utility.getGooglePlusComments(function (comment, author) {
+                Utility.displayLoading('Getting commenters from Google+...please wait', count / totalComments);
+                Utility.getGooglePlusComments(selectedVideoId, function (comment, author) {
                     var commentElt = $("<li class='comment googlePlus'></li>");
                     var body = $("<div class='commentBody'></div>");
                     var authorElt = $("<h2 class='author'>" + author + "</h2>");
@@ -462,6 +466,7 @@ function loadComments(count, url, currFetchID) {
                         commentHTML.find("#googlePlusMasterComment").append(commentElt);
                     }
                     $("#h2_comments").html(count);
+                    Utility.displayLoading('Getting comments from Google+...please wait', count / totalComments);
                     count++;
                 }, function (x, t, m) {
                     console.log("Error loading google+ comments." + x + t + m);

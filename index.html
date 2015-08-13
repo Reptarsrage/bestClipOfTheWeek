@@ -42,14 +42,15 @@
                 <li class='active'><a id="a_index">Search Youtube</a></li>
                 <li><a id="a_quick">Quick Search (no charts)</a></li>
                 <li><a id="a_comments">Commenters</a></li>
-                <li ><a id="a_config">Configure search terms</a></li>
+                <li><a id="a_config">Configure search terms</a></li>
                 <li><a id="a_about">About</a></li>
             </ul>
         </div>
     </div>
 
     <div id="body">
-        <h1 id="message" class="section" hidden="hidden"></h1>
+        <div id="message" class="section" hidden="hidden"><h1></h1></div>
+
         <div id="userSpace" class="section">
             <h2>Choose a video: <img name="choose" class="tooltip" src="/common/images/info.png" alt="?" /></h2>
             <input id="input_video" type="text" placeholder="Enter a YouTube video Url" />
@@ -58,7 +59,7 @@
                 <h3 id="h3_recommended">Recommended: <img name="recommended" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                 <div id="select_bestOfTheWeek">
                     <div class="loading">
-                        
+
                     </div>
                     <div class='error'>Error retrieving recommended videos.</div>
                 </div>
@@ -67,14 +68,14 @@
                 <h3 id="h3_starting_terms">Terms: <img name="terms" class="tooltip" src="/common/images/info.png" alt="?" /></h3>
                 <div id="list_starting_terms">
                     <div class="loading">
-                        
+
                     </div>
                     <div class='error'>Error retrieving terms.</div>
                 </div>
             </div>
         </div>
         <div id="collapse" class="expanded">
-            <img src="/common/images/arrow.png" alt="arrow"/>
+            <img src="/common/images/arrow.png" alt="arrow" />
         </div>
 
         <div id="results" class="section" hidden="hidden">
@@ -139,6 +140,7 @@
                 </ol>
             </div>
         </div>
+    </div>
 
     <!--DUPLICATED ACCROSS PAGES-->
     <div id="footer">

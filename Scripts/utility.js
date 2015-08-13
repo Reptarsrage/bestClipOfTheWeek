@@ -44,7 +44,7 @@ var Utility = {
         });
     },
 
-    getGooglePlusComments: function (success, error, final) {
+    getGooglePlusComments: function (videoId, success, error, final) {
         var url = "https://www.googleapis.com/plus/v1/people?query=%22Stonemountain64%22";
         Utility.makeAsyncYouTubeAjaxRequest(url, null,
             function (response) {
@@ -84,7 +84,7 @@ var Utility = {
                                         if (postId) {
                                             return;
                                         }
-                                        if (attitm.objectType == "video" && attitm.displayName == "Top 5 Battlefield Hardline Plays of the Week! (Through Wall Explosion, Collateral, Sniper) WBCW #97") {
+                                        if (attitm.objectType == "video" && attitm.url.indexOf(videoId) >= 0) {
                                             postId = itm.id;
                                             success(itm.object.content, "StoneMountain64");
                                         }
@@ -360,11 +360,14 @@ var Utility = {
 
     // Helper method to display a message on the page.
     displayMessage: function (message, good) {
-        $('#message').text(message);
+        $('#message h1').text(message);
+        $('#message .loadBar').remove();
 
         if (good == GOOD) {
             $('#message').attr("class", "good");
-            $('#message').fadeOut(500);
+            $('#message').fadeIn(500, function () {
+                $('#message').fadeOut(2000);
+            });
         } else if (good == BAD) {
             $('#message').attr("class", "bad");
             $('#message').fadeIn(500);
@@ -372,6 +375,25 @@ var Utility = {
             $('#message').attr("class", "okay");
             $('#message').fadeIn(500);
         }
+    },
+
+    // Helper method to display a message on the page.
+    displayLoading: function (message, percentage) {
+        if ($('#message').attr("class") == "bad") {
+            return;
+        }
+
+        $('#message').fadeIn(500);
+        $('#message h1').text(message);
+        if ($('#message .loadBar').length <= 0) {
+            $('#message').attr("class", "");
+            $('#message').append($("<div class='loadBar'></div>"));
+        }
+        if (percentage >= 0.95) {
+            percentage = 0.95;
+        }
+
+        $('#message .loadBar').css("width", (percentage * 100.00) + "%");
     },
 
     addToSortedList: function (listID, elt) {

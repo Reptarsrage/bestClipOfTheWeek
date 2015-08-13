@@ -31,6 +31,16 @@ body {
   min-height:100%;
 }
 
+.loadBar {
+    height: 100%;
+    background-color: #99FF66;
+    position: absolute;
+    left: 0;
+    top:0;
+    width: 1px;
+    z-index: 1;
+}
+
 .disabled {
     color: gray;
     font-style: italic;
@@ -63,9 +73,17 @@ button:disabled:hover {
     border: groove 2px #828282;
     width: 100%;
     min-width: 1000px;
+    height: 80px;
     margin: 0;
     clear: both;
     overflow: hidden;
+    position: relative;
+}
+
+#message h1 {
+    position:absolute;
+    left: 0;
+    z-index:999;
 }
 
 button {
