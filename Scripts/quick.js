@@ -403,7 +403,6 @@ function loadComments(count, url, currFetchID) {
                 var authorName = val.snippet.topLevelComment.snippet.authorDisplayName;
                 author.html(authorName);
 
-                var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
                 var replyCt = val.snippet.totalReplyCount;
                 var commentID = val.id;
 
@@ -434,10 +433,48 @@ function loadComments(count, url, currFetchID) {
             });
 
             if (!nextUrl) {
-                Utility.displayMessage('Completed query.', GOOD);
-                endTime = new Date().getTime();
-                var time = (endTime - startTime) / 1000.00;
-                console.log('Execution time: ' + time + " seconds");
+                // get google+ comments if any exist
+                Utility.getGooglePlusComments(function (comment, author) {
+                    var commentElt = $("<li class='comment googlePlus'></li>");
+                    var body = $("<div class='commentBody'></div>");
+                    var authorElt = $("<h2 class='author'>" + author + "</h2>");
+                    var userData = $("<div class='commentData'></div>");
+                    userData.html("<p>Retrieved from Google+</p>");
+
+                    var content = $("<div class='content'>" + parseComment(comment, currFetchID, author) + "</div>");
+                    body.append(authorElt).append(content).append(userData);
+                    body.hover(function () {
+                        // in
+                        $(this).find("span.highlight").css("font-size", "24pt");
+                    }, function () {
+                        // out
+                        $(this).find("span.highlight").css("font-size", "12pt");
+                    });
+
+
+                    if (author == "StoneMountain64") {
+                        commentElt.prop("id", "googlePlusMasterComment");
+                        commentElt.append(body);
+                        commentHTML.prepend(commentElt);
+
+                    } else {
+                        commentElt.append(body);
+                        commentHTML.find("#googlePlusMasterComment").append(commentElt);
+                    }
+                    $("#h2_comments").html(count);
+                    count++;
+                }, function (x, t, m) {
+                    console.log("Error loading google+ comments." + x + t + m);
+                    Utility.displayMessage('Completed query.', GOOD);
+                    endTime = new Date().getTime();
+                    var time = (endTime - startTime) / 1000.00;
+                    console.log('Execution time: ' + time + " seconds");
+                }, function () {
+                    Utility.displayMessage('Completed query.', GOOD);
+                    endTime = new Date().getTime();
+                    var time = (endTime - startTime) / 1000.00;
+                    console.log('Execution time: ' + time + " seconds");
+                });
             }
           }, function error(x,t,m) {
               if (currFetchID != fetchID)

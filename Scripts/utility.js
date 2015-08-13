@@ -8,7 +8,7 @@ const PLAYLIST_TITLE = "World's Best Clip of the Week"
 
 var Utility = {
 
-    bestClipOfTheWeekPlaylistID : null,
+    bestClipOfTheWeekPlaylistID: null,
 
     delayAfter: function executeAsync(func, delay) {
         delay = typeof delay !== 'undefined' ? delay : 0;
@@ -44,13 +44,86 @@ var Utility = {
         });
     },
 
+    getGooglePlusComments: function (success, error, final) {
+        var url = "https://www.googleapis.com/plus/v1/people?query=%22Stonemountain64%22";
+        Utility.makeAsyncYouTubeAjaxRequest(url, null,
+            function (response) {
+                var id = null;
+                $(response.items).each(function (idx, itm) {
+                    if (id) {
+                        return;
+                    }
+
+                    if (itm.displayName == "StoneMountain64" && itm.url.indexOf("StoneMountain64") > -1) {
+                        id = itm.id;
+                    }
+                });
+
+                if (!id) {
+                    error(x, t, m);
+                    return;
+                }
+
+                url = "https://www.googleapis.com/plus/v1/people/" + id + "/activities/public?";
+                Utility.makeAsyncYouTubeAjaxRequest(url, null,
+                    function (response) {
+                        var postId = null;
+                        $(response.items).each(function (idx, itm) {
+                            if (postId) {
+                                return;
+                            }
+                            if (itm.object && itm.object.attachments) {
+                                $(itm.object.attachments).each(function (attidx, attitm) {
+                                    if (postId) {
+                                        return;
+                                    }
+                                    if (attitm.objectType == "video" && attitm.displayName == "Top 5 Battlefield Hardline Plays of the Week! (Through Wall Explosion, Collateral, Sniper) WBCW #97") {
+                                        postId = itm.id;
+                                        success(itm.object.content, "StoneMountain64");
+                                    }
+                                });
+                            }
+                        });
+
+                        if (!postId) {
+                            error(x, t, m);
+                            return;
+                        }
+
+                        url = "https://www.googleapis.com/plus/v1/activities/" + postId + "/comments?"
+
+                        var getCommentPage = function (url, page) {
+                            var req = url;
+                            if (page) {
+                                req += "&pageToken=" + page;
+                            }
+
+                            Utility.makeAsyncYouTubeAjaxRequest(req, null,
+                            function (response) {
+                                $(response.items).each(function (idx, itm) {
+                                    success(itm.object.content, itm.actor.displayName);
+
+                                });
+                                if (response.nextPageToken) {
+                                    getCommentPage(url, response.nextPageToken);
+                                } else {
+                                    final();
+                                }
+                            }, error);
+                        }
+                        getCommentPage(url, null);
+                    },
+                    error);
+            }, error);
+    },
+
     getBestClipOfTheWeekPlaylistID: function (success, error) {
         if (this.bestClipOfTheWeekPlaylistID) {
             success(bestClipOfTheWeekPlaylistID);
         }
 
         // Retrieve the list of videos in the specified playlist.
-        var requestVideoPlaylist = function(channelID, pageToken) {
+        var requestVideoPlaylist = function (channelID, pageToken) {
             var url = "https://www.googleapis.com/youtube/v3/playlists?part=snippet&channelId=" + channelID + "&maxResults=20"
 
             if (pageToken) {
@@ -77,7 +150,7 @@ var Utility = {
                     if (nextPageToken)
                         requestVideoPlaylist(channelID, nextPageToken);
 
-                }, function (x,t,m) {
+                }, function (x, t, m) {
                     console.log(t + ': ' + x.status + ". " + m);
                     error(x, t, m);
                 });
@@ -188,18 +261,18 @@ var Utility = {
             var url = "https://www.googleapis.com/youtube/v3/videos?part=statistics&id=" + id + "&maxResults=1"
 
             Utility.makeAsyncYouTubeAjaxRequest(url, null,
-               function(response) {
+               function (response) {
                    if (response.pageInfo.totalResults > 0 && response.items.length > 0) {
                        // stats
-                       viewCount =response.items[0].statistics.viewCount;
-                       likeCount =response.items[0].statistics.likeCount;
-                       commentCount =response.items[0].statistics.commentCount;
+                       viewCount = response.items[0].statistics.viewCount;
+                       likeCount = response.items[0].statistics.likeCount;
+                       commentCount = response.items[0].statistics.commentCount;
                        videoHistoryStats.push([title, viewCount, commentCount, likeCount, shorthand, dateadded]);
                        return true;
                    } else {
                        return false;
                    }
-               }, function(x,t,m) {
+               }, function (x, t, m) {
                    return false;
                });
             return true;
@@ -256,14 +329,14 @@ var Utility = {
 
                    if (nextPageToken)
                        requestVideosInPlaylist(playlistId, nextPageToken);
-               }, function(x, t, m) {
+               }, function (x, t, m) {
                    error(x, t, m);
                });
         }
 
-        Utility.getBestClipOfTheWeekPlaylistID(function(id) {
+        Utility.getBestClipOfTheWeekPlaylistID(function (id) {
             requestVideosInPlaylist(id);
-        }, function(x, t, m) {
+        }, function (x, t, m) {
             error(x, t, m);
         });
     },

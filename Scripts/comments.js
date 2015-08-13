@@ -249,7 +249,6 @@ function loadComments(count, url, currFetchID) {
                    Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
 
                $.each(data["items"], function (key, val) {
-                   var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
                    var replyCt = val.snippet.totalReplyCount;
                    var commentID = val.id;
 
@@ -263,10 +262,22 @@ function loadComments(count, url, currFetchID) {
                });
 
                if (!nextUrl) {
-                   Utility.displayMessage('Completed query.', GOOD);
-                   endTime = new Date().getTime();
-                   var time = (endTime - startTime) / 1000.00;
-                   console.log('Execution time: ' + time + " seconds");
+                   // get google+ comments if any exist
+                   Utility.getGooglePlusComments(function (comment, author) {
+                       parseComment(comment, currFetchID, author);
+                       count++;
+                   }, function (x, t, m) {
+                       console.log("Error loading google+ comments." + x + t + m);
+                       Utility.displayMessage('Completed query.', GOOD);
+                       endTime = new Date().getTime();
+                       var time = (endTime - startTime) / 1000.00;
+                       console.log('Execution time: ' + time + " seconds");
+                   }, function () {
+                       Utility.displayMessage('Completed query.', GOOD);
+                       endTime = new Date().getTime();
+                       var time = (endTime - startTime) / 1000.00;
+                       console.log('Execution time: ' + time + " seconds");
+                   });
                }
            }, function error(x, t, m) {
                if (currFetchID != fetchID)

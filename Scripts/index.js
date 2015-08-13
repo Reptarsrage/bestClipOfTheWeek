@@ -207,7 +207,6 @@ function drawChart(chartType, containerID, dataTable, options) {
         return false;
     }
 
-    console.log("update " + containerID);
     $("#" + containerID).parent().find(".loading").fadeOut(1000);
     chart.draw(dataTable, options);
 
@@ -274,7 +273,7 @@ function toggleComments(cb, manual) {
 
     if (cb.prop('checked')) {
         $("#comments").append(commentHTML);
-        $("#comments").show("slide", { direction: "left" }, 500);
+        $("#comments").show();
         $(".commentBody").hover(function () {
             // in
             $(this).find("span.highlight").css("font-size", "24pt");
@@ -283,11 +282,7 @@ function toggleComments(cb, manual) {
             $(this).find("span.highlight").css("font-size", "12pt");
         });
     } else {
-        $("input[type='checkbox']").prop('disabled', true);
-        $("#comments").hide("slide", { direction: "left" }, 500, function () {
-            $("#comments").find("*").filter(":not(.error, .loading)").remove();
-            $("input[type='checkbox']").prop('disabled', false);
-        });
+        $("#comments").hide();
     }
 }
 
@@ -299,9 +294,9 @@ function toggleVoters(cb, manual) {
     }
 
     if (cb.prop('checked')) {
-        $("#voters").show("slide", { direction: "left" }, 500);
+        $("#voters").show();
     } else {
-        $("#voters").hide("slide", { direction: "left" }, 500);
+        $("#voters").hide();
     }
 }
 
@@ -600,10 +595,50 @@ function loadComments(count, url, currFetchID) {
              });
 
              if (!nextUrl) {
-                 Utility.displayMessage('Completed query.', GOOD);
-                 endTime = new Date().getTime();
-                 var time = (endTime - startTime) / 1000.00;
-                 console.log('Execution time: ' + time + " seconds");
+                 // get google+ comments if any exist
+                 Utility.getGooglePlusComments(function (comment, author) {
+                     var commentElt = $("<li class='comment googlePlus'></li>");
+                     var body = $("<div class='commentBody'></div>");
+                     var authorElt = $("<h2 class='author'>"+author+"</h2>");
+                     var userData = $("<div class='commentData'></div>");
+                     userData.html("<p> reply number: " + count + "</p>" +
+                                 "<p>Retrieved from Google+</p>" +
+                                 "<p>No further information loaded</p>");
+
+                     var content = $("<div class='content'>" + parseComment(comment, currFetchID, author) + "</div>");
+                     body.append(authorElt).append(content).append(userData);
+                     body.hover(function () {
+                         // in
+                         $(this).find("span.highlight").css("font-size", "24pt");
+                     }, function () {
+                         // out
+                         $(this).find("span.highlight").css("font-size", "12pt");
+                     });
+
+
+                     if (author == "StoneMountain64") {
+                         commentElt.prop("id", "googlePlusMasterComment");
+                         commentElt.append(body);
+                         commentHTML.prepend(commentElt);
+                         
+                     } else {
+                         commentElt.append(body);
+                         commentHTML.find("#googlePlusMasterComment").append(commentElt);
+                     }
+                     $("#h2_comments").html(count);
+                     count++;
+                 }, function (x, t, m) {
+                     console.log("Error loading google+ comments." + x + t + m);
+                     Utility.displayMessage('Completed query.', GOOD);
+                     endTime = new Date().getTime();
+                     var time = (endTime - startTime) / 1000.00;
+                     console.log('Execution time: ' + time + " seconds");
+                 }, function () {
+                     Utility.displayMessage('Completed query.', GOOD);
+                     endTime = new Date().getTime();
+                     var time = (endTime - startTime) / 1000.00;
+                     console.log('Execution time: ' + time + " seconds");
+                 });
              }
          }, function error(x, t, m) {
              if (currFetchID != fetchID)
@@ -617,8 +652,8 @@ function loadComments(count, url, currFetchID) {
              } else {
                  // give up
                  $("#termSpace .loading, #commentSpace .loading, #commentSpace .error, #chartSection, #termResults").fadeOut(1000);
-                 $("#termSpace .error, #commentSpace > .error").fadeIn(1000, function() {
-                    $("#h2_comments").html('Error');
+                 $("#termSpace .error, #commentSpace > .error").fadeIn(1000, function () {
+                     $("#h2_comments").html('Error');
                  });
                  $("input[type='checkbox']").prop('checked', false);
                  $("input[type='checkbox']").prop('disabled', true);
@@ -764,8 +799,6 @@ function parseComment(comment, currFetchID, author) {
 }
 
 function loadChart() {
-    console.log("load");
-
     // get only non zero vals
     var nonNullData = new google.visualization.DataTable();
     var pieColors = Array(ConfiguredTermArray.length);
