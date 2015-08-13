@@ -65,55 +65,67 @@ var Utility = {
                 }
 
                 url = "https://www.googleapis.com/plus/v1/people/" + id + "/activities/public?";
-                Utility.makeAsyncYouTubeAjaxRequest(url, null,
-                    function (response) {
-                        var postId = null;
-                        $(response.items).each(function (idx, itm) {
-                            if (postId) {
+
+                var getPost = function (url, page) {
+                    var req = url;
+                    if (page) {
+                        req += "&pageToken=" + page;
+                    }
+
+                    Utility.makeAsyncYouTubeAjaxRequest(req, null,
+                        function (response) {
+                            var postId = null;
+                            $(response.items).each(function (idx, itm) {
+                                if (postId) {
+                                    return;
+                                }
+                                if (itm.object && itm.object.attachments) {
+                                    $(itm.object.attachments).each(function (attidx, attitm) {
+                                        if (postId) {
+                                            return;
+                                        }
+                                        if (attitm.objectType == "video" && attitm.displayName == "Top 5 Battlefield Hardline Plays of the Week! (Through Wall Explosion, Collateral, Sniper) WBCW #97") {
+                                            postId = itm.id;
+                                            success(itm.object.content, "StoneMountain64");
+                                        }
+                                    });
+                                }
+                            });
+
+                            if (!postId && response.nextPageToken) {
+                                getPost(url, response.nextPageToken);
+                                return;
+                            } else if (!postId) {
+                                error(null, 404, "Error: Post not found.");
                                 return;
                             }
-                            if (itm.object && itm.object.attachments) {
-                                $(itm.object.attachments).each(function (attidx, attitm) {
-                                    if (postId) {
-                                        return;
-                                    }
-                                    if (attitm.objectType == "video" && attitm.displayName == "Top 5 Battlefield Hardline Plays of the Week! (Through Wall Explosion, Collateral, Sniper) WBCW #97") {
-                                        postId = itm.id;
-                                        success(itm.object.content, "StoneMountain64");
-                                    }
-                                });
-                            }
-                        });
 
-                        if (!postId) {
-                            error(x, t, m);
-                            return;
-                        }
+                            url = "https://www.googleapis.com/plus/v1/activities/" + postId + "/comments?"
 
-                        url = "https://www.googleapis.com/plus/v1/activities/" + postId + "/comments?"
-
-                        var getCommentPage = function (url, page) {
-                            var req = url;
-                            if (page) {
-                                req += "&pageToken=" + page;
-                            }
-
-                            Utility.makeAsyncYouTubeAjaxRequest(req, null,
-                            function (response) {
-                                $(response.items).each(function (idx, itm) {
-                                    success(itm.object.content, itm.actor.displayName);
-
-                                });
-                                if (response.nextPageToken) {
-                                    getCommentPage(url, response.nextPageToken);
-                                } else {
-                                    final();
+                            var getCommentPage = function (url, page) {
+                                var req = url;
+                                if (page) {
+                                    req += "&pageToken=" + page;
                                 }
-                            }, error);
-                        }
-                        getCommentPage(url, null);
-                    },
-                    error);
+
+                                Utility.makeAsyncYouTubeAjaxRequest(req, null,
+                                function (response) {
+                                    $(response.items).each(function (idx, itm) {
+                                        success(itm.object.content, itm.actor.displayName);
+
+                                    });
+                                    if (response.nextPageToken) {
+                                        getCommentPage(url, response.nextPageToken);
+                                    } else {
+                                        final();
+                                    }
+                                }, error);
+                            }
+                            getCommentPage(url, null);
+                        },
+                        error);
+                }
+                getPost(url, null);
             }, error);
     },
 
@@ -202,6 +214,7 @@ var Utility = {
                     ConfiguredColorArray = new Array();
                     ConfiguredTermArray = new Array();
                     var rows = resp.split("<br/>");
+                    var diabledQueue = [];
                     for (i = 0; i < rows.length; i++) {
                         cols = rows[i].split(" ");
                         if (cols[0].trim() == '')
@@ -233,12 +246,16 @@ var Utility = {
                             ConfiguredTermArray.push([cols[0].replace(/&nbsp;/g, ' '), 0]);
                             var list = $("<li class=" + cols[0].replace(/[^\w]/gi, '') + "></li>");
                             list.text(cols[0].replace(/&nbsp;/g, ' '));
+                            listElt.append(list);
                         } else {
                             var list = $("<li class='disabled'></li>");
                             list.text("(disabled): " + cols[0].replace(/&nbsp;/g, ' '));
-                        }
+                            diabledQueue.push(list);
+                        }                   
+                    }
 
-                        listElt.append(list);
+                    while (diabledQueue.length > 0) {
+                        listElt.append(diabledQueue.shift());
                     }
                 }
                 success(ConfiguredColorArray, ConfiguredTermArray, listElt);

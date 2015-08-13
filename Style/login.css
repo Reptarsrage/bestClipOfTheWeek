@@ -5,6 +5,13 @@
  * Login page style
  */
 
+#backgorund_overlay {
+    width: 100%;
+    height: 100%; 
+    position: absolute;
+    background-color: rgba(0,0,0,0.5);
+    z-index: 50;
+}
 
 #backgorund_grid {
     width: 100%;

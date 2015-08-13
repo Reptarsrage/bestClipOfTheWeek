@@ -14,7 +14,6 @@ var ConfiguredTermArray;
 var ConfiguredColorArray;
 var startTime, endTime;
 var loaded = false;
-var termStats;
 var data = null;
 var commentHTML = $("<div></div>");
 var overallCount = 0;
@@ -23,7 +22,6 @@ var timerCount = 0;
 var gapiPieChart, gapiBarChart, gapiColumnChart;
 var gapiPieChart_options, gapiBarChart_options, gapiColumnChart_options;
 var gapiPieChart_data, gapiPieChart_data, gapiPieChart_data;
-var maxValue = 1000;
 var fetchID = 0;
 var voters = new Array();
 var videoHistoryStats;
@@ -121,13 +119,11 @@ $(document).ready(function () {
 
     //reset
     loaded = false;
-    termStats = null;
     commentHTML = $("<div></div>");
     overallCount = 0;
     lastCount = 0;
     timerCount = 0;
     gapiPieChart, gapiBarChart, gapiColumnChart = null;
-    maxValue = 1000;
     data = new google.visualization.DataTable();
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);
@@ -324,13 +320,11 @@ function fetchResults() {
 
     //reset
     loaded = false;
-    termStats = null;
     commentHTML = $("<div></div>");
     overallCount = 0;
     lastCount = 0;
     timerCount = 0;
     gapiPieChart, gapiBarChart, gapiColumnChart = null;
-    maxValue = 1000;
     data = new google.visualization.DataTable();
     voters = new Array();
     toggleVoters($("#checkbox_voters"), false);

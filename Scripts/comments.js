@@ -18,7 +18,7 @@ window.onerror = function (msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+    Utility.displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
     fetchID++;
     var suppressErrorAlert = true;
     return suppressErrorAlert;
