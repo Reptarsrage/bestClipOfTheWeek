@@ -1,4 +1,12 @@
-﻿var TwitterPlugIn = {
+﻿/*
+Justin Robb
+8/20/15
+bestClipOfTheWeek
+Twitter function for getting video replies
+*/
+
+
+var TwitterPlugIn = {
     /* Example Call
     getTwitterCommentsForVideo("yEXuG2IRL2k", function (com, auth) {
         $("#test").append("<p>" + auth + " - " + com + "</p>");

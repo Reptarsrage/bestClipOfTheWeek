@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/Style/common.css?v=0.2.4.2(beta)">
+    <link rel="stylesheet" href="/Style/common.css?v=0.3.0.0(beta)">
 
     <script src="Scripts/jquery-1.11.3.min.js"></script>
     <script src="Scripts/jquery-ui.min.js"></script>
@@ -25,9 +25,9 @@
         validateLogin();
     </script>
 
-    <script src="Scripts/utility.js?v=0.2.4.2(beta)"></script>
-    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.2.4.2(beta)"></script>
-    <script type="text/javascript" src="/Scripts/header.js?v=0.2.4.2(beta)"></script>
+    <script src="Scripts/utility.js?v=0.3.0.0(beta)"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.3.0.0(beta)"></script>
+    <script type="text/javascript" src="/Scripts/header.js?v=0.3.0.0(beta)"></script>
 </head>
 <body>
     <!--DUPLICATED ACCROSS PAGES-->
@@ -51,9 +51,9 @@
             <p>
                 So I got incredibly bored at work one day and tried to come up with ideas for a side project. Hit a wall so I decided to watch a couple videos on the YouTubes. When suddenly inspiration struck! I figured it would be both fun and a good programming exercise to come up with a way to tally the results of StoneMountain64's Best Clip of the Week videos.
             </p><p>
-                This site is not meant for a wide range of users. Mostly just one, although now that I've made it I  possibly see a little room for growth. My intention was to have a program that took a url and a list of terms and returned a count of votes for each term. After I completed this I thought, 'wouldn't it be cool if I could play with the terms, store them and manipulate them?' Well this whim lead to a backend server and a service running on Openshift. Then I thought, wouldn't it be cool if I had some charts? Luckily I was already using Youtube Data and Analytics, and Google+ API's, so adding Google Charts was not difficult. Then I figured since I have a database that may or may not charge me money for heavy use, I need some security. This drove me to make a login in system. Then I figured might as well go balls out and make a bad-ass login page, so I did.
+                This site is not meant for a wide range of users. Mostly just one. My intention was to have a program that took a YouTube video URL and a list of terms and returned a count of votes for each term. After I completed this I thought, 'wouldn't it be cool if I could play with the terms, store them and manipulate them?' Well this whim lead to a backend server and a service running on Openshift. Then I thought, wouldn't it be cool if I had some charts? Luckily I was already using YouTube Data and Analytics, and Google+ API's, so adding Google Charts was not difficult. Then I figured since I have a database that may or may not charge me money for heavy use, I need some security. This drove me to make a login in system. Then I figured might as well go balls out and make a ridiculous login page.
             </p><p>
-                After all that was said and done, I had kind of this clunky cool looking website. There are a couple of things that I haven't gotten to yet. The biggest one is improving the load time of the results. Client-side processing, slow google API's and zero caching have all added up to a whopping 90sec page load time... and unless I want to spend money and/or a ton of time, I'm not sure how to improve this. There is also the issue with errors cropping up. I didn't write unit tests as this was just kind of an ad-hoc fun project and I didn't want to deal with the overhead. There are some pretty heavy restrictions on my back-end server size, the amount of API calls I can make, and a few other limiting factors.
+                After all that was said and done, I had kind of this clunky cool looking website. There are a couple of things that I haven't gotten to yet. The biggest one is improving the load time of the results. Client-side processing, slow Google API's and zero caching have all added up to a whopping 90sec page load time... and unless I want to spend money and/or a ton of time, I'm not sure how to improve this. There is also the issue with errors cropping up. I didn't write unit tests as this was just kind of an ad-hoc fun project and I didn't want to deal with the overhead. There are some pretty heavy restrictions on my back-end server size, the amount of API calls I can make, and a few other limiting factors.
             </p><p>
                 I had a super fun time making this site. Flaws and all I think it turned out pretty well.
             </p>

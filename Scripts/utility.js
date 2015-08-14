@@ -1,8 +1,16 @@
-﻿// Constants
+﻿/*
+Justin Robb
+8/20/15
+bestClipOfTheWeek
+Utility functions (shared)
+*/
+
+
+// Constants
 const GOOD = 0;
 const BAD = 1;
 const OKAY = 2
-const VERSION_NUMBER = "0.2.4.2(beta)"
+const VERSION_NUMBER = "0.3.0.0(beta)"
 const PLAYLIST_TITLE = "World's Best Clip of the Week"
 
 
