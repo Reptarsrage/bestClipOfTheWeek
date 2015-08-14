@@ -73,7 +73,7 @@ button:disabled:hover {
     border: groove 2px #828282;
     width: 100%;
     min-width: 1000px;
-    height: 80px;
+    min-height: 100px;
     margin: 0;
     clear: both;
     overflow: hidden;
@@ -83,6 +83,7 @@ button:disabled:hover {
 #message h1 {
     position:absolute;
     left: 0;
+    top: -20px;
     z-index:999;
 }
 

@@ -133,10 +133,7 @@ $(document).ready(function () {
     retryCt = 25;
     totalComments = 0;
     selectedVideoId = "";
-
 });
-
-Utility.displayMessage("Authorizing...", OKAY);
 
 google.load("visualization", "1", {
     packages: ["corechart", 'table', "bar"]
