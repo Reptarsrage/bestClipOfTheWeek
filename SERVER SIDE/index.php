@@ -63,7 +63,22 @@
 	
 	// Handle requests
 	if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-		if (isset($_GET["signup"]) && !empty($_GET["signup"])) {
+		if (isset($_GET["file"]) && !empty($_GET["file"])) {
+			$filename = $_GET["file"];
+			$attachment_location = $_SERVER["DOCUMENT_ROOT"] . $filename;
+			if (file_exists($attachment_location)) {
+				header($_SERVER["SERVER_PROTOCOL"] . " 200 OK");
+				header("Cache-Control: public"); // needed for i.e.
+				header("Content-Type: image/png");
+				header("Content-Length:".filesize($attachment_location));
+				header("Content-Disposition: attachment; filename=" . $filename);
+				readfile($attachment_location);
+				die();        
+			} else {
+				header('HTTP/1.1 404 Not Found');
+				echo "Error: File " . $filename . " not found.";
+			}
+		} else if (isset($_GET["signup"]) && !empty($_GET["signup"])) {
 			// GET Signup
 			// Adds a new user to the back-end and logs them in, returns the session token
 			// expect username, password
@@ -276,6 +291,56 @@
 				die();
 			}
 		}
+	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["download"]) && !empty($_POST["download"])) {
+		// special case to enable downloading of chart png across browsers
+		$error = "";
+		if (isset($_POST["username"]) && !empty($_POST["username"])) {
+			$username = $_POST["username"];
+		} else {
+			$error = "Username is invalid or not set";
+		}
+		
+		if (isset($_POST["token"]) && !empty($_POST["token"])) {
+			$token = $_POST["token"];
+		} else {
+			$error = "Token is invalid or not set";
+		}
+		
+		if (isset($_POST["filename"]) && !empty($_POST["filename"])) {
+			$filename = $_POST["filename"];
+		} else {
+			$error = "File name is invalid or not set";
+		}
+		
+		userAuthorize($username, $token, $ip_address, $mysqlCon);
+	
+		if (empty($error)) {
+			// request is good!
+			$EncodedPNG = $_POST["download"];
+			//Replace spaces with +
+			$EncodedPNG = str_replace(' ','+',$EncodedPNG);
+			//Remove identifier string from begining of data.
+			$EncodedPNG =  str_replace('data:image/png;base64,', '', $EncodedPNG);
+			$decoded=base64_decode($EncodedPNG);	
+			$my_file = $filename;
+			
+			if (!($handle = fopen($my_file, 'w'))) {
+				header('HTTP/1.1 500 Internal server error');
+				echo "Error: Unable to create file " . $filename;
+				die();
+			}
+			fwrite($handle, $decoded);
+			fclose($handle);
+			
+			header('HTTP/1.1 200 Ok');
+			echo $my_file;
+		} else {
+			// request error
+			header('HTTP/1.1 400 Bad Request');
+			echo "Error: " . $error;
+			die();
+		}
+		
 	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["method"]) && $_POST["method"] === 'POST') {
 		// POST
 		// updates or adds the term to the back-end for the given user

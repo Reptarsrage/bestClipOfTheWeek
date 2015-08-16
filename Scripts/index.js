@@ -64,6 +64,7 @@ window.onerror = function (msg, url, line, col, error) {
 $(document).ready(function () {
     // get terms and colors
     $("#fetch").prop("disabled", true);
+    $("#downloadPieChart").prop("disabled", true);
     $("#fetch").prop("title", "Please wait for terms to be loaded");
     $("#fetch").click(fetchResults);
 
@@ -103,23 +104,56 @@ $(document).ready(function () {
         }
     });
 
-    $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#downloadPieChart").click(function () {
+        $("#downloadPieChart").prop("disabled", true);
+        var data = gapiPieChart.getImageURI();
+        $.ajax({
+            url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
+            type: "POST",
+            timeout: 5000,
+            cache: false,
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            data: {
+                username: urlParams['username'],
+                token: urlParams['token'],
+                download: data,
+                filename: 'piechart.png'
+            },
+            success: function (resp) {
+                if (resp["error"]) {
+                    // error?
+                    console.log("Error with image response: " + resp.error.message);
+                    //alert("Error getting image: " + resp.error.message);
+                    return;
+                } else {
+                    window.location = "https://bestclipoftheweek-1xxoi1ew.rhcloud.com/?file=" + resp;
+                    $("#downloadPieChart").prop("disabled", false);
+                }
+            },
+            error: function (x, t, m) {
+                console.log("Error getting image: " + t + ': ' + x.status + ". " + x.message + t + m);
+                //alert("Error getting image: " + t + ': ' + x.status + ". " + m);
+            }
+        });
+    });
 
-    // start off hiding errors, will be shown as they crop up
+    $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" +VERSION);
+    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" +VERSION);
+    $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" +VERSION);
+    $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" +VERSION);
+
+        // start off hiding errors, will be shown as they crop up
     $(".error").hide();
     $(".loading").show();
 
-    // hide all sections (will show one at a time as it completes
+        // hide all sections (will show one at a time as it completes
     $("#commentSpace").hide();
     $("#termSpace").hide();
     $("#results").hide();
     $("#chartSection").hide();
     $("#termResults").hide();
 
-    //reset
+        //reset
     loaded = false;
     commentHTML = $("<div></div>");
     overallCount = 0;
@@ -307,6 +341,7 @@ function fetchResults() {
     $("#voters").find("*").filter(":not(.error, .svgContainer)").remove();
     $("#h2_comments").html('0');
     $("#stats_group").css("background-image", "url()");
+    $("#downloadPieChart").prop("disabled", true);
 
     // start off hiding errors, will be shown as they crop up
     $(".error").filter(":not(#userSpace .error)").hide();
@@ -751,7 +786,9 @@ function parseComment(comment, currFetchID, author) {
             // Animation complete.
             $(this).fadeIn(1000);
             $("#chartSection").show();
-            $("#piechart").fadeIn(1000);
+            $("#piechart").fadeIn(1000, function () {
+                $("#downloadPieChart").prop("disabled", false);
+            });
             $("#barchart").fadeIn(1000);
             $("#termResults").fadeIn(1000);
         });
@@ -835,7 +872,7 @@ function loadChart() {
     var options = {
         colors: pieColors,
         theme: 'maximized',
-        backgroundColor: '#ECECEC',
+        backgroundColor: 'transparent',
         pieSliceText: 'label',
         pieSliceTextStyle: {
             color: 'black',
@@ -848,9 +885,10 @@ function loadChart() {
 
     // BAR
     var baroptions = {
+        backgroundColor: { fill: 'transparent' },
         theme: 'maximized',
         chartArea: {
-            backgroundColor: '#ECECEC',
+            backgroundColor: 'transparent',
         },
         hAxis: {
             title: 'Votes',
