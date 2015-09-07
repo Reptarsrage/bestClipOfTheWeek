@@ -13,7 +13,7 @@ function validateLogin() {
 
     //check for token
     if (!urlParams['token'] || !urlParams['username'])
-        window.location = "login.html?v=0.4.0.0(beta)";
+        window.location = "login.html?v=0.4.1.0(beta)";
 
     // authorize
     var username = urlParams['username'];
@@ -32,18 +32,18 @@ function validateLogin() {
         },
         success: function (msg) {
             if (!msg) {
-                window.location = "login.html?v=0.4.0.0(beta)";
+                window.location = "login.html?v=0.4.1.0(beta)";
             }
             // msg.status
             // msg.responseText
             // msg. statusText
             if (msg.hasOwnProperty("status")) {
                 if (msg.status != 200)
-                    window.location = "login.html?v=0.4.0.0(beta)";
+                    window.location = "login.html?v=0.4.1.0(beta)";
             }
         },
         error: function (reason) {
-            window.location = "login.html?v=0.4.0.0(beta)";
+            window.location = "login.html?v=0.4.1.0(beta)";
         },
     });
 }

@@ -38,7 +38,7 @@
 }
 
 input {
-    width: 315px;
+    width: 325px;
     height: 25px;
 }
 
@@ -58,6 +58,7 @@ input {
     width: 480px;
     background-color: #ECECEC;
     margin: 10px 0 10px 0;
+    border: 1px solid gray;
 }
 
 p {

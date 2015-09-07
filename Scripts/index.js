@@ -49,7 +49,7 @@ window.onerror = function (msg, url, line, col, error) {
 
     // You can view the information in an alert to see things working like this:
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    Utility.displayMessage("An error occured on the page. Please try a hard refresh (CTRL + F5). If you experience any further issues please contact me for support (link in footer).", BAD);
+    Utility.displayMessage("An error occured. Please try a hard refresh (CTRL + F5). If you experience any further issues please contact me for support (link in footer).", BAD);
     fetchID++; // stop all events
 
     // TODO: Report this error via ajax so you can keep track

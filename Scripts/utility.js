@@ -10,7 +10,7 @@ Utility functions (shared)
 const GOOD = 0;
 const BAD = 1;
 const OKAY = 2
-const VERSION_NUMBER = "0.4.0.0(beta)"
+const VERSION_NUMBER = "0.4.1.0(beta)"
 const PLAYLIST_TITLE = "World's Best Clip of the Week"
 
 

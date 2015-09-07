@@ -13,7 +13,7 @@ window.onerror = function (msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col;
     extra += !error ? '' : '\nerror: ' + error;
     console.log("Error: " + msg + "\nurl: " + url + "\nline: " + line + extra);
-    displayMessage("An error occured on the page. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
+    displayMessage("An error occured. Please try releoading the page. If you experience any further issues you can contact me for support.", BAD);
     var suppressErrorAlert = true;
     return suppressErrorAlert;
 };
