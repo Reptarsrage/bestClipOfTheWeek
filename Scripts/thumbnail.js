@@ -98,6 +98,7 @@ function fetchThumbnail(num) {
 
 
 function getVideoThumbnail(id, containerId, num) {
+    $("#" + containerId).parent().find(".button_fetch").prop("disabled", true);
     $("#" + containerId + " .img_thumb").remove();
     $("#" + containerId).parent().find(".url").empty();
     $("#" + containerId).parent().find(".title").text("");
@@ -125,6 +126,7 @@ function getVideoThumbnail(id, containerId, num) {
                    // error
                    $("#" + containerId + " .loading").fadeOut(500);
                    $("#" + containerId + " .error").fadeIn(500);
+                   $("#" + containerId).parent().find(".button_fetch").prop("disabled", false);
                    Utility.displayMessage('Error loading thumbnail: No thumbnail found.');
                    return;
                }
@@ -138,7 +140,9 @@ function getVideoThumbnail(id, containerId, num) {
                img.css("width", "480px");
                $("#" + containerId + " .loading").fadeOut(500);
                $("#" + containerId).append(img);
-               img.fadeIn(500);
+               img.fadeIn(500, function () {
+                   $("#" + containerId).parent().find(".button_fetch").prop("disabled", false);
+               });
 
                $("#" + containerId).parent().find(".title").text(response.items[0].snippet.title);
                $("#" + containerId).parent().find(".resolution").text("Resolution: " + thumb.width + " x " + thumb.height);
@@ -163,6 +167,7 @@ function getVideoThumbnail(id, containerId, num) {
            // error 
            $("#" + containerId + " .loading").fadeOut(500);
            $("#" + containerId + " .error").fadeIn(500);
+           $("#" + containerId).parent().find(".button_fetch").prop("disabled", false);
            Utility.displayMessage('Error loading thumbnail: ' + x.status + ". " + m, BAD);
        });
 }
