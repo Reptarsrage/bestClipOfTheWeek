@@ -73,7 +73,7 @@
 				header("Content-Length:".filesize($attachment_location));
 				header("Content-Disposition: attachment; filename=" . $filename);
 				readfile($attachment_location);
-				die();        
+				die();
 			} else {
 				header('HTTP/1.1 404 Not Found');
 				echo "Error: File " . $filename . " not found.";
@@ -340,7 +340,47 @@
 			echo "Error: " . $error;
 			die();
 		}
+	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["thumbnail"]) && !empty($_POST["thumbnail"])) {
+		// special case to enable downloading of thumnail images across browsers
+		$error = "";
+		if (isset($_POST["username"]) && !empty($_POST["username"])) {
+			$username = $_POST["username"];
+		} else {
+			$error = "Username is invalid or not set";
+		}
 		
+		if (isset($_POST["token"]) && !empty($_POST["token"])) {
+			$token = $_POST["token"];
+		} else {
+			$error = "Token is invalid or not set";
+		}
+		
+		if (isset($_POST["filename"]) && !empty($_POST["filename"])) {
+			$filename = $_POST["filename"];
+		} else {
+			$error = "File name is invalid or not set";
+		}
+		
+		userAuthorize($username, $token, $ip_address, $mysqlCon);
+	
+		if (empty($error)) {
+			// request is good!
+			$fileUrl = $_POST["thumbnail"];
+			
+			if (file_put_contents($filename, file_get_contents($fileUrl), LOCK_EX) > 0) {
+				header('HTTP/1.1 200 Ok');
+				echo $filename;
+			} else {
+				header('HTTP/1.1 500 Internal Server Error');
+				echo "Error: Unable to create image file.";
+				die();
+			}
+		} else {
+			// request error
+			header('HTTP/1.1 400 Bad Request');
+			echo "Error: " . $error;
+			die();
+		}
 	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["method"]) && $_POST["method"] === 'POST') {
 		// POST
 		// updates or adds the term to the back-end for the given user
@@ -397,6 +437,43 @@
 				mysqli_close($mysqlCon);
 				header('HTTP/1.1 500 Internal Server Error');
 				echo "Query failed";
+				die();
+			}
+		} else {
+			// request error
+			header('HTTP/1.1 400 Bad Request');
+			echo "Error: " . $error;
+			die();
+		}
+	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["delete_file"]) && !empty($_POST["delete_file"])) {
+		// DELETE
+		// removes a file from the server
+		// expects a username, token
+		$error = "";
+		$username = "";
+		if (isset($_POST["username"]) && !empty($_POST["username"])) {
+			$username = $_POST["username"];
+		} else {
+			$error = "Username is invalid or not set";
+		}
+		
+		if (isset($_POST["token"]) && !empty($_POST["token"])) {
+				$token = $_POST["token"];
+			} else {
+				$error = "Token is invalid or not set";
+			}
+			
+		userAuthorize($username, $token, $ip_address, $mysqlCon);
+		
+		if (empty($error)) {
+			// request is good!
+			$filename = $_POST["delete_file"];
+			if (unlink($filename)) {
+				header('HTTP/1.1 200 Ok');
+				echo "Success";
+			} else {
+				header('HTTP/1.1 500 Internal Server Error');
+				echo "Error: unable to delete file.";
 				die();
 			}
 		} else {

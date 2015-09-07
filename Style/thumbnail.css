@@ -1,0 +1,77 @@
+﻿/*
+ * Justin Robb
+ * 9/03/15
+ * Best Clip of the Week Application
+ * Thumbnail page style
+ */
+
+#left {
+    float: left;
+    width: 48%;
+    min-width: 495px;
+    height: 600px;   
+}
+
+#right {
+    float: right;
+    width: 48%;
+    min-width: 495px;
+    height: 600px;
+}
+
+#vertical_seperator {
+    height: 550px;
+    width: 10px;
+    position: absolute;
+    right: 50%;
+    left: 50%;
+    border: none;
+    margin: 0 0 50px 0;
+    padding: 0;
+    background: #CC4158;
+	background: -moz-linear-gradient(right,#CC4158 0,#8F2E3E 100%);
+	background: -webkit-gradient(linear,left top,left bottom,color-stop(0,#CC4158),color-stop(100%,#8F2E3E));
+	background: -webkit-linear-gradient(right,#CC4158 0,#8F2E3E 100%);
+	background: -o-linear-gradient(right,#CC4158 0,#8F2E3E 100%);
+	background: -ms-linear-gradient(right,#CC4158 0,#8F2E3E 100%);
+	background: linear-gradient(right,#CC4158 0,#8F2E3E 100%);
+}
+
+input {
+    width: 315px;
+    height: 25px;
+}
+
+#div_image2_container, #div_image1_container {
+    height: 100%;
+    margin: 0 auto 0 auto;
+    width: 480px;
+}
+
+#div_image2_container {
+    padding: 0 0 0 10px;
+}
+
+#div_image1, #div_image2 {
+    position: relative;
+    height: 360px;
+    width: 480px;
+    background-color: #ECECEC;
+    margin: 10px 0 10px 0;
+}
+
+p {
+    margin: 0;
+    padding: 0;
+    color: gray;
+    max-width: 480px;
+    word-wrap:break-word;
+}
+
+h3 {
+    margin: 0;
+    padding: 0;
+    color: gray;
+    max-width: 480px;
+    word-wrap:break-word;
+}

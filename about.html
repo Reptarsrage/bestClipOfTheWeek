@@ -15,7 +15,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <link rel="stylesheet" href="/Style/common.css?v=0.3.0.0(beta)">
+    <link rel="stylesheet" href="/Style/common.css?v=0.4.0.0(beta)">
 
     <script src="Scripts/jquery-1.11.3.min.js"></script>
     <script src="Scripts/jquery-ui.min.js"></script>
@@ -25,9 +25,9 @@
         validateLogin();
     </script>
 
-    <script src="Scripts/utility.js?v=0.3.0.0(beta)"></script>
-    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.3.0.0(beta)"></script>
-    <script type="text/javascript" src="/Scripts/header.js?v=0.3.0.0(beta)"></script>
+    <script src="Scripts/utility.js?v=0.4.0.0(beta)"></script>
+    <script type="text/javascript" src="/Scripts/tooltips.js?v=0.4.0.0(beta)"></script>
+    <script type="text/javascript" src="/Scripts/header.js?v=0.4.0.0(beta)"></script>
 </head>
 <body>
     <!--DUPLICATED ACCROSS PAGES-->
@@ -38,6 +38,7 @@
                 <li><a id="a_quick">Quick Search (no charts)</a></li>
                 <li><a id="a_comments">Commenters</a></li>
                 <li><a id="a_config">Configure search terms</a></li>
+                <li><a id="a_thumbnail">Video Thumbnails</a></li>
                 <li class='active'><a id="a_about">About</a></li>
             </ul>
         </div>
@@ -64,7 +65,7 @@
             <h3>API's:</h3>
             <ol>
                 <li><a href="https://developers.google.com/chart/">Jquery library</a> quite a revolutionary and free library.</li>
-                <li><a href="https://developers.google.com/youtube/analytics/">Jquery UI library</a> a pretty damn usefull for them tooltips.</li>
+                <li><a href="https://developers.google.com/youtube/analytics/">Jquery UI library</a> a pretty damn usefull tool for them tooltips.</li>
                 <li><a href="https://developers.google.com/youtube/v3/">JSColor</a> a SICK color chooser.</li>
                 <li><a href="https://developers.google.com/+/api/">nnattawat</a> for that ballin' flip animation.</li>
             </ol>
@@ -116,6 +117,7 @@
             $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
             $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
             $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+            $("#a_thumbnail").prop("href", "thumbnail.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
         });
     </script>
 </body>

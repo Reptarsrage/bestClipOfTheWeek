@@ -314,7 +314,7 @@ b.error {
   float: right;
 }
 #cssmenu > ul > li > a {
-  padding: 20px 25px;
+  padding: 20px 15px;
   font-size: 14px;
   font-weight: bold;
   text-transform: uppercase;
