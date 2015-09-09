@@ -48,12 +48,6 @@ $(document).ready(function () {
         }
     });
 
-    $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-    $("#a_thumbnail").prop("href", "thumbnail.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
-
     // start off hiding errors, will be shown as they crop up
     $(".error").hide();
     $(".loading").show();

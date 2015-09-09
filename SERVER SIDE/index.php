@@ -137,6 +137,73 @@
 			
 			header('HTTP/1.1 200 Ok');
 			echo $ret;
+			
+		} else if (isset($_GET["changepassword"]) && !empty($_GET["changepassword"])) {
+			// GET changepassword
+			// Changes the password for the user
+			// expect username, password (old), token, password (new)
+			if (isset($_GET["username"]) && !empty($_GET["username"])) {
+				$username = $_GET["username"];
+			} else {
+				$error = "Username is invalid or not set";
+			}
+			
+			if (isset($_GET["password"]) && !empty($_GET["password"])) {
+				$password = $_GET["password"];
+			} else {
+				$error = "Password is invalid or not set";
+			}
+			
+			if (isset($_GET["token"]) && !empty($_GET["token"])) {
+				$token = $_GET["token"];
+			} else {
+				$error = "Token is invalid or not set";
+			}
+			
+			if (isset($_GET["passwordNew"]) && !empty($_GET["passwordNew"])) {
+				$passwordNew = $_GET["passwordNew"];
+			} else {
+				$error = "New password is invalid or not set";
+			}
+			
+			if (!empty($error)) {
+				// request error
+				header('HTTP/1.1 400 Bad Request');
+				echo "Error: " . $error;
+				die();
+			}
+			
+			userAuthorize($username, $token, $ip_address, $mysqlCon);
+			
+			$options=['salt'=>$salt, 'cost'=>12];
+			$pwdhash = "";
+			if ($php_version > 5.5) {
+				$pwdhash=password_hash($password, PASSWORD_DEFAULT, $options);  // PHP 5.5+
+				$pwdhashNew=password_hash($passwordNew, PASSWORD_DEFAULT, $options);  // PHP 5.5+
+			} else {
+				$pwdhash=crypt($password,'$2y$12$'.$salt.'$'); // PHP 5.4 style
+				$pwdhashNew=crypt($passwordNew,'$2y$12$'.$salt.'$'); // PHP 5.4 style
+			}
+			
+			
+			$query = "SELECT fn_change_password('$username', '$token', '$pwdhash', '$pwdhashNew', '$ip_address') AS ret";
+			$loop = mysqli_query($mysqlCon, $query);
+			$ret = NULL;
+			while ($row = mysqli_fetch_array($loop))
+			{
+				 $ret = $row['ret'];
+			}
+			
+			if ($ret === NULL){
+				// failure
+				header('HTTP/1.1 501 Internal Server Error');
+				echo "Password change failed";
+				mysqli_close($mysqlCon);
+				die();
+			}
+			
+			header('HTTP/1.1 200 Ok');
+			echo $ret;
 		} else if (isset($_GET["login"]) && !empty($_GET["login"])) {
 			// GET Login
 			// logs the user in and returns the session token
@@ -290,6 +357,52 @@
 				echo "Error: " . $error;
 				die();
 			}
+		}
+	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["logout"]) && !empty($_POST["logout"])) {
+		// logs the user out
+		// expects username, token
+		
+		$error = "";
+		if (isset($_POST["username"]) && !empty($_POST["username"])) {
+			$username = $_POST["username"];
+		} else {
+			$error = "Username is invalid or not set";
+		}
+		
+		if (isset($_POST["token"]) && !empty($_POST["token"])) {
+			$token = $_POST["token"];
+		} else {
+			$error = "Token is invalid or not set";
+		}
+		
+		userAuthorize($username, $token, $ip_address, $mysqlCon);
+	
+		if (empty($error)) {
+			// request is good!
+			$query = "SELECT bestclipoftheweek.fn_logout('$username', '$token', '$ip_address') AS ret";
+			$error = "";
+			if (!($loop = mysqli_query($mysqlCon, $query))) {
+				$error = "Internal Error";
+			}
+			if (!($row = mysqli_fetch_array($loop))) {
+				$error = "Internal Error";
+			}
+			
+			if (!empty($error)) {
+				header('HTTP/1.1 500 Internal Server Error');
+				echo "Error: " . mysqli_error();
+				mysqli_close($mysqlCon);
+				die();
+			}
+
+			$resp = $row['ret'];
+			header('HTTP/1.1 200 Ok');
+			echo $resp;
+		} else {
+			// request error
+			header('HTTP/1.1 400 Bad Request');
+			echo "Error: " . $error;
+			die();
 		}
 	} else if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST["download"]) && !empty($_POST["download"])) {
 		// special case to enable downloading of chart png across browsers

@@ -103,7 +103,53 @@
 })(jQuery);
 
 (function($){
-$(document).ready(function(){
+    $(document).ready(function(){
+
+    if (urlParams['username'].length < 9) {
+        $("#logged_as").text("Logged in as " + urlParams['username']);
+    } else {
+        $("#logged_as").text(urlParams['username']);
+    }
+    
+    $("#a_logout").click(function () {
+        $.ajax({
+            url: 'https://bestclipoftheweek-1xxoi1ew.rhcloud.com/',
+            type: "POST",
+            timeout: 5000,
+            cache: false,
+            contentType: "application/x-www-form-urlencoded; charset=UTF-8",
+            data: {
+                username: urlParams['username'],
+                token: urlParams['token'],
+                logout: "logout",
+            },
+            success: function (resp) {
+                if (resp["error"]) {
+                    // error
+                    console.log("Error logging out. Response: " + resp.error.message);
+                    window.location = "login.html";
+                } else {
+                    window.location = "login.html";
+                }
+            },
+            error: function (x, t, m) {
+                console.log("Error logging out: " + t + ': ' + x.status + ". " + m);
+                window.location = "login.html";
+            }
+        });
+        
+    });
+
+    $("#a_changepassword").prop("href", "changepassword.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_index").prop("href", "index.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_config").prop("href", "config.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_about").prop("href", "about.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_quick").prop("href", "quick.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_comments").prop("href", "comments.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+    $("#a_thumbnail").prop("href", "thumbnail.html?username=" + urlParams['username'] + "&token=" + urlParams['token'] + "&version=" + VERSION);
+
+
+
 
 $(window).load(function() {
   $("#cssmenu").menumaker({
@@ -111,7 +157,7 @@ $(window).load(function() {
     format: "dropdown"
   });
 
-
+  
 $('#cssmenu').prepend("<div id='menu-indicator'></div>");
 
 var foundActive = false, activeElement, indicatorPosition, indicator = $('#cssmenu #menu-indicator'), defaultPosition;
