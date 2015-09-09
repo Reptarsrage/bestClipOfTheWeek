@@ -1,4 +1,11 @@
-﻿$(document).ready(function(){
+﻿/*
+ * Justin Robb
+ * 9/9/15
+ * Best Clip of the Week Application
+ * Change password JS
+ */
+
+$(document).ready(function () {
     $(document).keypress(function (e) {
         if (e.which == 13) {
             $("#input_new").change();
