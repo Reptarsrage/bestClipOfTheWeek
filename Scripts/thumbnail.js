@@ -106,7 +106,7 @@ function getVideoThumbnail(id, containerId, num) {
     Utility.makeAsyncYouTubeAjaxRequest(url, null,
        function success(response) {
            if (response.pageInfo.totalResults > 0 && response.items.length > 0) {
-               thumb = null;
+               var thumb = null;
                var maxRes = 0;
                for (jimageName in response.items[0].snippet.thumbnails) {
                    jimage = response.items[0].snippet.thumbnails[jimageName];
@@ -125,7 +125,7 @@ function getVideoThumbnail(id, containerId, num) {
                }
 
 
-               thumbUrl = thumb.url;
+               var thumbUrl = thumb.url;
 
                var img = $("<img src='" + thumbUrl + "' alt='thumbnail' class='img_thumb' />")
                img.hide();
@@ -154,6 +154,7 @@ function getVideoThumbnail(id, containerId, num) {
                // no results
                $("#" + containerId + " .loading").fadeOut(500);
                $("#" + containerId + " .error").fadeIn(500);
+               $("#" + containerId).parent().find(".button_fetch").prop("disabled", false);
                Utility.displayMessage('Error loading thumbnail: No video found with Id ' + id);
            }
        }, function error(x, t, m) {
