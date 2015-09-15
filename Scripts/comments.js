@@ -14,6 +14,7 @@ var retryCt = 25;
 var voteCount = 0;
 var selectedVideoId = "";
 var totalComments = 0;
+var comRplyCt = 0;
 
 window.onerror = function (msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col;
@@ -64,6 +65,7 @@ $(document).ready(function () {
     retryCt = 25;
     voteCount = 0;
     totalComments = 0;
+    comRplyCt = 0;
 
     //  populate list
     Utility.populateBestOfTheWeek(
@@ -128,7 +130,7 @@ function fetchResults() {
     voteCount = 0;
     selectedVideoId = "";
     totalComments = 0;
-
+    comRplyCt = 0;
 
     // Start
     $("#collapse").click();
@@ -204,7 +206,7 @@ function getVideoStats(id, currFetchID) {
                $("#stats_group").css('background-image', "url(" + thumbUrl + ")");
                image.fadeIn(1000);
 
-               Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
+               Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance&videoId=" + id + "&maxResults=" + 20, currFetchID) });
            } else {
                // no results
                $("#stats .loading").fadeOut(1000);
@@ -247,8 +249,10 @@ function loadComments(count, url, currFetchID) {
                    }
                }
 
-               if (nextUrl != "")
-                   Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
+               if (nextUrl != "") {
+                   var nextCt = count + data.pageInfo.totalResults;
+                   Utility.delayAfter(function () { loadComments(nextCt, nextUrl, currFetchID) });
+               }
 
                $.each(data["items"], function (key, val) {
                    var replyCt = val.snippet.totalReplyCount;
@@ -329,7 +333,8 @@ function loadCommentReplies(id, count, pageToken, currFetchID) {
 
             if (data["nextPageToken"]) {
                 nextPageToken = data["nextPageToken"];
-                Utility.delayAfter(function () { loadCommentReplies(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+                var nextCt = count + data.pageInfo.totalResults;
+                Utility.delayAfter(function () { loadCommentReplies(commentParent, id, nextCt, nextPageToken, currFetchID) });
             }
 
             $.each(data["items"], function (key, val) {

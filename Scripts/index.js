@@ -28,6 +28,7 @@ var videoHistoryStats;
 var retryCt = 25;
 var totalComments = 0;
 var selectedVideoId = "";
+var comRplyCt = 0;
 
 window.addEventListener('resize', function (event) {
     // resizing, so redraw charts
@@ -148,7 +149,7 @@ $(document).ready(function () {
     $("#chartSection").hide();
     $("#termResults").hide();
 
-        //reset
+    //reset
     loaded = false;
     commentHTML = $("<div></div>");
     overallCount = 0;
@@ -161,6 +162,7 @@ $(document).ready(function () {
     toggleComments($("#checkbox_comments"), false);
     retryCt = 25;
     totalComments = 0;
+    comRplyCt = 0;
     selectedVideoId = "";
 });
 
@@ -302,7 +304,7 @@ function toggleComments(cb, manual) {
         $("#comments").show();
         $(".commentBody").hover(function () {
             // in
-            $(this).find("span.highlight").css("font-size", "24pt");
+            $(this).find("span.highlight").css("font-size", "14pt");
         }, function () {
             // out
             $(this).find("span.highlight").css("font-size", "12pt");
@@ -362,6 +364,7 @@ function fetchResults() {
     toggleComments($("#checkbox_comments"), false);
     retryCt = 25;
     totalComments = 0;
+    comRplyCt = 0;
     $('#message').attr("class", "");
 
     // Start
@@ -450,7 +453,7 @@ function getVideoStats(id, currFetchID) {
                $("#stats_group").css('background-image', "url(" + thumbUrl + ")");
                image.fadeIn(1000);
 
-               Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
+               Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
                // draw column chart
                var nonNullData = new google.visualization.DataTable();
@@ -572,7 +575,8 @@ function loadComments(count, url, currFetchID) {
              }
 
              if (nextUrl) {
-                 Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
+                 var nextCt = count + data.pageInfo.totalResults;
+                 Utility.delayAfter(function () { loadComments(nextCt, nextUrl, currFetchID) });
              }
 
              $.each(data["items"], function (key, val) {
@@ -591,13 +595,13 @@ function loadComments(count, url, currFetchID) {
                  var googleID = val.snippet.topLevelComment.snippet.authorGoogleplusProfileUrl;
                  var replyCt = val.snippet.totalReplyCount;
                  var commentID = val.id;
-
+                 var publishedAt = val.snippet.topLevelComment.snippet.publishedAt;
 
                  var userData = $("<div class='commentData'></div>");
-                 userData.html("<p> reply number: " + count + "</p>" +
-                             "<p> Google+:<a href='" + googleID + "'></a></p>" +
-                             "<p> replyCt: " + replyCt + "</p>" +
-                             "<p> commentID: " + commentID + "</p>");
+                 userData.html("<p> Reply number: " + count + "</p>" +
+                             "<p> Google+:<a href='" + googleID + "' target='_blank'>"+googleID+"</a></p>" +
+                             "<p> ReplyCt: " + replyCt + "</p>" +
+                             "<p> Posted: " + publishedAt + "</p>");
 
                  var content = $("<div class='content'></div>");
                  content.html(parseComment(val.snippet.topLevelComment.snippet.textDisplay, currFetchID, authorName));
@@ -610,7 +614,7 @@ function loadComments(count, url, currFetchID) {
                  body.append(author).append(content).append(userData);
                  body.hover(function () {
                      // in
-                     $(this).find("span.highlight").css("font-size", "24pt");
+                     $(this).find("span.highlight").css("font-size", "14pt");
                  }, function () {
                      // out
                      $(this).find("span.highlight").css("font-size", "12pt");
@@ -623,7 +627,7 @@ function loadComments(count, url, currFetchID) {
                  if ($('#message h1').text().indexOf("Processing") >= 0) {
                      Utility.displayLoading('Processing query...please wait', count / totalComments);
                  }
-                 $("#h2_comments").html(count);
+                 $("#h2_comments").html(count + comRplyCt);
                  count++;
              });
 
@@ -637,13 +641,13 @@ function loadComments(count, url, currFetchID) {
                      var userData = $("<div class='commentData'></div>");
                      userData.html("<p> reply number: " + count + "</p>" +
                                  "<p>Retrieved from Google+</p>" +
-                                 "<p>No further information loaded</p>");
+                                 "<p>No further information loaded for this comment</p>");
 
                      var content = $("<div class='content'>" + parseComment(comment, currFetchID, author) + "</div>");
                      body.append(authorElt).append(content).append(userData);
                      body.hover(function () {
                          // in
-                         $(this).find("span.highlight").css("font-size", "24pt");
+                         $(this).find("span.highlight").css("font-size", "14pt");
                      }, function () {
                          // out
                          $(this).find("span.highlight").css("font-size", "12pt");
@@ -716,7 +720,8 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
 
              if (data["nextPageToken"]) {
                  nextPageToken = data["nextPageToken"];
-                 Utility.delayAfter(function () { loadCommentReplies(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+                 var nextCt = count + data.pageInfo.totalResults;
+                 Utility.delayAfter(function () { loadCommentReplies(commentParent, id, nextCt, nextPageToken, currFetchID) });
              }
 
              $.each(data["items"], function (key, val) {
@@ -731,16 +736,16 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
                  content.html(parseComment(val.snippet.textDisplay, currFetchID, authorName));
 
                  var userdata = $("<div class='commentData'></div>");
-                 userdata.html("<p> reply number: " + count + "</p>" +
-                             "<p> published: " + val.snippet.publishedAt + "</p>" +
-                             "<p> id: " + val.id + "</p>" +
+                 userdata.html("<p> Reply number: " + count + "</p>" +
+                             "<p> Posted: " + val.snippet.publishedAt + "</p>" +
+                             "<p> Id: " + val.id + "</p>" +
                              "<p> Next page token: " + nextPageToken + "</p>");
 
 
                  body.append(author).append(content).append(userdata);
                  body.hover(function () {
                      // in
-                     $(this).find("span.highlight").css("font-size", "24pt");
+                     $(this).find("span.highlight").css("font-size", "14pt");
                  }, function () {
                      // out
                      $(this).find("span.highlight").css("font-size", "12pt");
@@ -749,6 +754,7 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
                  comment.append(body);
                  commentParent.append(comment);
                  count++;
+                 comRplyCt++;
              });
          }, function error(x, t, m) {
              if (currFetchID != fetchID)

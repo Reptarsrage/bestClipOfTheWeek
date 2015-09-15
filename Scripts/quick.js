@@ -23,6 +23,7 @@ var lastCount = 0;
 var timerCount = 0;
 var selectedVideoId = "";
 var totalComments = 0;
+var comRplyCt = 0;
 
 window.onerror = function (msg, url, line, col, error) {
     var extra = !col ? '' : '\ncolumn: ' + col;
@@ -98,6 +99,7 @@ $(document).ready(function () {
     timerCount = 0;
     selectedVideoId = "";
     totalComments = 0;
+    comRplyCt = 0;
 
     //  populate list
     Utility.populateBestOfTheWeek(
@@ -197,7 +199,7 @@ function toggleComments(cb, manual) {
         $("#comments").show();
         $(".commentBody").hover(function () {
             // in
-            $(this).find("span.highlight").css("font-size", "24pt");
+            $(this).find("span.highlight").css("font-size", "14pt");
         }, function () {
             // out
             $(this).find("span.highlight").css("font-size", "12pt");
@@ -252,6 +254,7 @@ function fetchResults() {
     retryCt = 25;
     lastCount = 0;
     timerCount = 0;
+    comRplyCt = 0;
     $('#message').attr("class", "");
 
     // Start
@@ -343,7 +346,7 @@ function getVideoStats(id, currFetchID) {
             $("#stats_group").css('background-image', "url(" + thumbUrl + ")");
             image.fadeIn(1000);
 
-            Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&videoId=" + id + "&maxResults=" + 20, currFetchID) });
+            Utility.delayAfter(function () { loadComments(1, "https://www.googleapis.com/youtube/v3/commentThreads?part=snippet&order=relevance&videoId=" + id + "&maxResults=" + 20, currFetchID) });
 
         } else {
             // no results
@@ -389,8 +392,10 @@ function loadComments(count, url, currFetchID) {
                 }
             }
 
-            if (nextUrl != "")
-                Utility.delayAfter(function () { loadComments(count + data.pageInfo.resultsPerPage, nextUrl, currFetchID) });
+            if (nextUrl != "") {
+                var nextCt = count + data.pageInfo.totalResults;
+                Utility.delayAfter(function () { loadComments(nextCt, nextUrl, currFetchID) });
+            }
 
             $.each(data["items"], function (key, val) {
                 var comment = $("<li class='comment'></li>");
@@ -414,7 +419,7 @@ function loadComments(count, url, currFetchID) {
                 body.append(author).append(content);
                 body.hover(function () {
                     // in
-                    $(this).find("span.highlight").css("font-size", "24pt");
+                    $(this).find("span.highlight").css("font-size", "14pt");
                 }, function () {
                     // out
                     $(this).find("span.highlight").css("font-size", "12pt");
@@ -424,7 +429,7 @@ function loadComments(count, url, currFetchID) {
 
                 comment.append(body);
                 commentHTML.append(comment);
-                $("#h2_comments").html(count);
+                $("#h2_comments").html(count + comRplyCt);
                 if ($('#message h1').text().indexOf("Processing") >= 0) {
                     Utility.displayLoading('Processing query...please wait', count / totalComments);
                 }
@@ -446,7 +451,7 @@ function loadComments(count, url, currFetchID) {
                     body.append(authorElt).append(content).append(userData);
                     body.hover(function () {
                         // in
-                        $(this).find("span.highlight").css("font-size", "24pt");
+                        $(this).find("span.highlight").css("font-size", "14pt");
                     }, function () {
                         // out
                         $(this).find("span.highlight").css("font-size", "12pt");
@@ -520,7 +525,8 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
 
             if (data["nextPageToken"]) {
                 nextPageToken = data["nextPageToken"];
-                Utility.delayAfter(function () { loadCommentReplies(commentParent, id, count + data.pageInfo.resultsPerPage, nextPageToken, currFetchID) });
+                var nextCt = count + data.pageInfo.totalResults;
+                Utility.delayAfter(function () { loadCommentReplies(commentParent, id, nextCt, nextPageToken, currFetchID) });
             }
 
             $.each(data["items"], function (key, val) {
@@ -537,7 +543,7 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
                 body.append(author).append(content);
                 body.hover(function () {
                     // in
-                    $(this).find("span.highlight").css("font-size", "24pt");
+                    $(this).find("span.highlight").css("font-size", "14pt");
                 }, function () {
                     // out
                     $(this).find("span.highlight").css("font-size", "12pt");
@@ -546,6 +552,7 @@ function loadCommentReplies(commentParent, id, count, pageToken, currFetchID) {
                 comment.append(body);
                 commentParent.append(comment);
                 count++;
+                comRplyCt++;
             });
          }, function error(x, t, m) {
              if (currFetchID != fetchID)
