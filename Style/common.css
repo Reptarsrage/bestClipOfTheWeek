@@ -424,6 +424,7 @@ b.error {
     text-transform: uppercase;
     text-decoration: none;
     color: white;
+    z-index: 9999;
 }
 
 #menu_dropdown ul {
@@ -437,7 +438,6 @@ b.error {
     display: none;
     opacity: 0;
     visibility: hidden;
-    z-index: 9999;
     
     -webkit-transition: all 0.25s ease-out;
     -moz-transition: all 0.25s ease-out;
