@@ -1,0 +1,148 @@
+﻿html {
+    min-height: 100%;
+    position: relative;
+}
+
+body {
+    padding: 0 1em 60px 1em;
+}
+
+.body-content {
+    padding-bottom: 2rem;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    line-height: 30px;
+    background-color: #c7c7c7;
+}
+
+#btnLogOut {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: block;
+}
+
+@media screen and (min-width: 1600px) {
+    .container {
+        max-width: 1560px;
+    }
+}
+
+@media screen and (max-width: 576px) {
+    .container {
+        max-width: 100%;
+    }
+
+    body {
+        padding: 0 0 60px 0;
+    }
+}
+
+.modal-dialog {
+    background: #fff;
+}
+
+.oi-info {
+    height: 1em;
+    width: auto;
+    vertical-align: middle;
+}
+
+.oi-info:hover {
+    cursor: pointer;
+}
+
+#message .alert {
+    display: none;
+    width: 100%;
+    max-height: 100px;
+    overflow-y: auto;
+}
+
+hr {
+    width: 100%;
+}
+
+.loading {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image: url(/images/loading.gif);
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 50px 50px;
+    opacity: 0.5;
+    left: 0;
+    top: 0;
+    overflow: hidden;
+    min-height: 50px;
+    min-width: 50px;
+}
+
+.error {
+    font-style: italic;
+    color: gray;
+    text-align: center;
+    width: 100%;
+    font-weight: normal;
+    border: none;
+    clear: both;
+    display: none;
+}
+
+b.error {
+    font-weight: bold;
+}
+
+.progress-bar {
+    width: 0;
+    height: 30px;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.progress {
+    position: relative;
+    background-color: #b8b8b8;
+}
+
+.progress-text {
+    position: absolute;
+    display: block;
+    width: 100%;
+}
+
+.aspect-ratio-container {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+}
+
+.aspect-ratio-container-4x3 {
+    position: relative;
+    width: 100%;
+    padding-top: 75%;
+} 
+
+.aspect-ratio-content {
+    position: absolute;
+    width: 100%;
+    top: 0;
+    left: 0;
+    height: 100%;
+}
+
+.martop {
+    margin: 1rem 0 0 0;
+}
+
+.login-help {
+    text-align: center;
+}

@@ -1,0 +1,63 @@
+﻿@using Microsoft.AspNetCore.Identity
+@using BestClipOfTheWeek.Models
+@using BestClipOfTheWeek.Views.Shared
+
+@inject SignInManager<ApplicationUser> SignInManager
+@inject UserManager<ApplicationUser> UserManager
+
+@{
+    var controllerName = this.ViewContext.RouteData.Values["controller"].ToString();
+    var actionName = this.ViewContext.RouteData.Values["action"].ToString();
+    var useModals = controllerName.Equals("Home") && actionName.Equals("Index");
+}
+
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+    <a class="navbar-brand" href="#">Best Clip Of The Week</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            @if (SignInManager.IsSignedIn(User))
+            {
+                <li class="nav-item"><a class="nav-link @SharedNavPages.ReportNavClass(ViewContext)" asp-area="" asp-controller="Report" asp-action="Index">Report</a></li>
+                <li class="nav-item"><a class="nav-link @SharedNavPages.QuickNavClass(ViewContext)" asp-area="" asp-controller="Report" asp-action="Quick">Quick Report</a></li>
+                <li class="nav-item"><a class="nav-link @SharedNavPages.CommentersNavClass(ViewContext)" asp-area="" asp-controller="Report" asp-action="Commenters">Commenters Report</a></li>
+                <li class="nav-item"><a class="nav-link @SharedNavPages.TermNavClass(ViewContext)" asp-area="" asp-controller="Term" asp-action="Index">Configure Terms</a></li>
+            }
+            else
+            {
+                <li class="nav-item"><a class="nav-link @SharedNavPages.IndexNavClass(ViewContext)" asp-area="" asp-controller="Home" asp-action="Index">Home</a></li>
+            }
+            <li class="nav-item"><a class="nav-link @SharedNavPages.AboutNavClass(ViewContext)" asp-area="" asp-controller="Home" asp-action="About">About</a></li>
+            <li class="nav-item"><a class="nav-link @SharedNavPages.ContactNavClass(ViewContext)" asp-area="" asp-controller="Home" asp-action="Contact">Contact</a></li>
+        </ul>
+
+        @if (SignInManager.IsSignedIn(User))
+        {
+            <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-right">
+                <ul class="navbar-nav navbar-right">
+                    <li class="nav-item"><a class="nav-link" asp-area="" asp-controller="Manage" asp-action="Index" title="Manage">Hello @UserManager.GetUserName(User)!</a></li>
+                    <li class="nav-item"><button type="submit" class="nav-link" id="btnLogOut">Log out</button></li>
+                </ul>
+            </form>
+        }
+        else
+        {
+            <ul class="navbar-nav navbar-right ml-auto">
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="@Html.Raw(useModals ? "#" : Url.Action("Register", "Account"))"
+                       data-modal="@Html.Raw(useModals ? "register-modal" : "")">Register</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link"
+                       href="@Html.Raw(useModals ? "#" : Url.Action("Login", "Account"))"
+                       data-modal="@Html.Raw(useModals ? "login-modal" : "")">Log in</a>
+                </li>
+            </ul>
+       }
+    </div>
+</nav>
