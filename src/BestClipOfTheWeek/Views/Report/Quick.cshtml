@@ -1,0 +1,105 @@
+﻿@model BestClipOfTheWeek.Models.ReportViewModels.IndexViewModel
+
+@using BestClipOfTheWeek.Views.Shared
+
+@{
+    ViewData["Title"] = "Report";
+    ViewData.AddActivePage(SharedNavPages.Quick);
+}
+
+@section Styles {
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/report.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/report.min.css" asp-append-version="true">
+    </environment>
+
+    @{ await Html.RenderPartialAsync("_TermStyles", Model); }
+}
+
+@{ await Html.RenderPartialAsync("_QueryFlyout", Model); }
+
+<div id="results" class="container collapse">
+    <div id="progress" class="row collapse">
+        <div class="progress">
+            <div class="progress-bar bg-success progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100">
+                <span class="progress-text"></span>
+            </div>
+        </div>
+    </div>
+
+    <div id="statsSpace" class="row collapse">
+        <h3 class='error'>Unable to find stats for your video. Make sure the url you have provided is valid and contains a valid video ID. (For example: https&colon;&sol;&sol;www&period;youtube&period;com&sol;watch&quest;<b class='error'>v&equals;1M5vGlvic&lowbar;o</b>)</h3>
+        <div class="container">
+            <div class="row">
+                <hr />
+                <h2>Showing stats for: @{ await Html.RenderPartialAsync("_ToolTip", "stats"); }</h2>
+            </div>
+            <div id="stats" class="row">
+                <div class="col-lg-6 martop">
+                    <div id="stats_group" class="aspect-ratio-container-4x3">
+                        <div class="loading"></div>
+                        <div id="img_overlay" class="aspect-ratio-content">
+                            <h3><a id="img_overlay_link" href="" class="d-none d-md-block js-wipe"></a></h3>
+                            <p id="img_overlay_desc" class='d-none js-wipe'></p>
+                            <div id='div_video_stats'>
+                                <p>Views: <span id="div_video_stats_views" class="js-wipe"></span></p>
+                                <p>Likes: <span id="div_video_stats_likes" class="js-wipe"></span></p>
+                                <p>Dislikes: <span id="div_video_stats_dislikes" class="js-wipe"></span></p>
+                                <p>Favorites: <span id="div_video_stats_favorites" class="js-wipe"></span></p>
+                                <p>Comments: <span id="div_video_stats_comments" class="js-wipe"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="termResults" class="col-lg-6 martop">
+                    @*<h3>Terms: @{ await Html.RenderPartialAsync("_ToolTip", "terms"); }</h3>*@
+                    <div class="aspect-ratio-container-4x3">
+                        <div id="termResults_list" class="list-group aspect-ratio-content">
+                            <div class="loading"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="commentSpace" class="row collapse">
+        <h3 class='error space'>Unable to load comments for your video.</h3>
+        <div class="container">
+            <div class="row">
+                <hr />
+                <h2>Comments (<span id="h2_comments">0</span>):@{ await Html.RenderPartialAsync("_ToolTip", "comments"); }</h2>
+            </div>
+            <div class="row">
+                <label><input type="checkbox" id="checkbox_comments" /><span class="checkbox_comments">Show comments</span></label>
+                <label><input type="checkbox" id="checkbox_voters" /><span class="checkbox_voters">Show users who voted</span></label>
+            </div>
+            <div class="row">
+                <div class="container">
+                    <div class="collapse" id="comments">
+                        <div class="error">No comments</div>
+                    </div>
+
+                    <div class="collapse" id="voters">
+                        <div class="error">No voters</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <environment include="Development">
+        <script src="~/js/constants.js" asp-append-version="true"></script>
+        <script src="~/js/utility.js" asp-append-version="true"></script>
+        <script src="~/js/reportQuick.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/constants.min.js" asp-append-version="true"></script>
+        <script src="~/js/utility.min.js" asp-append-version="true"></script>
+        <script src="~/js/reportQuick.min.js" asp-append-version="true"></script>
+    </environment>
+}

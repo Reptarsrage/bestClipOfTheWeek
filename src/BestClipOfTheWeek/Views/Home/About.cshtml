@@ -1,0 +1,57 @@
+﻿@using BestClipOfTheWeek.Views.Shared
+
+@{
+    ViewData["Title"] = "About";
+    ViewData.AddActivePage(SharedNavPages.About);
+    var version = "v2.0.0.0";
+    var date = "10/15/2017";
+}
+<h1>About</h1>
+<h2>Best Clip of the Week</h2>
+<h3>@version</h3>
+<h3>@date</h3>
+
+<h4>Description</h4>
+
+<p>
+    So I got incredibly bored at work one day and tried to come up with ideas for a side project. Hit a wall so I decided to watch a couple videos on the YouTubes. When suddenly inspiration struck! I figured it would be both fun and a good programming exercise to come up with a way to tally the results of StoneMountain64's Best Clip of the Week videos.
+</p><p>
+    This site is not meant for a wide range of users. Mostly just one. My intention was to have a program that took a YouTube video URL and a list of terms and returned a count of votes for each term. After I completed this I thought, 'wouldn't it be cool if I could play with the terms, store them and manipulate them?' Well this whim lead to a backend server and a service running on Openshift. Then I thought, wouldn't it be cool if I had some charts? Luckily I was already using YouTube Data and Analytics, and Google+ API's, so adding Google Charts was not difficult. Then I figured since I have a database that may or may not charge me money for heavy use, I need some security. This drove me to make a login in system. Then I figured might as well go balls out and make a ridiculous login page.
+</p><p>
+    After all that was said and done, I had kind of this clunky cool looking website. There are a couple of things that I haven't gotten to yet. The biggest one is improving the load time of the results. Client-side processing, slow Google API's and zero caching have all added up to a whopping 90sec page load time... and unless I want to spend money and/or a ton of time, I'm not sure how to improve this. There is also the issue with errors cropping up. I didn't write unit tests as this was just kind of an ad-hoc fun project and I didn't want to deal with the overhead. There are some pretty heavy restrictions on my back-end server size, the amount of API calls I can make, and a few other limiting factors.
+</p><p>
+    I had a super fun time making this site. Flaws and all I think it turned out pretty well.
+</p>
+
+<h4>Credits:</h4>
+
+<dl>
+    <dt>API's:</dt>
+    <dd><a href="https://developers.google.com/chart/">Google Charts</a> for all your well-documented charting needs.</dd>
+    <dd><a href="https://developers.google.com/youtube/analytics/">YouTube Analytics and Reporting APIs</a> fetches YouTube stats, and much more.</dd>
+    <dd><a href="https://developers.google.com/youtube/v3/">YouTube Data API</a>  parses YouTube comments, and much much more.</dd>
+    <dd><a href="https://developers.google.com/+/api/">Google+ Data API</a> parses Google+ comments, and much much much more.</dd>
+    <dt>Images:</dt>
+    <dd><a href="http://stackoverflow.com/questions/14446677/how-to-make-3-corner-rounded-triangle-in-css">Murray Smith</a> for the most perfect triangle ever conceived.</dd>
+    <dd><a href="https://www.iconfinder.com/icons/401329/help_info_information_support_tip_tooltip_icon">Michal Kučera</a> for a fancy tool-tip image.</dd>
+    <dd><a href="http://pixshark.com/spinner-gif-transparent-background.htm">This site</a> for not the best loading image, but certainly the easiest to find.</dd>
+    <dt>Special Thanks:</dt>
+    <dd><a href="https://jquery.com/">Jquery library</a> quite a revolutionary and free library.</dd>
+    <dd><a href="https://jqueryui.com/">Jquery UI library</a> which was pretty damn usefull for them tooltips.</dd>
+    <dd><a href="http://jscolor.com/">JSColor</a> a SICK color chooser.</dd>
+    <dd><a href="http://nnattawat.github.io/flip/">nnattawat</a> for that ballin' flip animation.</dd>
+    <dd><a href="https://www.openshift.com/">OpenShift</a> for hosting my SQL server and PHP service for awhile.</dd>
+    <dd><a href="https://x10hosting.com/">x10hosting.com/</a> for hosting my site for free for awhile.</dd>
+    <dd><a href="https://azure.microsoft.com/">Microsoft Azure</a> for hosting my site currently.</dd>
+    <dd><a href="http://getbootstrap.com/">BootStrap</a> for making my site sexier.</dd>
+    <dd><a href="https://useiconic.com/open">Open Iconic</a> for font icons.</dd>
+    <dd><a href="http://cssmenumaker.com/menu/responsive-menu-bar">CSS Menu Maker</a> for my stupidly classy old header bar.</dd>
+    <dd><a href="http://www.w3schools.com/">W3Scools</a> my sensei.</dd>
+    <dd><a href="http://phpfiddle.org/">phpfiddle</a> for an easy solution to php programming.</dd>
+    <dd><a href="https://www.youtube.com/channel/UCN-v-Xn9S7oYk0X2v1jx1Qg">StoneMountain64</a> for kickin shit and eatin snakes.</dd>
+</dl>
+
+<h4>Support:</h4>
+
+<p>Feel free to contact me directly with any questions or concerns related to the site. I'm definitely open to criticism, ideas, suggestions and even more open to praise.</p>
+<p><a href="mailto:justinprobb@gmail.com">Contact me</a></p>

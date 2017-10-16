@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.26730.16
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BestClipOfTheWeek", "src\BestClipOfTheWeek\BestClipOfTheWeek.csproj", "{69E97C89-97FF-4006-9043-9837F704A4C6}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{69E97C89-97FF-4006-9043-9837F704A4C6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{69E97C89-97FF-4006-9043-9837F704A4C6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{69E97C89-97FF-4006-9043-9837F704A4C6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{69E97C89-97FF-4006-9043-9837F704A4C6}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {BCDC94A0-0DE4-43D9-AE62-B5E04A1ACDA3}
+	EndGlobalSection
+EndGlobal

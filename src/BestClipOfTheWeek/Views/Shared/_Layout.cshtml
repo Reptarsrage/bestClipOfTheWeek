@@ -1,0 +1,86 @@
+﻿@using Microsoft.Extensions.Options;
+@using BestClipOfTheWeek.Models.Configuration
+
+@inject IOptions<AppSettings> OptionsApplicationConfiguration
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Best Clip of the Week - @ViewData["Title"]</title>
+
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/main.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true">
+    </environment>
+
+    @RenderSection("Styles", required: false)
+</head>
+<body>
+    @* used for ajax in Utility.addAntiForgeryToken() *@
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
+    {
+        @Html.AntiForgeryToken()
+    }
+
+    @await Html.PartialAsync("_Nav")
+
+    <div id="message" class="row">
+        <div class="alert alert-success alert-dismissible">
+            <button type="button" class="close" data-hide="alert-success" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+            <strong>Success:</strong>&nbsp;<span class="message"></span>
+        </div>
+        <div class="alert alert-info alert-dismissible">
+            <button type="button" class="close" data-hide="alert-info" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button><strong>Info:</strong>&nbsp;<span class="message"></span>
+        </div>
+        <div class="alert alert-warning alert-dismissible">
+            <button type="button" class="close" data-hide="alert-warning" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button><strong>Warning:</strong>&nbsp;<span class="message"></span>
+        </div>
+        <div class="alert alert-danger alert-dismissible">
+            <button type="button" class="close" data-hide="alert-danger" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button><strong>Error:</strong>&nbsp;<span class="message"></span>
+        </div>
+    </div>
+
+    <div class="container body-content">
+        @RenderBody()
+    </div>
+    <footer class="footer">
+        <div class="container text-center">
+            <div class="row">
+                <span class="col">Website made by: <b id="foot_myname">Justin Robb</b></span><br />
+            </div>
+            <div class="row">
+                <div class="col ">
+                    <a class="mr-3" href="mailto:justinprobb@gmail.com"><small>Contact me</small></a>
+                    <a class="mr-3" href="https://www.linkedin.com/in/jurobb"><small>LinkedIn</small></a>
+                    <a class="mr-3" href="https://github.com/Reptarsrage"><small>Github</small></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        var YOUTUBE_API_KEY = '@OptionsApplicationConfiguration.Value.YouTubeApiKey';
+    </script>
+
+    <environment include="Development">
+        <script src="~/js/main.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/main.min.js" asp-append-version="true"></script>
+    </environment>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>

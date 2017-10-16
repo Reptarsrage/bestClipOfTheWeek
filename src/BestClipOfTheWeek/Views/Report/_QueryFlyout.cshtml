@@ -1,0 +1,52 @@
+﻿@model BestClipOfTheWeek.Models.ReportViewModels.IndexViewModel
+
+<div class="row collapse show" id="userSpace">
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <h2>Choose a video: @{ await Html.RenderPartialAsync("_ToolTip", "choose"); }</h2>
+                <div class="input-group">
+                    <input class="form-control" placeholder="Enter a YouTube video Url" id="input_video" type="text" />
+                    <span class="input-group-btn">
+                        <button type="submit" class="btn btn-primary" id="fetch">Fetch Results</button>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-md-@Html.Raw(Model.ShowTerms ? "9" : "12") martop">
+                <h3>Reccomended: @{ await Html.RenderPartialAsync("_ToolTip", "recommended"); }</h3>
+                <div id="recommendedVideosList">
+                    @{ await Html.RenderPartialAsync("_AsyncLoadedContent", "Error retrieving recommended videos."); }
+                </div>
+            </div>
+            @if (Model.ShowTerms)
+            {
+                <div class="col-md-3 martop">
+                    <h3>Terms: @{ await Html.RenderPartialAsync("_ToolTip", "terms"); }</h3>
+                    <div id="termsList">
+                        <ul class="list-group short-list">
+                            @foreach (var term in Model.Terms.OrderByDescending(t => t.Enabled))
+                            {
+                                if (term.Enabled)
+                                {
+                                    <li data-color="@term.Color" data-name="@term.Name" class="list-group-item @term.Name">@term.Name</li>
+                                }
+                                else
+                                {
+                                    <li data-color="@term.Color" data-name="@term.Name" class="list-group-item disabled">(disabled): @term.Name</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="collapseToggle" data-toggle="collapse" href="#userSpace" aria-expanded="true" aria-controls="userSpace">
+        <img class="oi-caret" src="/Images/arrow.png" alt="V" />
+    </div>
+</div>

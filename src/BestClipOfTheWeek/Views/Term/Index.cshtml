@@ -1,0 +1,90 @@
+﻿@model BestClipOfTheWeek.Models.TermViewModels.TermListViewModel
+
+@using BestClipOfTheWeek.Views.Shared
+
+@{
+    ViewData["Title"] = "Edit Terms";
+    ViewData.AddActivePage(SharedNavPages.Term);
+    var random = new Random();
+}
+
+@section Styles {
+    <environment include="Development">
+        <link rel="stylesheet" href="~/css/terms.css" asp-append-version="true">
+    </environment>
+    <environment exclude="Development">
+        <link rel="stylesheet" href="~/css/terms.min.css" asp-append-version="true">
+    </environment>
+    <style>
+        .selected {
+            background-color: gray;
+            font-weight: bold;
+        }
+    </style>
+}
+
+<h2>Configuration: @{ await Html.RenderPartialAsync("_ToolTip", "configuration"); }</h2>
+
+<table id="tableTerms" class="table ">
+    <thead>
+        <tr class="bg-primary">
+            <th>Term @{ await Html.RenderPartialAsync("_ToolTip", "term"); }</th>
+            <th>Color @{ await Html.RenderPartialAsync("_ToolTip", "color"); }</th>
+            <th>Enabled @{ await Html.RenderPartialAsync("_ToolTip", "enabled"); }</th>
+            <th>
+                <span>Add @{ await Html.RenderPartialAsync("_ToolTip", "add"); }</span>
+                <span> / </span>
+                <span>Delete @{ await Html.RenderPartialAsync("_ToolTip", "delete"); }</span>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>
+                <input name="id" type="hidden" value="0" />
+                <input name="name" placeholder="Add a term" class="input_term" type="text" maxlength="50" />
+            </td>
+            <td>
+                <input name="color" class="color" value="@($"{random.Next(0x1000000):X6}")" />
+            </td>
+            <td>
+                <input name="enabled" type="checkbox" checked="" />
+            </td>
+            <td>
+                <button class="btn btn-primary js-add">Add</button>
+            </td>
+        </tr>
+
+        @foreach (var term in Model.Terms)
+        {
+            <tr>
+                <td>
+                    <input name="id" type="hidden" value="@term.TermId" />
+                    <input name="name" class="js-change" placeholder="@term.Name" type="text" maxlength="50" value="@term.Name" />
+                </td>
+                <td>
+                    <input name="color" class="color js-change" value="@term.Color" />
+                </td>
+                <td>
+                    <input name="enabled" class="js-click" type="checkbox" checked="@(term.Enabled ? "checked" : string.Empty)" />
+                </td>
+                <td>
+                    <button class="btn btn-primary js-delete">Delete</button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <environment include="Development">
+        <script src="~/js/constants.js" asp-append-version="true"></script>
+        <script src="~/js/utility.js" asp-append-version="true"></script>
+        <script src="~/js/terms.js" asp-append-version="true"></script>
+    </environment>
+    <environment exclude="Development">
+        <script src="~/js/constants.min.js" asp-append-version="true"></script>
+        <script src="~/js/utility.min.js" asp-append-version="true"></script>
+        <script src="~/js/terms.min.js" asp-append-version="true"></script>
+    </environment>
+}
