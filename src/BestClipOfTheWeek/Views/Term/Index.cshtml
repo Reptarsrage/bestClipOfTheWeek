@@ -25,13 +25,13 @@
 
 <h2>Configuration: @{ await Html.RenderPartialAsync("_ToolTip", "configuration"); }</h2>
 
-<table id="tableTerms" class="table ">
-    <thead>
-        <tr class="bg-primary">
-            <th>Term @{ await Html.RenderPartialAsync("_ToolTip", "term"); }</th>
-            <th>Color @{ await Html.RenderPartialAsync("_ToolTip", "color"); }</th>
-            <th>Enabled @{ await Html.RenderPartialAsync("_ToolTip", "enabled"); }</th>
-            <th>
+<table id="tableTerms" class="table table-responsive">
+    <thead class="thead-inverse">
+        <tr>
+            <th class="bg-primary">Term @{ await Html.RenderPartialAsync("_ToolTip", "term"); }</th>
+            <th class="bg-primary">Color @{ await Html.RenderPartialAsync("_ToolTip", "color"); }</th>
+            <th class="bg-primary">Enabled @{ await Html.RenderPartialAsync("_ToolTip", "enabled"); }</th>
+            <th class="bg-primary">
                 <span>Add @{ await Html.RenderPartialAsync("_ToolTip", "add"); }</span>
                 <span> / </span>
                 <span>Delete @{ await Html.RenderPartialAsync("_ToolTip", "delete"); }</span>
