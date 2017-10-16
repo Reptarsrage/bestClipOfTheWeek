@@ -59,7 +59,8 @@ I had a super fun time making this site. Flaws and all I think it turned out pre
 - [x] Drop PHP/MySql service layer and use Enterprise Library & SQL Server
 - [x] Migrate site to Net Core 2.0
 - [x] Update site to SSL
-- [ ] Add site logging and Application Insights
+- [x] Add Application Insights
+- [ ] Add site logging to Splunk & Datadog
 - [ ] Add Unit tests
 - [ ] Add Integration tests
 - [ ] Set up a deployment pipeline (Octo/TeamCity)
