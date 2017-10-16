@@ -1,4 +1,5 @@
-﻿@using Microsoft.Extensions.Options;
+﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
+@using Microsoft.Extensions.Options;
 @using BestClipOfTheWeek.Models.Configuration
 
 @inject IOptions<AppSettings> OptionsApplicationConfiguration
@@ -18,6 +19,7 @@
     </environment>
 
     @RenderSection("Styles", required: false)
+    @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
 <body>
     @* used for ajax in Utility.addAntiForgeryToken() *@

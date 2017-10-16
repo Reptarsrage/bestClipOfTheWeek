@@ -69,7 +69,7 @@ gulp.task('favicon', function (cb) {
 
 gulp.task('mainJsMin', function (cb) {
     plugins.pump([
-        gulp.src(plugins.mainBowerFiles().concat(['Scripts/site.js'])),
+        gulp.src(plugins.mainBowerFiles().concat(['Scripts/site.js', 'bower_components/jscolor-picker/*'])),
         plugins.filter('**/*.js'),
         plugins.concat('main.min.js'),
         plugins.uglify(),
