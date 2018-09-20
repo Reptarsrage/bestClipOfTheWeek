@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.Extensions.Options;
 using System.Net;
 using System.Net.Mail;
 using System.Threading.Tasks;
 using BestClipOfTheWeek.Models;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.Extensions.Options;
 
 namespace BestClipOfTheWeek
 {
@@ -11,8 +11,8 @@ namespace BestClipOfTheWeek
     // For more details see https://go.microsoft.com/fwlink/?LinkID=532713
     public class EmailSender : IEmailSender
     {
-        private readonly AuthMessageSenderOptions _config;
         private readonly SmtpClient _client;
+        private readonly AuthMessageSenderOptions _config;
         private readonly MailAddress _fromAddress;
 
         public EmailSender(IOptions<AuthMessageSenderOptions> options)
@@ -31,15 +31,18 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        /// Sends a mail to a user using Gmail STMP
+        ///     Sends a mail to a user using Gmail STMP
         /// </summary>
         /// <param name="email">Address to send to</param>
         /// <param name="subject">Email subject line</param>
         /// <param name="htmlMessage">Email body</param>
-        /// <remarks>For troubleshooting <see href="https://stackoverflow.com/questions/704636/sending-email-through-gmail-smtp-server-with-c-sharp"/></remarks>
+        /// <remarks>
+        ///     For troubleshooting
+        ///     <see href="https://stackoverflow.com/questions/704636/sending-email-through-gmail-smtp-server-with-c-sharp" />
+        /// </remarks>
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {
-            using (var msg = new MailMessage(_fromAddress.Address, email, subject, htmlMessage) { IsBodyHtml = true })
+            using (var msg = new MailMessage(_fromAddress.Address, email, subject, htmlMessage) {IsBodyHtml = true})
             {
                 await _client.SendMailAsync(msg);
             }

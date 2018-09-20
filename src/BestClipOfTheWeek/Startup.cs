@@ -1,4 +1,6 @@
 using AutoMapper;
+using BestClipOfTheWeek.Data;
+using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -10,38 +12,34 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
-using BestClipOfTheWeek.Data;
-using BestClipOfTheWeek.Models;
 
 namespace BestClipOfTheWeek
 {
     public class Startup
     {
-        public IConfiguration Configuration { get; }
-
         /// <summary>
-        /// This method gets called by the runtime. Use this method to build the configuration.
+        ///     This method gets called by the runtime. Use this method to build the configuration.
         /// </summary>
         public Startup(IHostingEnvironment env)
         {
             var builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile("appsettings.json", false, true)
                 .AddEnvironmentVariables();
 
             if (env.IsDevelopment())
-            {
                 builder
-                    .AddJsonFile("appsettings.local.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.local.json", true, true)
                     .AddUserSecrets<Startup>();
-            }
 
             Configuration = builder.Build();
         }
 
+        public IConfiguration Configuration { get; }
+
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
+        ///     This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
@@ -79,7 +77,8 @@ namespace BestClipOfTheWeek
                 {
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                }); ;
+                });
+            ;
 
             services.AddAutoMapper();
             services.AddOptions();
@@ -90,7 +89,7 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        ///     This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -114,15 +113,15 @@ namespace BestClipOfTheWeek
             app.UseMvc(routes =>
             {
                 routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    "default",
+                    "{controller=Home}/{action=Index}/{id?}");
             });
 
             ConfigureNewtonsoft(app, env);
         }
 
         /// <summary>
-        /// Configures injected dependencies
+        ///     Configures injected dependencies
         /// </summary>
         /// <param name="services"></param>
         private void ConfigureDependencyInjection(IServiceCollection services)
@@ -136,7 +135,7 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        /// Configures Json serialization
+        ///     Configures Json serialization
         /// </summary>
         private static void ConfigureNewtonsoft(IApplicationBuilder app, IHostingEnvironment env)
         {
