@@ -1,3 +1,5 @@
+using System;
+
 namespace BestClipOfTheWeek.Models
 {
     public class ErrorViewModel
