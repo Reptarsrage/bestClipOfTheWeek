@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
@@ -64,12 +64,10 @@ namespace BestClipOfTheWeek.Areas.Identity.Pages.Account
             }
 
             // Sign in the user with this external login provider if the user already has a login.
-            var result =
-                await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
+            var result = await _signInManager.ExternalLoginSignInAsync(info.LoginProvider, info.ProviderKey, false, true);
             if (result.Succeeded)
             {
-                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name,
-                    info.LoginProvider);
+                _logger.LogInformation("{Name} logged in with {LoginProvider} provider.", info.Principal.Identity.Name, info.LoginProvider);
                 return LocalRedirect(returnUrl);
             }
 
@@ -82,10 +80,10 @@ namespace BestClipOfTheWeek.Areas.Identity.Pages.Account
             ReturnUrl = returnUrl;
             LoginProvider = info.LoginProvider;
             if (info.Principal.HasClaim(c => c.Type == ClaimTypes.Email))
-                Input = new InputModel
-                {
-                    Email = info.Principal.FindFirstValue(ClaimTypes.Email)
-                };
+            {
+                Input = new InputModel { Email = info.Principal.FindFirstValue(ClaimTypes.Email) };
+            }
+
             return Page();
         }
 

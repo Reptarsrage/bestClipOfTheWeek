@@ -53,7 +53,8 @@ module.exports = (env) => {
       ]
     },
     entry: {
-      site: './js/site.js'
+      site: './js/site.js',
+      cookieContent: './js/cookieContent.js'
     },
     plugins: [
       new ExtractTextPlugin('[name].css')

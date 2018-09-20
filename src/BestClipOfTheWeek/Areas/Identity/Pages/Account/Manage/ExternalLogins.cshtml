@@ -21,7 +21,7 @@
                             <div>
                                 <input asp-for="@login.LoginProvider" name="LoginProvider" type="hidden"/>
                                 <input asp-for="@login.ProviderKey" name="ProviderKey" type="hidden"/>
-                                <button type="submit" class="btn btn-default" title="Remove this @login.LoginProvider login from your account">Remove</button>
+                                <button type="submit" class="btn btn-light" title="Remove this @login.LoginProvider login from your account">Remove</button>
                             </div>
                         </form>
                     }
@@ -44,7 +44,9 @@
             <p class="d-flex flex-wrap">
                 @foreach (var provider in Model.OtherLogins)
                 {
-                    <button id="link-login-button" type="submit" class="btn btn-default m-2" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">@provider.DisplayName</button>
+                    <button id="link-login-button" type="submit" class="btn btn-light m-2" name="provider" value="@provider.Name" title="Log in using your @provider.DisplayName account">
+                        @Html.GetIconForExternalLogin(@provider.DisplayName)&nbsp;@provider.DisplayName
+                    </button>
                 }
             </p>
         </div>

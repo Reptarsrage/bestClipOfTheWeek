@@ -2,6 +2,7 @@ using AutoMapper;
 using BestClipOfTheWeek.Data;
 using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

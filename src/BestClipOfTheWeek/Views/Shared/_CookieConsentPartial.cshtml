@@ -4,34 +4,24 @@
     var showBanner = !consentFeature?.CanTrack ?? false;
     var cookieString = consentFeature?.CreateConsentCookie();
 }
-
 @if (showBanner)
 {
-    <nav class="navbar fixed-top navbar-expand-md navbar-light bg-light">
+    <nav class="navbar fixed-bottom navbar-expand-md navbar-dark bg-dark" id="cookieConsent">
         <a class="navbar-brand">
-            <i class="fas fa-info-circle" aria-hidden="true"></i>
+            <i class="fas fa-info-circle text-white" aria-hidden="true"></i>
         </a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#cookieConsent .navbar-collapse">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse">
-            <span class="navbar-text">
-                Use this space to summarize your privacy and cookie use policy.
+            <span class="navbar-text flex-full">
+                This website uses cookies to ensure you get the best experience on our website.
             </span>
             <div class="navbar-text">
-                <a asp-controller="Home" asp-action="Privacy" class="btn btn-info navbar-btn">Learn More</a>
-                <button type="button" class="btn btn-default navbar-btn" data-cookie-string="@cookieString">Accept</button>
+                <a asp-controller="Home" asp-action="Privacy" class="btn btn-info text-white navbar-btn mr-2">Learn More</a>
+                <button type="button" class="btn btn-light navbar-btn" data-cookie-string="@cookieString">Accept</button>
             </div>
         </div>
     </nav>
-    <script>
-        (function() {
-            document.querySelector("#cookieConsent button[data-cookie-string]").addEventListener("click",
-                function(el) {
-                    document.cookie = el.target.dataset.cookieString;
-                    document.querySelector("#cookieConsent").classList.add("hidden");
-                },
-                false);
-        })();
-    </script>
+    <script src="~/dist/cookieContent.js"></script>
 }

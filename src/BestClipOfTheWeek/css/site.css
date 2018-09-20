@@ -1,3 +1,19 @@
 .flex-full {
     flex: 1;
 }
+
+.facebook {
+    color: #3B5998;
+}
+
+.twitter {
+    color: #1DA1F2;
+}
+
+.google {
+    color: #DB4437
+}
+
+.microsoft {
+    color: #04a5f0;
+}
