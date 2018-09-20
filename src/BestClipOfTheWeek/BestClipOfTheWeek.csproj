@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
-    <UserSecretsId>aspnet-TestWebApp-6EFDB5E8-ABF7-4823-A7A9-E33A9B83A8AD</UserSecretsId>
+    <UserSecretsId>aspnet-BestClipOfTheWeek-6EFDB5E8-ABF7-4823-A7A9-E33A9B83A8AD</UserSecretsId>
     <DockerTargetOS>Linux</DockerTargetOS>
     <LangVersion>Latest</LangVersion>
     <Version>3.0.0-alpha</Version>
@@ -15,11 +15,11 @@
     <PackageReference Include="Microsoft.ApplicationInsights.AspNetCore" Version="2.4.1" />
     <PackageReference Include="Microsoft.AspNetCore.App" Version="2.1.4" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.4" PrivateAssets="All" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <Content Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
@@ -28,9 +28,34 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  
+
   <ItemGroup>
     <Folder Include="Areas\Identity\Services\" />
   </ItemGroup>
 
+  <Target Name="DebugRunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Debug' And !Exists('wwwroot\dist') ">
+    <Exec Command="node --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Exec Command="yarn --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Exec Command="yarn install" />
+    <Exec Command="yarn run dev" />
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js and yarn are required to build and run this project. To continue, please install Node.js from https://nodejs.org/ and yarn from https://yarnpkg.com/, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Performing first-run Webpack build..." />
+  </Target>
+
+  <Target Name="RunWebpack" BeforeTargets="Build" Condition=" '$(Configuration)' == 'Release'">
+    <Exec Command="node --version" ContinueOnError="true">
+        <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Exec Command="yarn --version" ContinueOnError="true">
+      <Output TaskParameter="ExitCode" PropertyName="ErrorCode" />
+    </Exec>
+    <Exec Command="yarn install --production" />
+    <Exec Command="yarn run prod" />
+    <Error Condition="'$(ErrorCode)' != '0'" Text="Node.js and yarn are required to build and run this project. To continue, please install Node.js from https://nodejs.org/ and yarn from https://yarnpkg.com/, and then restart your command prompt or IDE." />
+    <Message Importance="high" Text="Performing first-run Webpack build..." />
+  </Target>
 </Project>

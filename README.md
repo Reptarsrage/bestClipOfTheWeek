@@ -112,6 +112,37 @@ Add a new migration
 dotnet ef migrations add <NAME> --project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj --startup-project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj
 ```
 
+#### npm ([docs](https://nodejs.org/en/download/package-manager/))
+To install on Linux run
+```sh
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt-get install -y nodejs
+node --version
+```
+
+To install on Windows run
+```ps
+choco install -y nodejs.install
+refreshenv
+node --version
+```
+
+#### yarn ([docs](https://yarnpkg.com/lang/en/docs/install/))
+To install on Linux run
+```sh
+curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+sudo apt-get update && sudo apt-get install yarn
+yarn --version
+```
+
+To install on Windows run
+```ps
+choco install -y yarn
+refreshenv
+yarn --version
+```
+
 #### Set up Third-Party Authentication ([docs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/index))
 Follow instructions in the docs.
 

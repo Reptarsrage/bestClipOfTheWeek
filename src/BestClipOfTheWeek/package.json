@@ -1,0 +1,48 @@
+{
+  "name": "bestclipoftheweek",
+  "description": "Best Clip of the Week",
+  "version": "3.0.0-alpha",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Reptarsrage/bestClipOfTheWeek.git"
+  },
+  "author": "Meredith",
+  "dependencies": {
+    "@babel/core": "^7.0.0-beta.51",
+    "@babel/preset-env": "^7.0.0-beta.51",
+    "@babel/register": "^7.0.0-beta.51",
+    "babel-loader": "^8.0.0-beta.4",
+    "cross-env": "^5.2.0",
+    "css-loader": "^1.0.0",
+    "d3": "^5.7.0",
+    "extract-text-webpack-plugin": "^4.0.0-beta.0",
+    "file-loader": "^2.0.0",
+    "json-loader": "^0.5.7",
+    "moment": "^2.22.2",
+    "style-loader": "^0.23.0",
+    "uglifyjs-webpack-plugin": "^2.0.1",
+    "url-loader": "^1.0.1",
+    "webpack": "^4.15.1",
+    "webpack-cli": "^3.0.8"
+  },
+  "devDependencies": {
+    "aspnet-webpack": "^3.0.0",
+    "babel-eslint": "^9.0.0",
+    "eslint": "^5.0.1",
+    "eslint-config-airbnb-base": "^13.0.0",
+    "eslint-loader": "^2.0.0",
+    "eslint-plugin-import": "^2.13.0",
+    "stylelint": "^9.3.0",
+    "stylelint-config-standard": "^18.2.0",
+    "webpack-dev-middleware": "^3.1.3",
+    "webpack-hot-middleware": "^2.22.1"
+  },
+  "peerDependencies": {
+    "webpack": "3.11.0"
+  },
+  "scripts": {
+    "dev": "cross-env NODE_ENV=development node ./node_modules/webpack/bin/webpack.js",
+    "prod": "cross-env NODE_ENV=production node ./node_modules/webpack/bin/webpack.js --env.prod"
+  }
+}
