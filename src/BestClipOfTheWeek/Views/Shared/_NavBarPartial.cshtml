@@ -1,0 +1,28 @@
+﻿<nav class="navbar navbar-expand-md navbar-dark bg-primary">
+    <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">BestClipOfTheWeek</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav mr-auto">
+            <li class="nav-item @Html.IsActive("Home", "Index")">
+                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">
+                    <i class="fas fa-home"></i>&nbsp;<span>Home</span>
+                </a>
+            </li>
+            <li class="nav-item @Html.IsActive("Home", "About")">
+                <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">
+                    <i class="fas fa-home"></i>&nbsp;<span>About</span>
+                </a>
+            </li>
+            <li class="nav-item @Html.IsActive("Home", "Contact")">
+                <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">
+                    <i class="fas fa-envelope-open"></i>&nbsp;<span>Contact</span>
+                </a>
+            </li>
+            @if (LoggedIn)
+            {
+            }
+        </ul>
+    </div>
+</nav>
