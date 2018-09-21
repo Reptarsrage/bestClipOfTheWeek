@@ -1,6 +1,9 @@
 ﻿# [Best Clip Of The Week](https://www.bestclipoftheweek.com/)
 ### An ASP.NET Core 2.1 Web App
 
+[![codecov](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek/branch/master/graph/badge.svg)](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek)
+[![Build status](https://ci.appveyor.com/api/projects/status/4ntsr4sl2vey3krf?svg=true)](https://ci.appveyor.com/project/Reptarsrage/bestclipoftheweek)
+
 ## Description
 
 This is my attempt to tally the results of StoneMountain64's Best Clip of the Week videos.
