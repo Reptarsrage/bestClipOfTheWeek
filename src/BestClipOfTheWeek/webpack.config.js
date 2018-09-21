@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
-const ExtractTextPlugin = require('extract-text-webpack-plugin');
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 const outputDir = './wwwroot/dist';
 const appDirectory = fs.realpathSync(process.cwd());
@@ -11,7 +11,7 @@ module.exports = (env) => {
 
   const config = {
     stats: { modules: false },
-    resolve: { extensions: ['.js'] },
+    resolve: { extensions: ['.js', '.jsx'] },
     mode: isDevBuild ? 'development' : 'production',
     output: {
       path: path.join(__dirname, outputDir),
@@ -21,7 +21,7 @@ module.exports = (env) => {
     module: {
       rules: [
         {
-          exclude: /\.(html|js|s?css|json|jpe?g|png|gif|bmp)$/i,
+          exclude: /\.(html|js|jsx|s?css|json|jpe?g|png|gif|bmp)$/i,
           loader: require.resolve('file-loader'),
           options: {
             name: 'static/media/[name].[ext]'
@@ -36,7 +36,7 @@ module.exports = (env) => {
           }
         },
         {
-          test: /\.(js)$/,
+          test: /\.(js|jsx)$/,
           include: resolveApp('js'),
           loader: require.resolve('babel-loader'),
           options: {
@@ -45,19 +45,22 @@ module.exports = (env) => {
         },
         {
           test: /\.css$/,
-          loader: ExtractTextPlugin.extract({
-            fallback: 'style-loader',
-            use: isDevBuild ? 'css-loader' : 'css-loader?minimize'
-          })
+          use:[
+            MiniCssExtractPlugin.loader,
+            'css-loader'
+          ]
         }
       ]
     },
     entry: {
       site: './js/site.js',
-      cookieContent: './js/cookieContent.js'
+      cookieContent: './js/cookieContent.js',
+      sampleData: './js/index.jsx'
     },
     plugins: [
-      new ExtractTextPlugin('[name].css')
+      new MiniCssExtractPlugin({
+        filename: "[name].css"
+      })
     ].concat(isDevBuild ? [
       // Plugins that apply in development builds only
       new webpack.SourceMapDevToolPlugin({

@@ -2,12 +2,12 @@ using AutoMapper;
 using BestClipOfTheWeek.Data;
 using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -80,7 +80,6 @@ namespace BestClipOfTheWeek
                     facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
-            ;
 
             services.AddAutoMapper();
             services.AddOptions();
@@ -101,7 +100,8 @@ namespace BestClipOfTheWeek
                 app.UseDatabaseErrorPage();
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
-                    HotModuleReplacement = true
+                    HotModuleReplacement = true,
+                    ReactHotModuleReplacement = true
                 });
             }
             else
@@ -121,6 +121,10 @@ namespace BestClipOfTheWeek
                 routes.MapRoute(
                     "default",
                     "{controller=Home}/{action=Index}/{id?}");
+
+                routes.MapSpaFallbackRoute(
+                    name: "spa-fallback",
+                    defaults: new { controller = "Home", action = "Index" });
             });
 
             ConfigureNewtonsoft(app, env);
