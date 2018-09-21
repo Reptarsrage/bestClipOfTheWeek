@@ -289,4 +289,6 @@ __pycache__/
 
 # custom cache folder
 .cache/
-.gitconfig
+coverage.opencover.xml
+coverage.json
+package-lock.json

@@ -13,36 +13,33 @@ environment:
     secure: qGOrjom/Itd2Mu4kw0IEnwPzr43pBTTt3JUZGSLYvP+FZP0ssORhvp0nOn+3MQIM
 
 before_build:
-- choco install opencover.portable
 - choco install codecov
+- dotnet --version
+- dotnet --info
+- dotnet tool install --global coverlet.console
+- dotnet restore ./src/BestClipOfTheWeek/BestClipOfTheWeek.csproj --verbosity m --no-cache
 
 build_script:
-- dotnet --info
-- dotnet restore --no-cache
-- dotnet build --configuration Release --version-suffix %APPVEYOR_BUILD_NUMBER% --no-restore
+- dotnet build ./src/BestClipOfTheWeek/BestClipOfTheWeek.csproj -c Release --version-suffix %APPVEYOR_BUILD_NUMBER% --no-restore
+- dotnet publish ./src/BestClipOfTheWeek/BestClipOfTheWeek.csproj -c Release --no-build --no-restore
 
 test_script:
-- OpenCover.Console.exe -register:user -target:"%xunit20%\xunit.console.x86.exe" -targetargs:".\tests\BestClipOfTheWeek.Tests.Unit\bin\Release\netcoreapp2.1\BestClipOfTheWeek.Tests.Unit.dll -noshadow" -filter:"+[BestClipOfTheWeek*]* -[BestClipOfTheWeek.Tests.Unit*]*" -output:".\coverage.xml" -hideskipped:File -mergebyhash -skipautoprops -threshold:9999
-- codecov -f ".\coverage.xml"
+- dotnet restore ./tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj --verbosity m --no-cache
+- dotnet build ./tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj -c Release --no-restore
+- coverlet tests/BestClipOfTheWeek.Tests.Unit/bin/Release/netcoreapp2.1/BestClipOfTheWeek.Tests.Unit.dll --target "dotnet" --targetargs "test tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj -c Release --no-build" --format opencover
+- codecov -f coverage.opencover.xml
 
 artifacts:
-  - path: Artifacts\x64
-    name: Setup_x64
-    type: zip
-  - path: Artifacts\x86
-    name: Setup_x86
-    type: zip
+ - path: '\src\BestClipOfTheWeek\bin\Release\netcoreapp2.1\publish'
+   name: WebSite
+   type: WebDeployPackage
 
 deploy:
-  release: Best Clip of the Week v$(appveyor_build_version)
-  description: 'Appveyor auto-generated release'
-  provider: GitHub
-  tag: $(APPVEYOR_REPO_TAG_NAME)
-  auth_token:
-    secure: zQGJD6fs/xhZgf/3Rkagg765kNLqIsJ9ouxG/XUNknwalfz/jb8wp7+ZpTRzYhEp
-  artifact: Setup_x64,Setup_x86
-  draft: false
-  prerelease: false
+- provider: AzureAppServiceZipDeploy
+  website: BestClipOfTheWeek
+  username: justinprobb
+  password:
+    secure: 6FXUUPKgWuCGiuhoGRi0596iM2tmDjffVkfDgl0Tg1UBCzfqhRRjNJHbtKssPKYQ
   on:
     branch: master                 # release from master branch only
     appveyor_repo_tag: true        # deploy on tag push only
