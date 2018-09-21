@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Text.Encodings.Web;
@@ -122,7 +122,7 @@ namespace BestClipOfTheWeek.Areas.Identity.Pages.Account.Manage
         {
             return string.Format(
                 AuthenticatorUriFormat,
-                _urlEncoder.Encode("BestClipOfTheWeek"),
+                _urlEncoder.Encode("Best Clip of the Week"),
                 _urlEncoder.Encode(email),
                 unformattedKey);
         }

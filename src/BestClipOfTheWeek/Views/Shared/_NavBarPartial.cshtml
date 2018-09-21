@@ -3,25 +3,20 @@
 
 @{
     var LoggedIn = SignInManager.IsSignedIn(User);
+    var HomeController = LoggedIn
+        ? "SampleData"
+        : "Home";
 }
 
 <nav class="navbar navbar-expand-md navbar-dark bg-primary">
-    @if (LoggedIn)
-    {
-        <a asp-area="" asp-controller="SampleData" asp-action="Index" class="navbar-brand">BestClipOfTheWeek</a>
-    }
-    else
-    {
-        <a asp-area="" asp-controller="Home" asp-action="Index" class="navbar-brand">BestClipOfTheWeek</a>
-    }
-
+    <a asp-area="" asp-controller="@HomeController" asp-action="Index" class="navbar-brand">BestClipOfTheWeek</a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav mr-auto">
             <li class="nav-item @Html.IsActive("Home", "Index")">
-                <a asp-area="" asp-controller="Home" asp-action="Index" class="nav-link">
+                <a asp-area="" asp-controller="@HomeController" asp-action="Index" class="nav-link">
                     <i class="fas fa-home"></i>&nbsp;<span>Home</span>
                 </a>
             </li>

@@ -55,6 +55,7 @@ module.exports = (env) => {
     entry: {
       site: './js/site.js',
       cookieContent: './js/cookieContent.js',
+      qrcode: './js/qrcode.js',
       sampleData: './js/index.jsx'
     },
     plugins: [
