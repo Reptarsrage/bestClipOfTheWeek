@@ -1,19 +1,18 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
-import './NavMenu.css';
+import { NavLink  } from 'react-router-dom';
 
 export class NavMenu extends Component {
   render() {
     return (
         <ul className="nav nav-pills flex-column">
             <li className="nav-item">
-                <Link to={'/'} className="nav-link">Home</Link>
+                <NavLink to={'/'} exact={true} activeClassName='active' className="nav-link">Home</NavLink>
             </li>
             <li className="nav-item">
-                <Link to={'/counter'} className="nav-link">Counter</Link>
+                <NavLink to={'/counter'} activeClassName='active' className="nav-link">Counter</NavLink>
             </li>
             <li className="nav-item">
-                <Link to={'/fetchdata'} className="nav-link">Fetch data</Link>
+                <NavLink to={'/fetchdata'} activeClassName='active' className="nav-link">Fetch data</NavLink>
             </li>
         </ul>);
   }
