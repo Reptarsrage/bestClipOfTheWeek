@@ -31,7 +31,7 @@ namespace BestClipOfTheWeek.Tests.Unit.Controllers
 
             // Assert
             Assert.IsType<RedirectToActionResult>(actual);
-            Assert.Equal("SampleData", ((RedirectToActionResult)actual).ControllerName);
+            Assert.Equal("Report", ((RedirectToActionResult)actual).ControllerName);
             Assert.Equal("Index", ((RedirectToActionResult)actual).ActionName);
         }
 

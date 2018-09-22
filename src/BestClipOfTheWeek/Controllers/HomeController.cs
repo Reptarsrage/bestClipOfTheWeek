@@ -18,7 +18,7 @@ namespace BestClipOfTheWeek.Controllers
         {
             if (_signInManager.IsSignedIn(User))
             {
-                return RedirectToAction("Index", "SampleData");
+                return RedirectToAction("Index", "Report");
             }
 
             return View();

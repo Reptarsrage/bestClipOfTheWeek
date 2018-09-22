@@ -1,76 +1,61 @@
+using AutoMapper;
 using BestClipOfTheWeek.Models;
 using BestClipOfTheWeek.Models.Terms;
+using BestClipOfTheWeek.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using AutoMapper;
-using Newtonsoft.Json.Serialization;
-using BestClipOfTheWeek.Repositories;
 
 namespace BestClipOfTheWeek.Controllers
 {
     [Authorize]
-    [Route("[controller]/[action]")]
-    public class TermController : Controller
+    public class TermsController : Controller
     {
         private readonly ILogger _logger;
-        private readonly ITermsRepository _termsManager;
+        private readonly ITermsRepository _termsRepository;
         private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly JsonSerializerSettings _serializationSettings;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public TermController(ILogger<TermController> logger, ITermsRepository termsManager, UserManager<ApplicationUser> userManager, SignInManager<ApplicationUser> signInManager, IMapper mapper)
+        public TermsController(ILogger<TermsController> logger, ITermsRepository termsManager, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _logger = logger;
-            _termsManager = termsManager;
+            _termsRepository = termsManager;
             _userManager = userManager;
-            _signInManager = signInManager;
             _mapper = mapper;
-            _serializationSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.None,
-                ContractResolver = new CamelCasePropertyNamesContractResolver()
-            };
         }
 
         [HttpGet]
-        [Route("/api/Term")]
+        [Route("/api/Terms")]
         public async Task<IActionResult> Get()
         {
-            var terms = await _termsManager.ReadTerms(_userManager.GetUserId(User));
+            var terms = await _termsRepository.ReadTerms(_userManager.GetUserId(User));
 
-            ;
-
-            return Json(new TermListViewModel
-            {
-                Terms = terms?.Select(t => _mapper.Map<TermViewModel>(t)).OrderBy(t => t.Name).ToList() ?? new List<TermViewModel>()
-            });
+            return Json(terms?
+                .Select(t => _mapper.Map<TermViewModel>(t))
+                .OrderBy(t => t.Name) ?? Enumerable.Empty<TermViewModel>());
         }
 
         [HttpPost]
-        [Route("/api/Term")]
+        [Route("/api/Terms")]
         public async Task<IActionResult> Post([FromBody]TermViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(400, string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
+                return BadRequest(string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
             }
 
             try
             {
                 // Add
-                var id = await _termsManager.AddTerm(_userManager.GetUserId(User), _mapper.Map<Term>(model));
+                var id = await _termsRepository.AddTerm(_userManager.GetUserId(User), _mapper.Map<Term>(model));
 
                 // Return
                 model.TermId = id;
-                return Json(model, _serializationSettings);
+                return Json(model);
             }
             catch (Exception e)
             {
@@ -80,21 +65,21 @@ namespace BestClipOfTheWeek.Controllers
         }
 
         [HttpPatch]
-        [Route("/api/Term")]
+        [Route("/api/Terms")]
         public async Task<IActionResult> Patch([FromBody]TermViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(400, string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
+                return BadRequest(string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
             }
 
             try
             {
                 // Update
-                await _termsManager.UpdateTerm(_mapper.Map<Term>(model));
+                await _termsRepository.UpdateTerm(_mapper.Map<Term>(model));
 
                 // Return
-                return Json(model, _serializationSettings);
+                return Json(model);
             }
             catch (Exception e)
             {
@@ -104,13 +89,13 @@ namespace BestClipOfTheWeek.Controllers
         }
 
         [HttpDelete]
-        [Route("/api/Term/{id}")]
+        [Route("/api/Terms/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 // Delete
-                await _termsManager.RemoveTerm(id);
+                await _termsRepository.RemoveTerm(id);
 
                 // Return
                 return Ok(id);

@@ -1,13 +1,12 @@
 using AutoMapper;
 using BestClipOfTheWeek.Data;
 using BestClipOfTheWeek.Models;
+using BestClipOfTheWeek.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -53,7 +52,7 @@ namespace BestClipOfTheWeek
 
             services.Configure<CookiePolicyOptions>(options =>
             {
-                // This lambda determines whether user consent for non-essential cookies 
+                // This lambda determines whether user consent for non-essential cookies
                 // is needed for a given request.
                 options.CheckConsentNeeded = context => true;
                 options.MinimumSameSitePolicy = SameSiteMode.None;
@@ -139,6 +138,9 @@ namespace BestClipOfTheWeek
             // IOptions
             services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
             services.Configure<YouTubeOptions>(Configuration.GetSection("YouTube"));
+
+            // Repositories
+            services.AddScoped<ITermsRepository, TermsRepository>();
 
             // Email
             services.AddSingleton<IEmailSender, EmailSender>();

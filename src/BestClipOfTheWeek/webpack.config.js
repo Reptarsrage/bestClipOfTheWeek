@@ -56,7 +56,7 @@ module.exports = (env) => {
       site: './js/site.js',
       cookieContent: './js/cookieContent.js',
       qrcode: './js/qrcode.js',
-      sampleData: './js/index.jsx'
+      report: './js/Report/index.jsx'
     },
     plugins: [
       new MiniCssExtractPlugin({
