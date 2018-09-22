@@ -7,9 +7,9 @@ namespace BestClipOfTheWeek.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public HomeController(SignInManager<IdentityUser> signInManager)
+        public HomeController(SignInManager<ApplicationUser> signInManager)
         {
             _signInManager = signInManager;
         }

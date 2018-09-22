@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel.DataAnnotations;
 using System.Threading.Tasks;
+using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -13,9 +14,9 @@ namespace BestClipOfTheWeek.Areas.Identity.Pages.Account
     public class LoginWithRecoveryCodeModel : PageModel
     {
         private readonly ILogger<LoginWithRecoveryCodeModel> _logger;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public LoginWithRecoveryCodeModel(SignInManager<IdentityUser> signInManager,
+        public LoginWithRecoveryCodeModel(SignInManager<ApplicationUser> signInManager,
             ILogger<LoginWithRecoveryCodeModel> logger)
         {
             _signInManager = signInManager;

@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -10,13 +11,13 @@ namespace BestClipOfTheWeek.Areas.Identity.Pages.Account.Manage
     {
         private const string AuthenicatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}";
         private readonly ILogger<TwoFactorAuthenticationModel> _logger;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public TwoFactorAuthenticationModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager,
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager,
             ILogger<TwoFactorAuthenticationModel> logger)
         {
             _userManager = userManager;
