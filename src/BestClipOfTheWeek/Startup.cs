@@ -21,7 +21,7 @@ namespace BestClipOfTheWeek
     public class Startup
     {
         /// <summary>
-        ///     This method gets called by the runtime. Use this method to build the configuration.
+        /// This method gets called by the runtime. Use this method to build the configuration.
         /// </summary>
         public Startup(IHostingEnvironment env)
         {
@@ -42,7 +42,7 @@ namespace BestClipOfTheWeek
 
 
         /// <summary>
-        ///     This method gets called by the runtime. Use this method to add services to the container.
+        /// This method gets called by the runtime. Use this method to add services to the container.
         /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
@@ -109,7 +109,7 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        ///     This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
@@ -150,12 +150,11 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        ///     Configures injected dependencies
+        /// Configures injected dependencies
         /// </summary>
-        /// <param name="services"></param>
         private void ConfigureDependencyInjection(IServiceCollection services)
         {
-            // IOptions
+            // Options
             services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
             services.Configure<YouTubeOptions>(Configuration.GetSection("YouTube"));
 
@@ -167,7 +166,7 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        ///     Configures Json serialization
+        /// Configures Json serialization
         /// </summary>
         private static void ConfigureNewtonsoft(IApplicationBuilder app, IHostingEnvironment env)
         {

@@ -26,11 +26,11 @@ namespace BestClipOfTheWeek.Extensions
         }
 
         /// <summary>
-        ///     Sets active class on bootstrap nav links if given route matches the current path
+        /// Sets active class on bootstrap nav links if given route matches the current path
         /// </summary>
         /// <remarks>
-        ///     Shamelessly stolen from
-        ///     <see href="https://stackoverflow.com/questions/20410623/how-to-add-active-class-to-html-actionlink-in-asp-net-mvc" />
+        /// Shamelessly stolen from
+        /// <see href="https://stackoverflow.com/questions/20410623/how-to-add-active-class-to-html-actionlink-in-asp-net-mvc" />
         /// </remarks>
         public static string IsActive(this IHtmlHelper html, string control, string action)
         {

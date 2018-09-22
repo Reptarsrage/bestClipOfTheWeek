@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -29,17 +30,32 @@ namespace BestClipOfTheWeek.Controllers
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(IEnumerable<TermViewModel>), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
         [Route("/api/Terms")]
         public async Task<IActionResult> Get()
         {
-            var terms = await _termsRepository.ReadTerms(_userManager.GetUserId(User));
+            try
+            {
+                var terms = await _termsRepository.ReadTerms(_userManager.GetUserId(User));
 
-            return Json(terms?
-                .Select(t => _mapper.Map<TermViewModel>(t))
-                .OrderBy(t => t.Name) ?? Enumerable.Empty<TermViewModel>());
+                return Json(terms?
+                                .Select(t => _mapper.Map<TermViewModel>(t))
+                                .OrderBy(t => t.Term) ?? Enumerable.Empty<TermViewModel>());
+            }
+            catch (Exception e)
+            {
+                _logger.LogError(e, "Get failed for terms. {User}", _userManager.GetUserId(User));
+                return StatusCode(500, $"Get failed for terms. Please try again. {e.Message}");
+            }
         }
 
         [HttpPost]
+        [ProducesResponseType(typeof(TermViewModel), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
         [Route("/api/Terms")]
         public async Task<IActionResult> Post([FromBody]TermViewModel model)
         {
@@ -65,6 +81,10 @@ namespace BestClipOfTheWeek.Controllers
         }
 
         [HttpPatch]
+        [ProducesResponseType(typeof(TermViewModel), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
         [Route("/api/Terms")]
         public async Task<IActionResult> Patch([FromBody]TermViewModel model)
         {
@@ -89,6 +109,9 @@ namespace BestClipOfTheWeek.Controllers
         }
 
         [HttpDelete]
+        [ProducesResponseType(typeof(int), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
         [Route("/api/Terms/{id}")]
         public async Task<IActionResult> Delete(int id)
         {

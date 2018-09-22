@@ -31,14 +31,14 @@ namespace BestClipOfTheWeek
         }
 
         /// <summary>
-        ///     Sends a mail to a user using Gmail STMP
+        /// Sends a mail to a user using Gmail STMP
         /// </summary>
         /// <param name="email">Address to send to</param>
         /// <param name="subject">Email subject line</param>
         /// <param name="htmlMessage">Email body</param>
         /// <remarks>
-        ///     For troubleshooting
-        ///     <see href="https://stackoverflow.com/questions/704636/sending-email-through-gmail-smtp-server-with-c-sharp" />
+        /// For troubleshooting
+        /// <see href="https://stackoverflow.com/questions/704636/sending-email-through-gmail-smtp-server-with-c-sharp" />
         /// </remarks>
         public async Task SendEmailAsync(string email, string subject, string htmlMessage)
         {

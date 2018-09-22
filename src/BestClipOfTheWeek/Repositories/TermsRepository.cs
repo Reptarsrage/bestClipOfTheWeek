@@ -7,38 +7,28 @@ using System.Threading.Tasks;
 
 namespace BestClipOfTheWeek.Repositories
 {
+    /// <inheritdoc cref="ITermsRepository"/>
     public class TermsRepository : ITermsRepository
     {
         private readonly ApplicationDbContext _context;
 
+        /// <summary>
+        /// Creates a new instanace of a <see cref="TermsRepository"/>
+        /// </summary>
+        /// <param name="context"></param>
         public TermsRepository(ApplicationDbContext context)
         {
             _context = context;
         }
 
+        /// <inheritdoc cref="ITermsRepository.ReadTerms"/>
         public async Task<List<Term>> ReadTerms(string userId)
         {
             var user = await GetUserAndTerms(userId);
             return user.Terms;
         }
 
-        public async Task UpdateTerms(IEnumerable<Term> terms)
-        {
-            foreach (var term in terms)
-            {
-                await UpdateTerm(term);
-            }
-        }
-
-        public async Task AddTerms(string userId, IEnumerable<Term> terms)
-        {
-            var user = await GetUserAndTerms(userId);
-            _context.Users.Attach(user);
-            user.Terms = user.Terms ?? new List<Term>();
-            user.Terms.AddRange(terms);
-            await _context.SaveChangesAsync();
-        }
-
+        /// <inheritdoc cref="ITermsRepository.AddTerm"/>
         public async Task<int> AddTerm(string userId, Term term)
         {
             var user = await GetUserAndTerms(userId);
@@ -49,6 +39,7 @@ namespace BestClipOfTheWeek.Repositories
             return term.TermId;
         }
 
+        /// <inheritdoc cref="ITermsRepository.UpdateTerm"/>
         public async Task UpdateTerm(Term term)
         {
             var termOld = await GetTerm(term.TermId);
@@ -59,6 +50,7 @@ namespace BestClipOfTheWeek.Repositories
             await _context.SaveChangesAsync();
         }
 
+        /// <inheritdoc cref="ITermsRepository.RemoveTerm"/>
         public async Task RemoveTerm(int id)
         {
             var termOld = await GetTerm(id);
@@ -66,27 +58,29 @@ namespace BestClipOfTheWeek.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task RemoveTerms(List<int> ids)
-        {
-            foreach (var id in ids)
-            {
-                await RemoveTerm(id);
-            }
-        }
-
-        private async Task<Term> GetTerm(int id)
+        /// <summary>
+        /// Helper method to get a term by Id
+        /// </summary>
+        /// <param name="termId"><see cref="Term.TermId"/></param>
+        /// <returns>The requested term</returns>
+        private async Task<Term> GetTerm(int termId)
         {
             return await _context.Terms
-                .Where(b => b.TermId.Equals(id))
-                .FirstOrDefaultAsync();
+                .Where(b => b.TermId.Equals(termId))
+                .SingleAsync();
         }
 
+        /// <summary>
+        /// Helper method to get a user by Id, including all terms for that user
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <returns>The requested <see cref="ApplicationUser"/></returns>
         private async Task<ApplicationUser> GetUserAndTerms(string userId)
         {
             return await _context.Users
                 .Where(b => b.Id.Equals(userId))
                 .Include(b => b.Terms)
-                .FirstOrDefaultAsync();
+                .SingleAsync();
         }
     }
 }

@@ -2,24 +2,34 @@ using System.ComponentModel.DataAnnotations;
 
 namespace BestClipOfTheWeek.Models.Terms
 {
+    /// <summary>
+    /// Terms API view model
+    /// </summary>
     public class TermViewModel
     {
+        /// <summary>
+        /// Term Id
+        /// </summary>
         public int TermId { get; set; }
 
+        /// <summary>
+        /// Term name
+        /// </summary>
         [Required]
-        [DataType(DataType.Text)]
-        [Display(Name = "Term")]
         [StringLength(30, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 2)]
-        public string Name { get; set; }
+        public string Term { get; set; }
 
+        /// <summary>
+        /// Hex color code for the term
+        /// </summary>
         [Required]
-        [DataType(DataType.Text)]
-        [Display(Name = "Color")]
-        [StringLength(7, ErrorMessage = "The {0} must be at a valid hex color value (e.g. #ffffff).", MinimumLength = 6)]
+        [StringLength(7, ErrorMessage = "The {0} must be at a valid hex color value (e.g. #ffffff).", MinimumLength = 7)]
         public string Color { get; set; }
 
+        /// <summary>
+        /// Flag insicating if term is active
+        /// </summary>
         [Required]
-        [Display(Name = "Enabled")]
         public bool Enabled { get; set; }
     }
 }
