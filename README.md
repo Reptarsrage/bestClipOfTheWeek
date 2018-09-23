@@ -1,5 +1,6 @@
 ﻿# [Best Clip Of The Week](https://www.bestclipoftheweek.com/)
-### An ASP.NET Core 2.1 Web App
+
+## An ASP.NET Core 2.1 Web App
 
 [![codecov](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek/branch/master/graph/badge.svg)](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek)
 [![Build status](https://ci.appveyor.com/api/projects/status/4ntsr4sl2vey3krf?svg=true)](https://ci.appveyor.com/project/Reptarsrage/bestclipoftheweek)
@@ -35,6 +36,7 @@ site doesn't work, it would be nice to come up with a solution for this as well.
 I had a super fun time making this site. Flaws and all I think it turned out pretty well.
 
 ## Credits
+
 - API's
   - [Google Charts](https://developers.google.com/chart/) for all your well-documented charting needs.
   - [YouTube Analytics and Reporting APIs](https://developers.google.com/youtube/analytics/) fetches YouTube stats, and much more.
@@ -59,6 +61,7 @@ I had a super fun time making this site. Flaws and all I think it turned out pre
   - [StoneMountain64](https://www.youtube.com/channel/UCN-v-Xn9S7oYk0X2v1jx1Qg) for kickin shit and eatin snakes.
 
 ## TODO
+
 - [x] Drop PHP/MySql service layer and use Enterprise Library & SQL Server
 - [x] Migrate site to Net Core 2.0
 - [x] Update site to SSL
@@ -70,53 +73,66 @@ I had a super fun time making this site. Flaws and all I think it turned out pre
 - [ ] Move client side logic to server side with caching & storage
 - [ ] Improve YouTube & Google+ comment parsing logic to avoid so many missed comments
 
-## Useful Notes:
+## Useful Notes
 
-#### Docker ([docs](https://docs.docker.com/engine/reference/commandline/docker/))
+### Docker ([docs](https://docs.docker.com/engine/reference/commandline/docker/))
+
 Build docker container
+
 ```sh
 docker build -t bestclipoftheweek:latest .
 ```
 
 Run docker container
+
 ```sh
 docker run -it -p 5000:5000 -p 80:80 -e ASPNETCORE_URLS='http://*:5000' bestclipoftheweek:latest
 ```
 
-#### User Secrets ([docs](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets))
+### User Secrets ([docs](https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets))
+
 Set multiple secrets
+
 ```sh
 type .\input.json | dotnet user-secrets set
 ```
 
 Set secret
+
 ```sh
 dotnet user-secrets set <NAME> <VALUE>
 ```
 
 Lsit secrets
+
 ```sh
 dotnet user-secrets list
 ```
 
-#### Entity Framework ([docs](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet))
+### Entity Framework ([docs](https://docs.microsoft.com/en-us/ef/core/miscellaneous/cli/dotnet))
+
 Update the database to a specified migration
+
 ```sh
 dotnet ef database update --project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj --startup-project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj
 ```
 
 Drop the database
+
 ```sh
 dotnet ef database drop --project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj --startup-project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj
 ```
 
 Add a new migration
+
 ```sh
 dotnet ef migrations add <NAME> --project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj --startup-project .\src\BestClipOfTheWeek\BestClipOfTheWeek.csproj
 ```
 
-#### npm ([docs](https://nodejs.org/en/download/package-manager/))
+### npm ([docs](https://nodejs.org/en/download/package-manager/))
+
 To install on Linux run
+
 ```sh
 curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
 sudo apt-get install -y nodejs
@@ -124,14 +140,17 @@ node --version
 ```
 
 To install on Windows run
+
 ```ps
 choco install -y nodejs.install
 refreshenv
 node --version
 ```
 
-#### yarn ([docs](https://yarnpkg.com/lang/en/docs/install/))
+### yarn ([docs](https://yarnpkg.com/lang/en/docs/install/))
+
 To install on Linux run
+
 ```sh
 curl -sS https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
 echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
@@ -140,16 +159,19 @@ yarn --version
 ```
 
 To install on Windows run
+
 ```ps
 choco install -y yarn
 refreshenv
 yarn --version
 ```
 
-#### Set up Third-Party Authentication ([docs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/index))
+### Set up Third-Party Authentication ([docs](https://docs.microsoft.com/en-us/aspnet/core/security/authentication/social/index))
+
 Follow instructions in the docs.
 
 ## Support
+
 Feel free to contact me directly with any questions or concerns related to the site. I'm definitely open to criticism, ideas, suggestions and even more open to praise.
 
 [Contact me](mailto:justinprobb@gmail.com)
