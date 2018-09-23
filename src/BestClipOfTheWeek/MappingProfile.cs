@@ -8,11 +8,9 @@ namespace BestClipOfTheWeek
     {
         public MappingProfile()
         {
-            CreateMap<Term, TermViewModel>()
-                .ForMember(dest => dest.Term, opts => opts.MapFrom(src => src.Name));
+            CreateMap<Term, TermViewModel>();
 
-            CreateMap<TermViewModel, Term>()
-                .ForMember(dest => dest.Name, opts => opts.MapFrom(src => src.Term));
+            CreateMap<TermViewModel, Term>();
         }
     }
 }

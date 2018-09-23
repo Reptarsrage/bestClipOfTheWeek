@@ -26,7 +26,7 @@ export default class TermList extends Component {
       const { name, color, termId } = term;
       const style = { color };
       return (
-        <div className="list-group-item" key={termId} style={style} title={name}>
+        <div className="list-group-item border-0" key={termId} style={style} title={name}>
           <span className="lead">{name}</span>
         </div>
       );

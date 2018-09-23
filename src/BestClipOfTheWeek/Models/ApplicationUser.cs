@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity;
 using System.Collections.Generic;
 
 namespace BestClipOfTheWeek.Models
@@ -11,11 +11,11 @@ namespace BestClipOfTheWeek.Models
             Terms = new List<Term>();
         }
 
-        public virtual List<Term> Terms { get; set; }
+        public List<Term> Terms { get; set; }
 
-        public static IEnumerable<Term> GetDefaultTerms()
+        public static List<Term> GetDefaultTerms()
         {
-            return new[]
+            return new List<Term>
             {
                 new Term { Name = "Alpha", Color = "#ff0000", Enabled = true },
                 new Term { Name = "Bravo", Color = "#ff8000", Enabled = true },

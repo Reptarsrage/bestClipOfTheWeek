@@ -42,7 +42,7 @@ namespace BestClipOfTheWeek.Controllers
 
                 return Json(terms?
                                 .Select(t => _mapper.Map<TermViewModel>(t))
-                                .OrderBy(t => t.Term) ?? Enumerable.Empty<TermViewModel>());
+                                .OrderBy(t => t.Name) ?? Enumerable.Empty<TermViewModel>());
             }
             catch (Exception e)
             {

@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
 using BestClipOfTheWeek.Models;
@@ -45,7 +45,7 @@ namespace BestClipOfTheWeek.Areas.Identity.Pages.Account
             returnUrl = returnUrl ?? Url.Content("~/");
             if (ModelState.IsValid)
             {
-                var user = new ApplicationUser {UserName = Input.Email, Email = Input.Email};
+                var user = new ApplicationUser {UserName = Input.Email, Email = Input.Email, Terms = ApplicationUser.GetDefaultTerms()};
                 var result = await _userManager.CreateAsync(user, Input.Password);
                 if (result.Succeeded)
                 {
