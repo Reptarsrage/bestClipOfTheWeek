@@ -1,11 +1,15 @@
 /* global $ */
+import 'odometer/themes/odometer-theme-minimal.css';
 import React, { Component } from 'react';
+import Odometer from 'react-odometerjs';
 
 import LoadingButton from './LoadingButton';
 import SelectedVideoInfo from './SelectedVideoInfo';
 import PlaylistVideoList from './PlaylistVideoList';
 import PlaylistGraph from './PlaylistGraph';
 import TermList from './TermList';
+import VoteResultsGraph from './VoteResultsGraph';
+import VoteResultsList from './VoteResultsList';
 import YouTubeService from '../youtubeService';
 import { getChannelPlaylistVideosAsync, getTermsAsync, processVotes } from '../reportProvider';
 
@@ -25,7 +29,7 @@ export default class Index extends Component {
       comments: {
         count: 0,
         error: undefined,
-        fetching: true,
+        fetching: false,
         total: 0,
       },
       votes: {
@@ -46,6 +50,7 @@ export default class Index extends Component {
     this.fetchPlaylistVideosAsync = this.fetchPlaylistVideosAsync.bind(this);
     this.fetchTermsAsync = this.fetchTermsAsync.bind(this);
     this.changeSelectedVideo = this.changeSelectedVideo.bind(this);
+    this.processUpdates = this.processUpdates.bind(this);
   }
 
   changeSelectedVideo(video) {
@@ -53,10 +58,6 @@ export default class Index extends Component {
   }
 
   async componentDidMount() {
-    // Init bootstrap elements
-    const btn = document.getElementById('topSectionCollapseBtn');
-    $(btn).collapse();
-
     await this.fetchPlaylistVideosAsync();
     await this.fetchTermsAsync();
   }
@@ -77,70 +78,108 @@ export default class Index extends Component {
     // Fetch playlist terms
     const terms = await getTermsAsync();
 
+    const votes = {};
+    for (const term of terms) {
+      votes[term.name] = { ...term, votes: 0 };
+    }
+
     // Set state
-    this.setState(prevState => ({ ...prevState, terms: { ...prevState.terms, fetching: false, terms } }));
+    this.setState(prevState => ({
+      ...prevState,
+      terms: {
+        ...prevState.terms,
+        fetching: false,
+        terms,
+      },
+      votes: {
+        ...prevState.votes,
+        votes,
+      },
+    }));
+  }
+
+  processUpdates(commentsBatchResults) {
+    // Process Votes
+    const { votes: votesState } = this.state;
+    const { votes, voters } = votesState;
+    const voteResults = processVotes(commentsBatchResults, votes, voters);
+
+    // Set state
+    this.setState(prevState => ({
+      ...prevState,
+      comments: {
+        ...prevState.comments,
+        count: prevState.comments.count + commentsBatchResults.length,
+      },
+      votes: {
+        ...prevState.votes,
+        ...voteResults,
+      },
+    }));
   }
 
   // TODO: try / catch error processing
   async startParsingYouTubeCommentsAsync() {
-    const { selectedVideo, comments, votes: votesState } = this.state;
+    const { selectedVideo, votes: votesState } = this.state;
+    const { votes } = votesState;
 
     if (selectedVideo && selectedVideo.id) {
       const { id, commentCount } = selectedVideo;
+
+      // reset votes
+      for (const key of Object.keys(votes)) {
+        votes[key] = { ...votes[key], count: 0 };
+      }
 
       // Reset
       this.setState(prevState => ({
         ...prevState,
         selectedVideo: {
           ...selectedVideo,
-          total: commentCount,
         },
         comments: {
           ...prevState.comments,
-          comments: [],
+          count: 0,
           error: undefined,
-          fetching: false,
-          nextPageToken: '',
+          fetching: true,
+          total: commentCount,
+        },
+        votes: {
+          fetching: true,
+          voters: {},
+          votes,
         },
       }));
 
       // Collapse top
-      const btn = document.getElementById('topSectionCollapseBtn');
-      $(btn).collapse('hide');
+      const collapse = document.getElementById('topSectionCollapse');
+      $(collapse).collapse('hide');
 
       // Start fetching comments
       const service = new YouTubeService();
-      await service.getAllCommentsForVideo(id, 500, commentsBatchResults => {
-        // Process comment count
-        const count = comments.count + commentsBatchResults.length;
+      await service.getAllCommentsForVideo(id, 500, this.processUpdates);
 
-        // Process Votes
-        const { votes, voters } = votesState;
-        const voteResults = processVotes(commentsBatchResults, votes, voters);
-
-        // Set state
-        this.setState(prevState => ({
-          ...prevState,
-          comments: {
-            ...prevState.comments,
-            fetching: true,
-            count,
-          },
-          votes: {
-            ...prevState.votes,
-            ...voteResults,
-            fetching: true,
-          },
-        }));
-      });
+      // Finish
+      this.setState(prevState => ({
+        ...prevState,
+        comments: {
+          ...prevState.comments,
+          fetching: false,
+        },
+        votes: {
+          ...prevState.votes,
+          fetching: false,
+        },
+      }));
     }
   }
 
   render() {
-    const { selectedVideo, comments, playlistVideos, primaryColor, terms, channelName, playlistName } = this.state;
-    const { fetching } = comments;
+    const { selectedVideo, comments, playlistVideos, primaryColor, terms, channelName, playlistName, votes } = this.state;
+    const { fetching, total, count } = comments;
     const title = fetching ? 'Loading...' : 'Start';
     const id = (selectedVideo && selectedVideo.id) || '';
+    const showResults = fetching || count > 0;
 
     return (
       <div>
@@ -184,6 +223,27 @@ export default class Index extends Component {
             <div className="full card ease">
               <PlaylistGraph channelName={channelName} playlistName={playlistName} primaryColor={primaryColor} playlistVideos={{ ...playlistVideos }} />
             </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className="col-lg-6 mb-4">
+            <div className={showResults ? 'full card ease' : 'd-none ease'}>
+              <VoteResultsList votes={{ ...votes }} primaryColor={primaryColor} />
+            </div>
+          </div>
+          <div className="col-lg-6 mb-4">
+            <div className={showResults ? 'full card ease' : 'd-none ease'}>
+              <VoteResultsGraph votes={{ ...votes }} primaryColor={primaryColor} />
+            </div>
+          </div>
+        </div>
+
+        <div className="row">
+          <div className={showResults ? 'col-lg-12 mb-4 ease' : 'col-lg-12 mb-4 ease'}>
+            <h2>
+              <Odometer format="(,ddd)" value={count} /> of <Odometer format="(,ddd)" value={total} /> Comments loaded
+            </h2>
           </div>
         </div>
       </div>
