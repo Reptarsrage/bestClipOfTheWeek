@@ -5,33 +5,15 @@ root = true
 
 # Unix-style newlines with a newline ending every file
 [*]
+charset = utf-8
 indent_style = space
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
+indent_size = 2
 
 [*.md]
 trim_trailing_whitespace = false
 
-# Matches multiple files with brace expansion notation
-# Set default charset
-[*.{jsx,js,sass,scss,css,cs}]
-charset = utf-8
-
 [**.cs]
-indent_style = space
 indent_size = 4
-
-[ClientApp/**.{scss,css,sass}]
-indent_style = space
-indent_size = 2
-
-# Indentation override for all JS under ClientApp directory
-[ClientApp/**.{js,jsx}]
-indent_style = space
-indent_size = 2
-
-# Matches the exact files either package.json or .travis.yml
-[{package.json,webpack.config.js}]
-indent_style = space
-indent_size = 2
