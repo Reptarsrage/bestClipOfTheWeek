@@ -1,6 +1,56 @@
 import axios from 'axios';
 
 export default class YouTubeService {
+  static chooseWorstImage(item) {
+    const { thumbnails } = item.snippet;
+    let image;
+
+    if (thumbnails.default) {
+      image = thumbnails.default;
+    } else if (thumbnails.medium) {
+      image = thumbnails.medium;
+    } else if (thumbnails.high) {
+      image = thumbnails.high;
+    } else if (thumbnails.standard) {
+      image = thumbnails.standard;
+    } else if (thumbnails.maxres) {
+      image = thumbnails.maxres;
+    } else {
+      return undefined;
+    }
+
+    return {
+      height: image.height,
+      url: image.url,
+      width: image.width,
+    };
+  }
+
+  static chooseBestImage(item) {
+    const { thumbnails } = item.snippet;
+    let image;
+
+    if (thumbnails.maxres) {
+      image = thumbnails.maxres;
+    } else if (thumbnails.standard) {
+      image = thumbnails.standard;
+    } else if (thumbnails.high) {
+      image = thumbnails.high;
+    } else if (thumbnails.medium) {
+      image = thumbnails.medium;
+    } else if (thumbnails.default) {
+      image = thumbnails.default;
+    } else {
+      return undefined;
+    }
+
+    return {
+      height: image.height,
+      url: image.url,
+      width: image.width,
+    };
+  }
+
   constructor() {
     this.baseUrl = 'https://www.googleapis.com/youtube/v3';
     this.infoCacheTime = 86400; // seconds
@@ -26,20 +76,8 @@ export default class YouTubeService {
       commentCount: parseInt(item.statistics.commentCount, 10),
       dislikeCount: parseInt(item.statistics.dislikeCount, 10),
       id: item.id,
-      imageMaxRes: !item.snippet.thumbnails.maxres
-        ? undefined
-        : {
-            height: item.snippet.thumbnails.maxres.height, // eslint-disable-line indent
-            url: item.snippet.thumbnails.maxres.url, // eslint-disable-line indent
-            width: item.snippet.thumbnails.maxres.width, // eslint-disable-line indent
-          }, // eslint-disable-line indent
-      imageMedium: !item.snippet.thumbnails.medium
-        ? undefined
-        : {
-            height: item.snippet.thumbnails.medium.height, // eslint-disable-line indent
-            url: item.snippet.thumbnails.medium.url, // eslint-disable-line indent
-            width: item.snippet.thumbnails.medium.width, // eslint-disable-line indent
-          }, // eslint-disable-line indent
+      imageMaxRes: this.constructor.chooseBestImage(item),
+      imageMedium: this.constructor.chooseWorstImage(item),
       likeCount: parseInt(item.statistics.likeCount, 10),
       publishedDate: new Date(Date.parse(item.snippet.publishedAt)),
       title: item.snippet.title,

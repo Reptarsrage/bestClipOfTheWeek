@@ -1,7 +1,7 @@
 import '@babel/polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Route } from 'react-router-dom';
 
 import Index from './components/Index';
 
@@ -17,9 +17,9 @@ const baseUrl = document.getElementsByTagName('base')[0].getAttribute('href');
 // Define render
 const renderApp = () => {
   ReactDOM.render(
-    <BrowserRouter basename={baseUrl}>
-      <Index />
-    </BrowserRouter>,
+    <MemoryRouter basename={baseUrl}>
+      <Route path="/" component={Index} />
+    </MemoryRouter>,
     rootElement,
   );
 };

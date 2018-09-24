@@ -11,6 +11,7 @@ import TermList from './TermList';
 import VoteResultsGraph from './VoteResultsGraph';
 import VoteResultsList from './VoteResultsList';
 import YouTubeService from '../youtubeService';
+import VoteTabControl from './VoteTabControl';
 import { getChannelPlaylistVideosAsync, getTermsAsync, processVotes } from '../reportProvider';
 
 export default class Index extends Component {
@@ -54,7 +55,10 @@ export default class Index extends Component {
   }
 
   changeSelectedVideo(video) {
-    this.setState(prevState => ({ ...prevState, selectedVideo: { ...video } }));
+    this.setState(prevState => ({
+      ...prevState,
+      selectedVideo: { ...video },
+    }));
   }
 
   async componentDidMount() {
@@ -226,6 +230,14 @@ export default class Index extends Component {
           </div>
         </div>
 
+        <div className={showResults ? 'row ease' : 'd-none ease'}>
+          <div className="col mb-4">
+            <h2>
+              <Odometer format="(,ddd)" value={count} /> of <Odometer format="(,ddd)" value={total} /> Comments loaded
+            </h2>
+          </div>
+        </div>
+
         <div className="row">
           <div className="col-lg-6 mb-4">
             <div className={showResults ? 'full card ease' : 'd-none ease'}>
@@ -241,9 +253,7 @@ export default class Index extends Component {
 
         <div className="row">
           <div className={showResults ? 'col-lg-12 mb-4 ease' : 'col-lg-12 mb-4 ease'}>
-            <h2>
-              <Odometer format="(,ddd)" value={count} /> of <Odometer format="(,ddd)" value={total} /> Comments loaded
-            </h2>
+            <VoteTabControl votes={{ ...votes }} primaryColor={primaryColor} selectedVideo={{ ...selectedVideo }} terms={{ ...terms }} {...this.props} />
           </div>
         </div>
       </div>

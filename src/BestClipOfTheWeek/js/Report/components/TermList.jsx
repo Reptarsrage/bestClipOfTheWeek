@@ -14,7 +14,7 @@ export default class TermList extends Component {
     if (terms.length === 0) {
       return (
         <div className="flex-center h-100 flex-column">
-          <span>No terms configured.</span>
+          <span>No terms configured</span>
           <a href="/Terms">
             Configure terms <i className="fas fa-external-link-alt" />
           </a>

@@ -59,6 +59,53 @@ export const processVotes = (comments, oldVotes, oldVoters) => {
   return { voters, votes };
 };
 
+export const sortComments = comments => {
+  const alreadyMoved = {};
+  for (let i = 0; i < comments.length; i += 1) {
+    const comment = comments[i];
+    if (comment.parentId && !(comment.id in alreadyMoved)) {
+      comments.splice(i, 1);
+      const idx = comments.findIndex(parent => parent.id === comment.parentId);
+      comments.splice(idx + 1, 0, comment);
+      alreadyMoved[comment.id] = true;
+    }
+  }
+
+  return comments;
+};
+
+export const parseComments = (comments, terms) =>
+  comments.map(comment => {
+    const pieces = [];
+    pieces.push({ color: '', isTerm: false, text: comment.text });
+    for (const { color, name } of terms) {
+      const regex = new RegExp(name, 'i');
+      for (let i = 0; i < pieces.length; i += 1) {
+        if (pieces[i].isTerm) {
+          continue;
+        }
+        const piece = pieces[i].text;
+        const idx = piece.search(regex);
+        if (idx < 0) {
+          continue;
+        }
+        const expandedPiece = [];
+        expandedPiece.push({ color: '', isTerm: false, text: piece.substring(0, idx) });
+        expandedPiece.push({ color, isTerm: true, text: piece.substring(idx, idx + name.length) });
+        expandedPiece.push({ color: '', isTerm: false, text: piece.substring(idx + name.length, piece.length) });
+        pieces.splice(i, 1, ...expandedPiece.filter(p => p.text.length > 0));
+        i -= 1;
+      }
+    }
+
+    // Set piece Ids
+    for (let i = 0; i < pieces.length; i += 1) {
+      pieces[i].id = i;
+    }
+
+    return { ...comment, pieces };
+  });
+
 const batchProcessComments = (comments, terms) => {
   const votes = [];
 

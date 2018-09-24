@@ -148,3 +148,11 @@
     transform: rotateY(360deg);
   }
 }
+
+.comment-border-primary {
+  border-left: 3px solid #2196F3 !important
+}
+
+.comment-border-secondary {
+  border-left: 3px solid #dfdfdf !important;
+}

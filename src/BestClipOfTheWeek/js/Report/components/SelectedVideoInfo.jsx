@@ -15,7 +15,7 @@ export default class SelectedVideoInfo extends Component {
     if (!selectedVideo || !selectedVideo.id) {
       return (
         <div className="flex-center h-100 flex-column">
-          <span>No video selected.</span>
+          <span>No video selected</span>
           <button className="btn btn-link btn-sm" type="button" onClick={this.constructor.expandTop}>
             Select a video
           </button>
