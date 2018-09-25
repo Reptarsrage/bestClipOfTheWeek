@@ -1,4 +1,4 @@
-﻿# [Best Clip Of The Week](https://www.bestclipoftheweek.com/)
+# [Best Clip Of The Week](https://www.bestclipoftheweek.com/)
 
 ## An ASP.NET Core 2.1 Web App
 
@@ -66,12 +66,23 @@ I had a super fun time making this site. Flaws and all I think it turned out pre
 - [x] Migrate site to Net Core 2.0
 - [x] Update site to SSL
 - [x] Add Application Insights
+- [x] Migrate site to Net Core 2.1
+- [x] Improve YouTube & Google+ comment parsing logic to avoid so many missed comments
+- [x] Add Unit tests
+- [x] Set up a deployment pipeline (Appveyor/Github/CodeCov)
+- [x] Update Pie chart controls
 - [ ] Add site logging to Splunk & Datadog
-- [ ] Add Unit tests
 - [ ] Add Integration tests
-- [ ] Set up a deployment pipeline (Octo/TeamCity)
 - [ ] Move client side logic to server side with caching & storage
-- [ ] Improve YouTube & Google+ comment parsing logic to avoid so many missed comments
+- [ ] Add form validation
+- [ ] Add animation
+- [ ] Add Error handeling
+- [ ] Add Splash home page
+- [ ] About
+- [ ] Contact
+- [ ] SEO
+- [ ] Localization
+- [ ] [Accessibility](https://www.w3.org/WAI/standards-guidelines/aria/)
 
 ## Useful Notes
 
