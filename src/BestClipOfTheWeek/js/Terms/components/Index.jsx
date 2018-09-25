@@ -74,7 +74,7 @@ export default class Index extends Component {
     return terms.find(t => t.termId === termId);
   }
 
-  handleKeyDown(event) {
+  async handleKeyDown(event) {
     const { colorPickerState } = this.state;
     const { colorPickerShown } = colorPickerState;
 
@@ -85,8 +85,8 @@ export default class Index extends Component {
     }
   }
 
-  handleColorPickerChangeComplete(e) {
-    const { newTerm, colorPickerState, termsState } = this.state;
+  async handleColorPickerChangeComplete(e) {
+    const { newTerm, colorPickerState, termsState, termsService } = this.state;
     const { selectedTerm } = colorPickerState;
     const { terms } = termsState;
 
@@ -101,7 +101,12 @@ export default class Index extends Component {
     } else {
       const term = terms.find(t => t.termId === selectedTerm.termId);
       term.color = e.hex;
+
+      // Update UI
       this.forceUpdate();
+
+      // Upddate server
+      await termsService.updateTerm(term);
     }
 
     this.setState(prevState => ({
@@ -125,7 +130,7 @@ export default class Index extends Component {
     }));
   }
 
-  handleTermChange(e) {
+  async handleTermChange(e) {
     if (!e || !e.target) {
       return;
     }
@@ -137,12 +142,23 @@ export default class Index extends Component {
     }
 
     // Update the term and force state update
+    const { termsService } = this.state;
     if (e.target.name === 'name') {
       term.name = e.target.value;
+
+      // Update UI
       this.forceUpdate();
+
+      // Upddate server
+      await termsService.updateTerm(term);
     } else if (e.target.name === 'enabled') {
       term.enabled = e.target.checked;
+
+      // Update UI
       this.forceUpdate();
+
+      // Upddate server
+      await termsService.updateTerm(term);
     }
   }
 
@@ -176,7 +192,7 @@ export default class Index extends Component {
     }));
   }
 
-  handleTermDelete(e) {
+  async handleTermDelete(e) {
     if (!e || !e.target) {
       return;
     }
@@ -188,10 +204,11 @@ export default class Index extends Component {
     }
 
     // Remove target term
-    const { termsState } = this.state;
+    const { termsState, termsService } = this.state;
     let { terms } = termsState;
     terms = terms.filter(({ termId }) => termId !== term.termId);
 
+    // Update UI
     this.setState(prevState => ({
       ...prevState,
       termsState: {
@@ -199,6 +216,9 @@ export default class Index extends Component {
         terms,
       },
     }));
+
+    // Upddate server
+    await termsService.deleteTerm(term.termId);
   }
 
   handleNewTermChange(e) {
@@ -223,15 +243,21 @@ export default class Index extends Component {
     }));
   }
 
-  handleNewTermCreate(e) {
+  async handleNewTermCreate(e) {
     if (!e || !e.target) {
       return;
     }
 
-    const { termsState, newTerm } = this.state;
+    const { termsState, newTerm, termsService } = this.state;
     const { terms } = termsState;
-    terms.push(newTerm);
 
+    // Upddate server
+    const { termId } = await termsService.createTerm(newTerm);
+
+    // Set id
+    terms.push({ ...newTerm, termId });
+
+    // Update UI
     this.setState(prevState => ({
       ...prevState,
       newTerm: {

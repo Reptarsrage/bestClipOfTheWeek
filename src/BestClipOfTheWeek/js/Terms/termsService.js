@@ -8,7 +8,7 @@ export default class TermsService {
   }
 
   async createTerm(term) {
-    const response = await axios.post('/api/Terms', term);
+    const response = await axios.post('/api/Terms', { ...term, termId: undefined });
     const { data } = response;
     return data;
   }
