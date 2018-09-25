@@ -156,3 +156,32 @@
 .comment-border-secondary {
   border-left: 3px solid #dfdfdf !important;
 }
+
+.swatch {
+  background: #ffffff;
+  border-radius: 1px;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .1);
+  cursor: pointer;
+  display: inline-block;
+  padding: 5px;
+  position: relative;
+}
+
+.swatch-color {
+  border-radius: 2px;
+  height: 14px;
+  width: 36px;
+}
+
+.popover {
+  position: absolute;
+  z-index: 2;
+}
+
+.cover {
+  bottom: 0;
+  left: 0;
+  position: fixed;
+  right: 0;
+  top: 0;
+}

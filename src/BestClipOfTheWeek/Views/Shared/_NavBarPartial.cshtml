@@ -1,4 +1,4 @@
-﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Identity
 @inject SignInManager<ApplicationUser> SignInManager
 
 @{
@@ -20,6 +20,14 @@
                     <i class="fas fa-home"></i>&nbsp;<span>Home</span>
                 </a>
             </li>
+            @if (SignInManager.IsSignedIn(User))
+            {
+              <li class="nav-item @Html.IsActive("Terms", "Index")">
+                <a asp-area="" asp-controller="Terms" asp-action="Index" class="nav-link">
+                  <i class="fas fa-edit"></i>&nbsp;<span>Edit Terms</span>
+                </a>
+              </li>
+            }
             <li class="nav-item @Html.IsActive("Home", "About")">
                 <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">
                     <i class="fas fa-home"></i>&nbsp;<span>About</span>

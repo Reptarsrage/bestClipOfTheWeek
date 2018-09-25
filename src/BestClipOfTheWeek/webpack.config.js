@@ -1,12 +1,12 @@
 const path = require('path');
 const fs = require('fs');
 const webpack = require('webpack');
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const outputDir = './wwwroot/dist';
 const appDirectory = fs.realpathSync(process.cwd());
 const resolveApp = relativePath => path.resolve(appDirectory, relativePath);
-module.exports = (env) => {
+module.exports = env => {
   const isDevBuild = !(env && env.prod);
 
   const config = {
@@ -16,7 +16,7 @@ module.exports = (env) => {
     output: {
       path: path.join(__dirname, outputDir),
       filename: '[name].js',
-      publicPath: 'dist/'
+      publicPath: 'dist/',
     },
     module: {
       rules: [
@@ -24,55 +24,57 @@ module.exports = (env) => {
           exclude: /\.(html|js|jsx|s?css|json|jpe?g|png|gif|bmp)$/i,
           loader: require.resolve('file-loader'),
           options: {
-            name: 'static/media/[name].[ext]'
-          }
+            name: 'static/media/[name].[ext]',
+          },
         },
         {
           test: /\.(jpe?g|png|gif|bmp)$/i,
           loader: require.resolve('url-loader'),
           options: {
             limit: 10000,
-            name: 'static/media/[name].[ext]'
-          }
+            name: 'static/media/[name].[ext]',
+          },
         },
         {
           test: /\.(js|jsx)$/,
           include: resolveApp('js'),
           loader: require.resolve('babel-loader'),
           options: {
-            cacheDirectory: true
-          }
+            cacheDirectory: true,
+          },
         },
         {
           test: /\.css$/,
-          use:[
-            MiniCssExtractPlugin.loader,
-            'css-loader'
-          ]
-        }
-      ]
+          use: [MiniCssExtractPlugin.loader, 'css-loader'],
+        },
+      ],
     },
     entry: {
       site: './js/site.js',
       cookieContent: './js/cookieContent.js',
       qrcode: './js/qrcode.js',
-      report: './js/Report/index.jsx'
+      report: './js/Report/index.jsx',
+      terms: './js/Terms/index.jsx',
     },
     plugins: [
       new MiniCssExtractPlugin({
-        filename: "[name].css"
-      })
-    ].concat(isDevBuild ? [
-      // Plugins that apply in development builds only
-      new webpack.SourceMapDevToolPlugin({
-        filename: '[file].map',
-        moduleFilenameTemplate: path.relative(outputDir, '[resourcePath]')
-      })
-    ] : [
-      // Plugins that apply in production builds only
-      new webpack.NoEmitOnErrorsPlugin(),
-      new webpack.optimize.OccurrenceOrderPlugin()
-    ])
+        filename: '[name].css',
+      }),
+    ].concat(
+      isDevBuild
+        ? [
+            // Plugins that apply in development builds only
+            new webpack.SourceMapDevToolPlugin({
+              filename: '[file].map',
+              moduleFilenameTemplate: path.relative(outputDir, '[resourcePath]'),
+            }),
+          ]
+        : [
+            // Plugins that apply in production builds only
+            new webpack.NoEmitOnErrorsPlugin(),
+            new webpack.optimize.OccurrenceOrderPlugin(),
+          ],
+    ),
   };
 
   return [config];

@@ -29,6 +29,11 @@ namespace BestClipOfTheWeek.Controllers
             _mapper = mapper;
         }
 
+        public IActionResult Index()
+        {
+            return View();
+        }
+
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<TermViewModel>), 200)]
         [ProducesResponseType(401)]
