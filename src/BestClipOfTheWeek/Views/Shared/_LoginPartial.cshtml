@@ -4,14 +4,23 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-    <form asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})" method="post" id="logoutForm" class="form-inline my-2 my-lg-0">
-        <div class="form-row">
-            <a asp-area="Identity" asp-page="/Account/Manage/Index" class="form-control mr-2 text-light" title="Manage">Hello @UserManager.GetUserName(User)!</a>
-            <div class="col">
-                <button type="submit" class="btn btn-success my-2 my-sm-0">Logout</button>
-            </div>
-        </div>
-    </form>
+  <form class="nav-item dropdown" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})" method="post" id="logoutForm">
+    <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      @UserManager.GetUserName(User)
+    </a>
+    <div class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+      <a asp-area="Identity" asp-page="/Account/Manage/Index" class="dropdown-item text-dark" title="Manage">
+        <i class="fas fa-cog"></i>
+        &nbsp;
+        Manage Account
+      </a>
+      <button type="submit" class="btn-link pointer dropdown-item text-dark">
+        <i class="fas fa-sign-out-alt"></i>
+        &nbsp;
+        Logout
+      </button>
+    </div>
+  </form>
 }
 else
 {
