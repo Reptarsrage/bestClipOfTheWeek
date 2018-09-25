@@ -20,10 +20,11 @@ export default class VoteResultsList extends Component {
             const { votes: count, color, name, termId } = value;
             const style = { color };
             return (
-              <div className="list-group-item" key={termId} style={style} title={name}>
+              <div className="list-group-item border-0" key={termId} style={style} title={name}>
                 <span className="mr-2">{name}</span>
                 &nbsp;
                 <Odometer format="(,ddd)" value={count} />
+                <hr className="p-0 m-0" />
               </div>
             );
           })
@@ -34,7 +35,7 @@ export default class VoteResultsList extends Component {
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">{title}</h5>
         </header>
-        <div className="list-group short-list min-height-short">{items}</div>
+        <div className="list-group medium-list min-height-medium">{items}</div>
       </section>
     );
   }

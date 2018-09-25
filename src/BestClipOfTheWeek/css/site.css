@@ -19,7 +19,7 @@
 }
 
 .custom-tooltip {
-  background: rgba(255, 255, 255, .9);
+  background: rgba(255, 255, 255, 0.9);
   max-width: 50vw;
   overflow: hidden;
 }
@@ -71,13 +71,22 @@
   cursor: pointer;
 }
 
+.medium-list {
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.min-height-medium {
+  min-height: 500px;
+}
+
 .short-list {
   max-height: 275px;
   overflow-y: auto;
 }
 
 .playlist-videos {
-  padding: .5rem 0;
+  padding: 0.5rem 0;
 }
 
 .playlist-videos img {
@@ -94,7 +103,7 @@
 }
 
 .ease {
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 }
 
 .full {
@@ -138,8 +147,8 @@
 }
 
 .comment {
-  border-left: .5rem solid #bebebe;
-  padding-left: .5rem;
+  border-left: 0.5rem solid #bebebe;
+  padding-left: 0.5rem;
 }
 
 @keyframes rotation {
@@ -150,7 +159,7 @@
 }
 
 .comment-border-primary {
-  border-left: 3px solid #2196F3 !important
+  border-left: 3px solid #2196f3 !important;
 }
 
 .comment-border-secondary {
@@ -160,7 +169,7 @@
 .swatch {
   background: #ffffff;
   border-radius: 1px;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, .1);
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.1);
   cursor: pointer;
   display: inline-block;
   padding: 5px;

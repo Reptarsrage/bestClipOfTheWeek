@@ -28,6 +28,7 @@ export default class TermList extends Component {
       return (
         <div className="list-group-item border-0" key={termId} style={style} title={name}>
           <span className="lead">{name}</span>
+          <hr className="p-0 m-0" />
         </div>
       );
     });

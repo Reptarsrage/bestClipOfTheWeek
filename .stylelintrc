@@ -25,6 +25,7 @@
         "name": "media"
       }
     ],
+    "number-leading-zero": "always",
     "order/properties-alphabetical-order": true,
   }
 }

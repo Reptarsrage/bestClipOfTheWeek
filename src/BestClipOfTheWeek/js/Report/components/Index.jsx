@@ -239,12 +239,12 @@ export default class Index extends Component {
         </div>
 
         <div className="row">
-          <div className="col-lg-6 mb-4">
+          <div className="col-lg-5 col-xl-3 mb-4">
             <div className={showResults ? 'full card ease' : 'd-none ease'}>
               <VoteResultsList votes={{ ...votes }} primaryColor={primaryColor} />
             </div>
           </div>
-          <div className="col-lg-6 mb-4">
+          <div className="col-lg-7 col-xl-9 mb-4">
             <div className={showResults ? 'full card ease' : 'd-none ease'}>
               <VoteResultsGraph votes={{ ...votes }} primaryColor={primaryColor} />
             </div>

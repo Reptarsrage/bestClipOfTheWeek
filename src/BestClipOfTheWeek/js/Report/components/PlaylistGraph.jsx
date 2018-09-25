@@ -76,7 +76,7 @@ export default class PlaylistGraph extends Component {
 
   saveSvgAsPng() {
     const element = document.querySelector('.js-playlist-graph svg.recharts-surface');
-    saveSvgAsPng(element, 'graph.png');
+    saveSvgAsPng(element, 'playlistVideosChart.png', { scale: 2 });
   }
 
   getFilterToolbar() {
