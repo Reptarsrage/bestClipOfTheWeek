@@ -99,21 +99,23 @@ export default class Index extends Component {
         },
       }));
     } else {
-      const term = terms.find(t => t.termId === selectedTerm.termId);
-      term.color = e.hex;
-
-      // Update UI
-      this.forceUpdate();
+      const index = terms.findIndex(t => t.termId === selectedTerm.termId);
+      terms[index] = { ...terms[index], color: e.hex };
 
       // Upddate server
-      await termsService.updateTerm(term);
+      await termsService.updateTerm(terms[index]);
     }
 
+    // Update UI
     this.setState(prevState => ({
       ...prevState,
       colorPickerState: {
         ...prevState.colorPickerState,
         colorPickerColor: e.hex,
+      },
+      termsState: {
+        ...prevState.termsState,
+        terms,
       },
     }));
   }
