@@ -9,7 +9,12 @@
 }
 
 <nav class="navbar navbar-expand-md navbar-dark bg-primary">
-    <a asp-area="" asp-controller="@HomeController" asp-action="Index" class="navbar-brand">BestClipOfTheWeek</a>
+    <a asp-area="" asp-controller="@HomeController" asp-action="Index" class="navbar-brand">
+      <svg class="svg-inline--fa" fill="#FFFFFF" height=64 style="width: auto; height: 64px;" width=64>
+        <use href="/dist/static/media/icons.svg#icon-logo" />
+      </svg>
+      <span class="d-none d-xl-inline">Best Clip of the Week</span>
+    </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
