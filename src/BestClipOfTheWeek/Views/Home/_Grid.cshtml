@@ -1,0 +1,41 @@
+@{
+    var ColCount = 12;
+    var RowCount = 9;
+    var Tints = new[] {"#eef7fe", "#dbeefd", "#c8e5fc", "#b6dcfb", "#a3d4fa", "#91cbf9" };
+    var Rando = new Random();
+}
+
+@for (var row = 0; row < RowCount; row++)
+{
+  <div class="row align-items-stretch">
+    @for (var col = 0; col < ColCount; col++)
+    {
+      string className;
+      var tint = Tints[Rando.Next(Tints.Length)];
+      if (col <= 1 || col >= ColCount - 2)
+      {
+        className = "d-none d-xl-flex";
+      } else if (col <= 2 || col >= ColCount - 3)
+      {
+        className = "d-none d-lg-flex";
+      }
+      else if (col <= 3 || col >= ColCount - 4)
+      {
+        className = "d-none d-md-flex";
+      }
+      else if (col <= 3 || col >= ColCount - 5)
+      {
+        className = "d-none d-sm-flex";
+      }
+      else
+      {
+        className = "d-flex";
+      }
+
+      <div class="m-0 p-0 flex-full @className">
+        <div class="aspect-ratio-4-3" style="background: @tint;">
+        </div>
+      </div>
+    }
+  </div>
+}

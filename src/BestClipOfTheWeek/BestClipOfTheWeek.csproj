@@ -27,6 +27,9 @@
     <Content Update="appsettings.local.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Update="Views\Home\_Grid.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
     <Content Update="Views\Terms\Index.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>

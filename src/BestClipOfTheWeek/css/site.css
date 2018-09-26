@@ -194,3 +194,20 @@
   right: 0;
   top: 0;
 }
+
+.aspect-ratio-4-3 {
+  padding-top: 75%; /* 4:3 Aspect Ratio */
+  position: relative;
+  width: 100%;
+}
+
+.absolute-center {
+  align-items: center;
+  display: flex;
+  height: 100%;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: 0;
+  width: 100%;
+}
