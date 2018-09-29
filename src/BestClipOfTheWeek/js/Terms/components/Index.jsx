@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { GridLoader } from 'halogenium';
 import { SketchPicker } from 'react-color';
 
-import TermsService from '../termsService';
+import TermsService from '../../termsService';
 
 export default class Index extends Component {
   constructor() {

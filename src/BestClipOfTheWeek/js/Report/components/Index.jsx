@@ -10,7 +10,7 @@ import PlaylistGraph from './PlaylistGraph';
 import TermList from './TermList';
 import VoteResultsGraph from './VoteResultsGraph';
 import VoteResultsList from './VoteResultsList';
-import YouTubeService from '../youtubeService';
+import YouTubeService from '../../youtubeService';
 import VoteTabControl from './VoteTabControl';
 import { getChannelPlaylistVideosAsync, getTermsAsync, processVotes } from '../reportProvider';
 

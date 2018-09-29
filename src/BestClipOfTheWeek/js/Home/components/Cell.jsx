@@ -34,13 +34,19 @@ export default class Cell extends Component {
   }
 
   render() {
-    const { frontColor, backColor } = this.props;
+    const { frontColor, backColor, image } = this.props;
     const { isFlipped } = this.state;
+
+    const imageElt = image ? <img style={{ width: '100%', height: '100%', opacity: 0.3 }} src={image} alt="" /> : null;
 
     return (
       <ReactCardFlip className="h-100 w-100" isFlipped={isFlipped} infinite flipSpeedFrontToBack={2} flipSpeedBackToFront={2}>
-        <div key="front" className="h-100 w-100" style={{ backgroundColor: frontColor }} />
-        <div key="back" className="h-100 w-100" style={{ backgroundColor: backColor }} />
+        <div key="front" className="h-100 w-100" style={{ backgroundColor: frontColor }}>
+          {imageElt}
+        </div>
+        <div key="back" className="h-100 w-100" style={{ backgroundColor: backColor }}>
+          {imageElt}
+        </div>
       </ReactCardFlip>
     );
   }
@@ -49,4 +55,5 @@ export default class Cell extends Component {
 Cell.propTypes = {
   frontColor: PropTypes.string,
   backColor: PropTypes.string,
+  image: PropTypes.string,
 };

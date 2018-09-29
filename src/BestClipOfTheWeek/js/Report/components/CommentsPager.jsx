@@ -5,7 +5,7 @@ import { GridLoader } from 'halogenium';
 
 import LoadingButton from './LoadingButton';
 import { parseComments, sortComments } from '../reportProvider';
-import YouTubeService from '../youtubeService';
+import YouTubeService from '../../youtubeService';
 
 export default class CommentsPager extends Component {
   static expandTop() {

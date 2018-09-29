@@ -1,5 +1,5 @@
-import YouTubeService from './youtubeService';
-import TermsService from './termsService';
+import YouTubeService from '../youtubeService';
+import TermsService from '../termsService';
 
 export const getTermsAsync = async () => {
   const service = new TermsService();
