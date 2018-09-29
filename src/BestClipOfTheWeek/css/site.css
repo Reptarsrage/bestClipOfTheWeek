@@ -211,3 +211,8 @@
   top: 0;
   width: 100%;
 }
+
+.splash {
+  max-height: 80vh;
+  overflow: hidden;
+}
