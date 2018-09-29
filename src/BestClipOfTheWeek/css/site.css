@@ -216,3 +216,16 @@
   max-height: 80vh;
   overflow: hidden;
 }
+
+.splash-logo {
+  height: auto;
+  width: 90%;
+}
+
+@media (min-width: 768px) {
+  .splash-logo {
+    height: auto;
+    width: 50%;
+    min-width: 500px;
+  }
+}
