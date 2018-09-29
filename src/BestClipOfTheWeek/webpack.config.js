@@ -55,6 +55,7 @@ module.exports = env => {
       qrcode: './js/qrcode.js',
       report: './js/Report/index.jsx',
       terms: './js/Terms/index.jsx',
+      home: './js/Home/index.jsx',
     },
     plugins: [
       new MiniCssExtractPlugin({

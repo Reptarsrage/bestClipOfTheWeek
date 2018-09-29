@@ -223,9 +223,10 @@
 }
 
 @media (min-width: 768px) {
+
   .splash-logo {
     height: auto;
-    width: 50%;
     min-width: 500px;
+    width: 50%;
   }
 }

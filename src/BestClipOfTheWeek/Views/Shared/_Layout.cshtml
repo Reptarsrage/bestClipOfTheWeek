@@ -14,10 +14,10 @@
     <link rel="stylesheet" href="~/dist/site.css" />
     @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
-<body class="bg-light" style="display: flex; flex-direction: column; min-height: 100vh;">
+<body class="bg-light d-flex flex-column" style="height: 100vh;">
     <partial name="_NavBarPartial" />
     <partial name="_CookieConsentPartial" />
-    <div class="container bg-white py-2 py-lg-3 py-xl-4" style="flex: 1;">
+    <div class="container bg-white py-2 py-lg-3 py-xl-4 d-flex flex-column flex-full">
         @RenderBody()
     </div>
     <footer class="container bg-white py-2 py-lg-3 py-xl-4 text-center">

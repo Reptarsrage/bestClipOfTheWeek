@@ -2,11 +2,13 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="relative splash">
-  <partial name="_Grid"/>
-  <div class="absolute-center">
-    <svg class="svg-inline--fa splash-logo" fill="#000" height="500" width="500">
-      <use href="/dist/static/media/icons.svg#icon-logo" />
-    </svg>
-  </div>
-</div>
+@section header {
+  <base href="/" />
+}
+<noscript>
+  You need to enable JavaScript to run this app.
+</noscript>
+<div id="react-app" class="d-flex flex-full"></div>
+@section Scripts {
+  <script src="~/dist/home.js"></script>
+}
