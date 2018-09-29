@@ -8,7 +8,7 @@
         : "Home";
 }
 
-<nav class="navbar navbar-expand-md navbar-dark bg-primary">
+<nav class="navbar navbar-expand-md navbar-dark bg-primary py-1">
     <a asp-area="" asp-controller="@HomeController" asp-action="Index" class="navbar-brand">
       <svg class="svg-inline--fa" fill="#FFFFFF" height=64 style="width: auto; height: 64px;" width=64>
         <use href="/dist/static/media/icons.svg#icon-logo" />
@@ -22,25 +22,25 @@
         <ul class="navbar-nav mr-auto">
             <li class="nav-item @Html.IsActive("Home", "Index")">
                 <a asp-area="" asp-controller="@HomeController" asp-action="Index" class="nav-link">
-                    <i class="fas fa-home"></i>&nbsp;<span>Home</span>
+                    <i class="fas fa-home mr-2"></i><span>Home</span>
                 </a>
             </li>
             @if (SignInManager.IsSignedIn(User))
             {
               <li class="nav-item @Html.IsActive("Terms", "Index")">
                 <a asp-area="" asp-controller="Terms" asp-action="Index" class="nav-link">
-                  <i class="fas fa-edit"></i>&nbsp;<span>Edit Terms</span>
+                  <i class="fas fa-edit mr-2"></i><span>Edit Terms</span>
                 </a>
               </li>
             }
             <li class="nav-item @Html.IsActive("Home", "About")">
                 <a asp-area="" asp-controller="Home" asp-action="About" class="nav-link">
-                    <i class="fas fa-home"></i>&nbsp;<span>About</span>
+                    <i class="fas fa-home mr-2"></i><span>About</span>
                 </a>
             </li>
             <li class="nav-item @Html.IsActive("Home", "Contact")">
                 <a asp-area="" asp-controller="Home" asp-action="Contact" class="nav-link">
-                    <i class="fas fa-envelope-open"></i>&nbsp;<span>Contact</span>
+                    <i class="fas fa-envelope-open mr-2"></i><span>Contact</span>
                 </a>
             </li>
         </ul>
