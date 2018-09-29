@@ -33,6 +33,7 @@
     "qrcode": "^1.2.2",
     "qs": "^6.5.2",
     "react": "^16.5.2",
+    "react-card-flip": "^0.2.1",
     "react-color": "^2.14.1",
     "react-dom": "^16.5.2",
     "react-hot-loader": "^4.3.11",

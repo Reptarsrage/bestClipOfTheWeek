@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 
+import Cell from './Cell';
+
 export default class Grid extends Component {
   constructor() {
     super();
@@ -9,6 +11,7 @@ export default class Grid extends Component {
       width: 120,
       height: 90,
       rows: [],
+      minColumns: 4,
     };
 
     this.nodeRef = React.createRef();
@@ -26,10 +29,10 @@ export default class Grid extends Component {
 
   handleResize() {
     const node = this.nodeRef.current;
-    const { width, height, rows, tints } = this.state;
+    const { width, height, rows, tints, minColumns } = this.state;
     const { clientWidth, clientHeight } = node;
 
-    const columnCount = Math.floor(clientWidth / width);
+    const columnCount = Math.max(minColumns, Math.floor(clientWidth / width));
     const rowCount = Math.floor(clientHeight / height);
 
     // Add rows if needed
@@ -45,7 +48,12 @@ export default class Grid extends Component {
     for (const { columns } of rows) {
       // Add columns to each row as needed
       while (columnCount > columns.length) {
-        columns.push({ key: columns.length, color: tints[Math.floor(Math.random() * tints.length)], shown: true });
+        columns.push({
+          key: columns.length,
+          frontColor: tints[Math.floor(Math.random() * tints.length)],
+          backColor: tints[Math.floor(Math.random() * tints.length)],
+          shown: true,
+        });
       }
 
       // Hide/Show columns as needed
@@ -68,7 +76,11 @@ export default class Grid extends Component {
   }
 
   renderColumns(columns) {
-    return columns.filter(({ shown }) => shown).map(({ key, color }) => <div key={key} className="d-flex flex-full" style={{ backgroundColor: color }} />);
+    return columns.filter(({ shown }) => shown).map(({ key, frontColor, backColor }) => (
+      <div key={key} className="d-flex flex-full">
+        <Cell key={key} frontColor={frontColor} backColor={backColor} />
+      </div>
+    ));
   }
 
   render() {

@@ -230,3 +230,16 @@
     width: 50%;
   }
 }
+
+.react-card-flip {
+  width: 100%;
+}
+
+.react-card-flipper {
+  height: 100%;
+}
+
+.react-card-front,
+.react-card-back {
+  height: 100%;
+}
