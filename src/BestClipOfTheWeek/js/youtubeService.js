@@ -65,7 +65,7 @@ export default class YouTubeService {
     const params = {
       fields: 'items(id,snippet(publishedAt,thumbnails,title),statistics,contentDetails(duration))',
       id: videoIds.join(','),
-      key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+      key: window.YouTubeApiKey,
       maxResults: videoIds.length,
       part: 'id,statistics,snippet,contentDetails',
     };
@@ -89,7 +89,7 @@ export default class YouTubeService {
     const params = {
       fields: 'items(id,snippet(authorDisplayName,publishedAt,parentId,textDisplay))',
       id: commentIds.join(','),
-      key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+      key: window.YouTubeApiKey,
       part: 'id,snippet',
       textFormat: 'plainText',
     };
@@ -157,7 +157,7 @@ export default class YouTubeService {
     const url = `${this.baseUrl}/commentThreads`;
     const params = {
       fields: 'items(id,replies(comments(id,snippet(publishedAt,textDisplay,authorDisplayName)))),nextPageToken',
-      key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+      key: window.YouTubeApiKey,
       maxResults: pageSize,
       order: 'relevance',
       pageToken,
@@ -190,7 +190,7 @@ export default class YouTubeService {
     const url = `${this.baseUrl}/commentThreads`;
     const params = {
       fields: 'items(id,replies(comments(id,snippet(publishedAt,textDisplay,authorDisplayName)))),nextPageToken',
-      key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+      key: window.YouTubeApiKey,
       maxResults: '100',
       pageToken: '',
       part: 'id,replies',
@@ -251,7 +251,7 @@ export default class YouTubeService {
         params: {
           fields: 'items/id,nextPageToken',
           forUsername: channelName,
-          key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+          key: window.YouTubeApiKey,
           maxResults: '1',
           part: 'id',
         },
@@ -266,7 +266,7 @@ export default class YouTubeService {
     const params = {
       channelId,
       fields: 'items(id,snippet/title),nextPageToken',
-      key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+      key: window.YouTubeApiKey,
       maxResults: '50',
       pageToken: '',
       part: 'id,snippet',
@@ -296,7 +296,7 @@ export default class YouTubeService {
     const url = `${this.baseUrl}/playlistItems`;
     const params = {
       fields: 'items/contentDetails/videoId,nextPageToken',
-      key: 'AIzaSyAB4qUxv4HVAhcysFGMEG4NwG7s0ojf7P0',
+      key: window.YouTubeApiKey,
       maxResults: '50',
       pageToken: '',
       part: 'contentDetails',
