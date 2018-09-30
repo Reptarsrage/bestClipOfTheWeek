@@ -21,7 +21,7 @@ export default class VoteResultsGraph extends Component {
     const { votes } = votesState;
 
     if (Object.keys(votes).length === 0) {
-      return <GridLoader className="full flex-center min-height-short" color={primaryColor} />;
+      return <GridLoader className="h-100 w-100 flex-center min-height-short" color={primaryColor} />;
     }
 
     const data = Object.keys(votes)
@@ -46,11 +46,11 @@ export default class VoteResultsGraph extends Component {
     const title = 'Vote Results';
 
     return (
-      <section className="full d-flex flex-column results-graph" title={title}>
+      <section className="h-100 w-100 d-flex flex-column results-graph" title={title}>
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">{title}</h5>
         </header>
-        <div className="flex-1 js-vote-results-graph">{this.getGraph()}</div>
+        <div className="flex-full js-vote-results-graph">{this.getGraph()}</div>
         <footer className="d-none d-sm-block p-2 card-footer">
           <div className="row">
             <div className="col-sm-8 text-right d-none d-sm-block" />

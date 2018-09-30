@@ -31,7 +31,7 @@ export default class VoteResultsList extends Component {
       );
 
     return (
-      <section className="full d-flex flex-column" title={title}>
+      <section className="h-100 w-100 d-flex flex-column" title={title}>
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">{title}</h5>
         </header>

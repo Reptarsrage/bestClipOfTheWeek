@@ -28,7 +28,7 @@ body {
   overflow: hidden;
 }
 
-.clip {
+.overflow-hidden {
   overflow: hidden;
 }
 
@@ -108,15 +108,6 @@ body {
 
 .ease {
   transition: all 0.2s ease-in-out;
-}
-
-.full {
-  height: 100%;
-  width: 100%;
-}
-
-.flex-1 {
-  flex: 1;
 }
 
 .min-height-short {

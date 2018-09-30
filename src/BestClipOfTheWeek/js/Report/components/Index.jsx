@@ -202,12 +202,12 @@ export default class Index extends Component {
 
           <div className="row">
             <div className="col-lg-8 mb-4">
-              <div className="full card ease">
+              <div className="h-100 w-100 card ease">
                 <PlaylistVideoList changeSelectedVideo={this.changeSelectedVideo} selectedVideo={{ ...selectedVideo }} playlistVideos={{ ...playlistVideos }} primaryColor={primaryColor} />
               </div>
             </div>
             <div className="col-lg-4 mb-4">
-              <div className="full card ease">
+              <div className="h-100 w-100 card ease">
                 <TermList primaryColor={primaryColor} terms={{ ...terms }} />
               </div>
             </div>
@@ -219,12 +219,12 @@ export default class Index extends Component {
 
         <div className="row">
           <div className="col-lg-6 mb-4">
-            <div className="full card ease">
+            <div className="h-100 w-100 card ease">
               <SelectedVideoInfo selectedVideo={{ ...selectedVideo }} primaryColor={primaryColor} />
             </div>
           </div>
           <div className="col-lg-6 mb-4">
-            <div className="full card ease">
+            <div className="h-100 w-100 card ease">
               <PlaylistGraph channelName={channelName} playlistName={playlistName} primaryColor={primaryColor} playlistVideos={{ ...playlistVideos }} />
             </div>
           </div>
@@ -240,12 +240,12 @@ export default class Index extends Component {
 
         <div className="row">
           <div className="col-lg-5 col-xl-3 mb-4">
-            <div className={showResults ? 'full card ease' : 'd-none ease'}>
+            <div className={showResults ? 'h-100 w-100 card ease' : 'd-none ease'}>
               <VoteResultsList votes={{ ...votes }} primaryColor={primaryColor} />
             </div>
           </div>
           <div className="col-lg-7 col-xl-9 mb-4">
-            <div className={showResults ? 'full card ease' : 'd-none ease'}>
+            <div className={showResults ? 'h-100 w-100 card ease' : 'd-none ease'}>
               <VoteResultsGraph votes={{ ...votes }} primaryColor={primaryColor} />
             </div>
           </div>

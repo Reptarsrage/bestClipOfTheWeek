@@ -34,7 +34,7 @@ export default class TermList extends Component {
     });
 
     return (
-      <section className="full d-flex flex-column">
+      <section className="h-100 w-100 d-flex flex-column">
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">Terms</h5>
         </header>

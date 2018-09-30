@@ -136,7 +136,7 @@ export default class PlaylistGraph extends Component {
     const { primaryColor } = this.props;
 
     if (data.length === 0) {
-      return <GridLoader className="flex-center full" color={primaryColor} />;
+      return <GridLoader className="flex-center h-100 w-100" color={primaryColor} />;
     }
 
     // ensure max is valid and take the last {max} values from data
@@ -222,12 +222,12 @@ export default class PlaylistGraph extends Component {
     const { channelName, playlistName } = this.props;
 
     return (
-      <section className="full d-flex flex-column">
+      <section className="h-100 w-100 d-flex flex-column">
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">{`${playlistName} by ${channelName}`}</h5>
         </header>
 
-        <div className="flex-1 min-height-short js-playlist-graph">{graph}</div>
+        <div className="flex-full min-height-short js-playlist-graph">{graph}</div>
 
         {controls}
       </section>

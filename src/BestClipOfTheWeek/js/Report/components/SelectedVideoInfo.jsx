@@ -30,15 +30,15 @@ export default class SelectedVideoInfo extends Component {
     const formatter = format(',');
 
     return (
-      <section className="full d-flex flex-column" title={title}>
+      <section className="h-100 w-100 d-flex flex-column" title={title}>
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">
             <a href={url}>{title}</a>
           </h5>
         </header>
 
-        <div className="flex-1 min-height-short">
-          <div className="relative full clip">
+        <div className="flex-full min-height-short">
+          <div className="relative h-100 w-100 overflow-hidden">
             <div className="background-blur fill-absolute" style={{ backgroundImage: `url("${bgImageUrl}")` }} />
             <img alt={title} className="ease img-fill fill-absolute" src={imageUrl} />
           </div>
