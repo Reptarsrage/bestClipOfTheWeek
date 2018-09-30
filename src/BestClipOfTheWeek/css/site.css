@@ -256,5 +256,9 @@ body {
 .term-form-row {
   align-items: center;
   justify-content: space-evenly;
-  min-width: 300px;
+  min-width: 500px;
+}
+
+.term-form-button {
+  width: 85px;
 }
