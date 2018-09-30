@@ -75,8 +75,8 @@ export default class Cell extends Component {
     const { frontColor, backColor } = this.props;
     const { isFlipped, frontImage, backImage } = this.state;
 
-    const frontImageElt = frontImage ? <img style={{ width: '100%', height: '100%', opacity: 0.3 }} src={frontImage} alt="" /> : null;
-    const backImageElt = backImage ? <img style={{ width: '100%', height: '100%', opacity: 0.3 }} src={backImage} alt="" /> : null;
+    const frontImageElt = frontImage ? <img className="splash-cell-img" src={frontImage} alt="" /> : null;
+    const backImageElt = backImage ? <img className="splash-cell-img" src={backImage} alt="" /> : null;
 
     return (
       <ReactCardFlip className="h-100 w-100" isFlipped={isFlipped} infinite flipSpeedFrontToBack={2} flipSpeedBackToFront={2}>

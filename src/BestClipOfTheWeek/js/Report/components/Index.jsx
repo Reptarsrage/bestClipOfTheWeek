@@ -132,7 +132,7 @@ export default class Index extends Component {
 
       // reset votes
       for (const key of Object.keys(votes)) {
-        votes[key] = { ...votes[key], count: 0 };
+        votes[key] = { ...votes[key], votes: 0 };
       }
 
       // Reset
@@ -186,7 +186,7 @@ export default class Index extends Component {
     const showResults = fetching || count > 0;
 
     return (
-      <div>
+      <div className="container-fluid">
         <div className="collapse container-fluid bg-light mb-0 show" id="topSectionCollapse">
           <div className="row">
             <div className="col-lg-12 my-2">

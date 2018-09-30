@@ -46,7 +46,7 @@ export default class VoteResultsGraph extends Component {
     const title = 'Vote Results';
 
     return (
-      <section className="full d-flex flex-column" title={title} style={{ minHeight: '500px' }}>
+      <section className="full d-flex flex-column results-graph" title={title}>
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">{title}</h5>
         </header>

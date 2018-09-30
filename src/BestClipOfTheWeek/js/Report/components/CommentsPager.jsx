@@ -37,7 +37,7 @@ export default class CommentsPager extends Component {
   async componentDidUpdate(prevProps) {
     const { selectedVideo } = this.props;
 
-    if (selectedVideo !== prevProps.selectedVideo) {
+    if (!selectedVideo || !prevProps.selectedVideo || selectedVideo.id !== prevProps.selectedVideo.id) {
       await this.loadMore(true);
     }
   }
@@ -58,6 +58,8 @@ export default class CommentsPager extends Component {
       commentsPager: {
         ...prevState.commentsPager,
         fetching: true,
+        comments: startOver ? [] : prevState.comments,
+        nextPageToken: startOver ? undefined : prevState.nextPageToken,
       },
     }));
 

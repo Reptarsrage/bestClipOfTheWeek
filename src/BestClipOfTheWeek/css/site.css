@@ -1,3 +1,7 @@
+body {
+  min-height: 100vh;
+}
+
 .flex-full {
   flex: 1;
 }
@@ -242,4 +246,14 @@
 .react-card-front,
 .react-card-back {
   height: 100%;
+}
+
+.splash-cell-img {
+  height: 100%;
+  opacity: 0.3;
+  width: 100%;
+}
+
+.results-graph {
+  min-height: 500px;
 }

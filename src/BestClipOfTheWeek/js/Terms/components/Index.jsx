@@ -282,7 +282,7 @@ export default class Index extends Component {
 
     // Stop here if loading
     if (fetching || !fetched) {
-      return <GridLoader className="min-height-short flex-center" color={primaryColor} />;
+      return <GridLoader className="flex-full flex-center" color={primaryColor} />;
     }
 
     // Build color picker and backdrop
