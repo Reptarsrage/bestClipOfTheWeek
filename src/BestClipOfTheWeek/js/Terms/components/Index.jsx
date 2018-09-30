@@ -299,65 +299,49 @@ export default class Index extends Component {
     // Build table rows from terms
     const selectedTermId = selectedTerm.termId;
     const termEltsList = terms.map(term => (
-      <tr key={term.termId} className="ease">
-        <td>
-          <input data-id={term.termId} maxLength="50" name="name" onChange={this.handleTermChange} placeholder={term.name} type="text" value={term.name} />
-        </td>
-        <td>
+      <div key={term.termId} className="form-row term-form-row ease">
+        <div className="form-group d-flex">
+          <input className="form-control" data-id={term.termId} maxLength="50" name="name" onChange={this.handleTermChange} placeholder={term.name} type="text" value={term.name} />
+        </div>
+        <div className="form-group d-flex">
           <div role="button" className="swatch" data-id={term.termId} onClick={this.handleColorSwatchClick} onKeyDown={this.handleKeyDown} tabIndex="0">
             <div className="swatch-color" data-id={term.termId} style={{ background: term.color }} />
             {selectedTermId === term.termId ? colorPickerElt : null}
           </div>
-        </td>
-        <td>
+        </div>
+        <div className="form-group d-flex">
           <input checked={term.enabled} data-id={term.termId} name="enabled" onChange={this.handleTermChange} type="checkbox" />
-        </td>
-        <td>
+        </div>
+        <div className="form-group d-flex">
           <button type="button" className="btn btn-danger" data-id={term.termId} onClick={this.handleTermDelete}>
             Delete
           </button>
-        </td>
-      </tr>
+        </div>
+      </div>
     ));
 
     return (
       <div className="container-fluid">
-        <table className="table table-responsive-sm my-4">
-          <thead className="text-light">
-            <tr>
-              <th className="bg-primary">Term</th>
-              <th className="bg-primary">Color</th>
-              <th className="bg-primary">Enabled</th>
-              <th className="bg-primary">
-                <span>Add</span>
-                <span> / </span>
-                <span>Delete</span>
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>
-                <input maxLength="50" name="name" onChange={this.handleNewTermChange} placeholder="Add a term" type="text" value={newTerm.name} />
-              </td>
-              <td>
-                <div role="button" className="swatch" data-id={newTerm.termId} onClick={this.handleColorSwatchClick} onKeyDown={this.handleKeyDown} tabIndex="0">
-                  <div className="swatch-color" data-id={newTerm.termId} style={{ background: newTerm.color }} />
-                  {selectedTermId === newTerm.termId ? colorPickerElt : null}
-                </div>
-              </td>
-              <td>
-                <input checked={newTerm.enabled} name="enabled" onChange={this.handleNewTermChange} type="checkbox" />
-              </td>
-              <td>
-                <button type="button" className="btn btn-success" onClick={this.handleNewTermCreate}>
-                  Add
-                </button>
-              </td>
-            </tr>
-            {termEltsList}
-          </tbody>
-        </table>
+        <div className="form-row term-form-row ease">
+          <div className="form-group d-flex">
+            <input className="form-control" maxLength="50" name="name" onChange={this.handleNewTermChange} placeholder="Add a term" type="text" value={newTerm.name} />
+          </div>
+          <div className="form-group d-flex">
+            <div role="button" className="swatch" data-id={newTerm.termId} onClick={this.handleColorSwatchClick} onKeyDown={this.handleKeyDown} tabIndex="0">
+              <div className="swatch-color" data-id={newTerm.termId} style={{ background: newTerm.color }} />
+              {selectedTermId === newTerm.termId ? colorPickerElt : null}
+            </div>
+          </div>
+          <div className="form-group d-flex">
+            <input checked={newTerm.enabled} name="enabled" onChange={this.handleNewTermChange} type="checkbox" />
+          </div>
+          <div className="form-group d-flex">
+            <button type="button" className="btn btn-success" onClick={this.handleNewTermCreate}>
+              Add
+            </button>
+          </div>
+        </div>
+        {termEltsList}
       </div>
     );
   }

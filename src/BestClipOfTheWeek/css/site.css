@@ -252,3 +252,9 @@ body {
 .results-graph {
   min-height: 500px;
 }
+
+.term-form-row {
+  align-items: center;
+  justify-content: space-evenly;
+  min-width: 300px;
+}
