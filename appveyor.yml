@@ -35,10 +35,7 @@ artifacts:
    type: WebDeployPackage
 
 deploy:
-- provider: AzureAppServiceZipDeploy
-  website: BestClipOfTheWeek
-  username: justinprobb
-  password:
-    secure: 6FXUUPKgWuCGiuhoGRi0596iM2tmDjffVkfDgl0Tg1UBCzfqhRRjNJHbtKssPKYQ
+- provider: Environment
+  name: BestClipOfTheWeek-Production
   on:
     branch: master                 # release from master branch only
