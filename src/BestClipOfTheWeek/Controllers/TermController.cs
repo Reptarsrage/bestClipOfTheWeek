@@ -1,11 +1,11 @@
-﻿using BestClipOfTheWeek.Models;
-using BestClipOfTheWeek.Models.TermViewModels;
-using BestClipOfTheWeek.Services;
+using AutoMapper;
+using BestClipOfTheWeek.Models;
+using BestClipOfTheWeek.Models.Terms;
+using BestClipOfTheWeek.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,108 +14,123 @@ using System.Threading.Tasks;
 namespace BestClipOfTheWeek.Controllers
 {
     [Authorize]
-    public class TermController : Controller
+    public class TermsController : Controller
     {
         private readonly ILogger _logger;
-        private readonly ITermsManager _termsManager;
+        private readonly ITermsRepository _termsRepository;
+        private readonly IMapper _mapper;
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly JsonSerializerSettings _serializationSettings;
-        private readonly SignInManager<ApplicationUser> _signInManager;
 
-        public TermController(
-          ILogger<TermController> logger,
-          ITermsManager termsManager,
-          UserManager<ApplicationUser> userManager,
-          SignInManager<ApplicationUser> signInManager)
+        public TermsController(ILogger<TermsController> logger, ITermsRepository termsManager, UserManager<ApplicationUser> userManager, IMapper mapper)
         {
             _logger = logger;
-            _termsManager = termsManager;
+            _termsRepository = termsManager;
             _userManager = userManager;
-            _signInManager = signInManager;
-            _serializationSettings = new JsonSerializerSettings
-            {
-                Formatting = Formatting.None
-            };
+            _mapper = mapper;
+        }
+
+        public IActionResult Index()
+        {
+            return View();
         }
 
         [HttpGet]
-        [Route("Term")]
-        [Route("Term/Index")]
-        public async Task<IActionResult> Index()
+        [ProducesResponseType(typeof(IEnumerable<TermViewModel>), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        [Route("/api/Terms")]
+        public async Task<IActionResult> Get()
         {
-            if (!_signInManager.IsSignedIn(User))
+            try
             {
-                return RedirectToAction(nameof(HomeController.Index), "Home");
-            }
+                var terms = await _termsRepository.ReadTerms(_userManager.GetUserId(User));
 
-            var terms = await _termsManager.ReadTerms(_userManager.GetUserId(User));
-            return View(new TermListViewModel
+                return Json(terms?
+                                .Select(t => _mapper.Map<TermViewModel>(t))
+                                .OrderBy(t => t.Name) ?? Enumerable.Empty<TermViewModel>());
+            }
+            catch (Exception e)
             {
-                Terms = terms?.Select(t => new TermViewModel(t)).OrderBy(t => t.Name).ToList() ?? new List<TermViewModel>()
-            });
+                _logger.LogError(e, "Get failed for terms. {User}", _userManager.GetUserId(User));
+                return StatusCode(500, $"Get failed for terms. Please try again. {e.Message}");
+            }
         }
 
         [HttpPost]
-        [Route("/api/Term")]
+        [ProducesResponseType(typeof(TermViewModel), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        [Route("/api/Terms")]
         public async Task<IActionResult> Post([FromBody]TermViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(400, string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
+                return BadRequest(string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
             }
 
             try
             {
                 // Add
-                var id = await _termsManager.AddTerm(_userManager.GetUserId(User), model.GetTerm());
+                var id = await _termsRepository.AddTerm(_userManager.GetUserId(User), _mapper.Map<Term>(model));
 
                 // Return
                 model.TermId = id;
-                return Json(model, _serializationSettings);
+                return Json(model);
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "Add failed for term. {User} {Term}", _userManager.GetUserId(User), model.TermId);
                 return StatusCode(500, $"Add failed for term. Please try again. {e.Message}");
             }
         }
 
         [HttpPatch]
-        [Route("/api/Term")]
+        [ProducesResponseType(typeof(TermViewModel), 200)]
+        [ProducesResponseType(400)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        [Route("/api/Terms")]
         public async Task<IActionResult> Patch([FromBody]TermViewModel model)
         {
             if (!ModelState.IsValid)
             {
-                return StatusCode(400, string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
+                return BadRequest(string.Join(",", ModelState.Values.SelectMany(v => v.Errors.Select(e => e.ErrorMessage))));
             }
 
             try
             {
                 // Update
-                await _termsManager.UpdateTerm(model.GetTerm());
+                await _termsRepository.UpdateTerm(_mapper.Map<Term>(model));
 
                 // Return
-                return Json(model, _serializationSettings);
+                return Json(model);
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "Update failed for term. {User} {Term}", _userManager.GetUserId(User), model.TermId);
                 return StatusCode(500, $"Update failed for term. Please try again. {e.Message}");
             }
         }
 
         [HttpDelete]
-        [Route("/api/Term/{id}")]
+        [ProducesResponseType(typeof(int), 200)]
+        [ProducesResponseType(401)]
+        [ProducesResponseType(500)]
+        [Route("/api/Terms/{id}")]
         public async Task<IActionResult> Delete(int id)
         {
             try
             {
                 // Delete
-                await _termsManager.RemoveTerm(id);
+                await _termsRepository.RemoveTerm(id);
 
                 // Return
-                return Ok();
+                return Ok(id);
             }
             catch (Exception e)
             {
+                _logger.LogError(e, "Deletion failed for term. {User} {Term}", _userManager.GetUserId(User), id);
                 return StatusCode(500, $"Deletion failed for term. Please try again. {e.Message}");
             }
         }

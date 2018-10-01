@@ -1,88 +1,43 @@
-﻿@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
-@using Microsoft.Extensions.Options;
-@using BestClipOfTheWeek.Models.Configuration
-
-@inject IOptions<AppSettings> OptionsApplicationConfiguration
-
+@inject Microsoft.ApplicationInsights.AspNetCore.JavaScriptSnippet JavaScriptSnippet
 <!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Best Clip of the Week - @ViewData["Title"]</title>
-
-    <environment include="Development">
-        <link rel="stylesheet" href="~/css/main.css" asp-append-version="true">
-    </environment>
-    <environment exclude="Development">
-        <link rel="stylesheet" href="~/css/main.min.css" asp-append-version="true">
-    </environment>
-
-    @RenderSection("Styles", required: false)
+    <link rel="shortcut icon" href="~/favicon.ico" />
+    <title>@ViewData["Title"] - BestClipOfTheWeek</title>
+    @RenderSection("header", required: false)
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/brands.css" integrity="sha384-rf1bqOAj3+pw6NqYrtaE1/4Se2NBwkIfeYbsFdtiR6TQz0acWiwJbv1IM/Nt/ite" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/solid.css" integrity="sha384-VGP9aw4WtGH/uPAOseYxZ+Vz/vaTb1ehm1bwx92Fm8dTrE+3boLfF1SpAtB1z7HW" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/fontawesome.css" integrity="sha384-1rquJLNOM3ijoueaaeS5m+McXPJCGdr5HcA03/VHXxcp2kX2sUrQDmFc3jR5i/C7" crossorigin="anonymous">
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.1.3/materia/bootstrap.min.css" rel="stylesheet" integrity="sha384-5bFGNjwF8onKXzNbIcKR8ABhxicw+SC1sjTh6vhSbIbtVgUuVTm2qBZ4AaHc7Xr9" crossorigin="anonymous">
+    <link rel="stylesheet" href="~/dist/site.css" />
     @Html.Raw(JavaScriptSnippet.FullScript)
 </head>
-<body>
-    @* used for ajax in Utility.addAntiForgeryToken() *@
-    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "__AjaxAntiForgeryForm" }))
-    {
-        @Html.AntiForgeryToken()
-    }
-
-    @await Html.PartialAsync("_Nav")
-
-    <div id="message" class="row">
-        <div class="alert alert-success alert-dismissible">
-            <button type="button" class="close" data-hide="alert-success" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button>
-            <strong>Success:</strong>&nbsp;<span class="message"></span>
-        </div>
-        <div class="alert alert-info alert-dismissible">
-            <button type="button" class="close" data-hide="alert-info" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button><strong>Info:</strong>&nbsp;<span class="message"></span>
-        </div>
-        <div class="alert alert-warning alert-dismissible">
-            <button type="button" class="close" data-hide="alert-warning" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button><strong>Warning:</strong>&nbsp;<span class="message"></span>
-        </div>
-        <div class="alert alert-danger alert-dismissible">
-            <button type="button" class="close" data-hide="alert-danger" aria-label="Close">
-                <span aria-hidden="true">&times;</span>
-            </button><strong>Error:</strong>&nbsp;<span class="message"></span>
-        </div>
-    </div>
-
-    <div class="container body-content">
+<body class="bg-light d-flex flex-column">
+    <partial name="_NavBarPartial" />
+    <partial name="_CookieConsentPartial" />
+    <div class="container bg-white py-2 py-lg-3 py-xl-4 d-flex flex-column flex-full">
         @RenderBody()
     </div>
-    <footer class="footer">
-        <div class="container text-center">
-            <div class="row">
-                <span class="col">Website made by: <b id="foot_myname">Justin Robb</b></span><br />
-            </div>
-            <div class="row">
-                <div class="col ">
-                    <a class="mr-3" href="mailto:justinprobb@gmail.com"><small>Contact me</small></a>
-                    <a class="mr-3" href="https://www.linkedin.com/in/jurobb"><small>LinkedIn</small></a>
-                    <a class="mr-3" href="https://github.com/Reptarsrage"><small>Github</small></a>
-                </div>
-            </div>
+    <footer class="container bg-white py-2 py-lg-3 py-xl-4 text-center">
+      <div class="row">
+        <span class="col-12">Website made by: <b>Justin Robb</b></span><br />
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <a class="mr-3" href="mailto:justinprobb@gmail.com"><small>Contact me</small></a>
+          <a class="mr-3" href="https://www.linkedin.com/in/jurobb"><small>LinkedIn</small></a>
+          <a href="https://github.com/Reptarsrage"><small>Github</small></a>
         </div>
+      </div>
     </footer>
+    <partial name="_YouTubeApiKey.cshtml"/>
 
-    <script>
-        var YOUTUBE_API_KEY = '@OptionsApplicationConfiguration.Value.YouTubeApiKey';
-    </script>
-
-    <environment include="Development">
-        <script src="~/js/main.js" asp-append-version="true"></script>
-    </environment>
-    <environment exclude="Development">
-        <script src="~/js/main.min.js" asp-append-version="true"></script>
-    </environment>
-
-    @RenderSection("Scripts", required: false)
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+    <script src="~/dist/site.js"></script>
+    @RenderSection("Scripts", false)
 </body>
 </html>

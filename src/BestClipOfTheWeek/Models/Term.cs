@@ -1,4 +1,4 @@
-﻿namespace BestClipOfTheWeek.Models
+namespace BestClipOfTheWeek.Models
 {
     public class Term
     {
@@ -12,8 +12,10 @@
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Term))
+            if (!(obj is Term))
+            {
                 return false;
+            }
 
             var t = (Term)obj;
             return t.TermId.Equals(TermId);

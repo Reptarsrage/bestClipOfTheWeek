@@ -1,4 +1,4 @@
-﻿using BestClipOfTheWeek.Models;
+using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +6,8 @@ namespace BestClipOfTheWeek.Data
 {
     public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
+        public virtual DbSet<Term> Terms { get; set; }
+
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
         {
@@ -18,7 +20,5 @@ namespace BestClipOfTheWeek.Data
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
         }
-
-        public virtual DbSet<Term> Terms { get; set; }
     }
 }
