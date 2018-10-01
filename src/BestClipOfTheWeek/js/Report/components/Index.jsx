@@ -84,7 +84,9 @@ export default class Index extends Component {
 
     const votes = {};
     for (const term of terms) {
-      votes[term.name] = { ...term, votes: 0 };
+      if (term.enabled) {
+        votes[term.name] = { ...term, votes: 0 };
+      }
     }
 
     // Set state

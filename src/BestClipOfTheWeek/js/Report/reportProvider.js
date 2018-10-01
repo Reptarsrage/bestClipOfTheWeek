@@ -78,7 +78,11 @@ export const parseComments = (comments, terms) =>
   comments.map(comment => {
     const pieces = [];
     pieces.push({ color: '', isTerm: false, text: comment.text });
-    for (const { color, name } of terms) {
+    for (const { color, name, enabled } of terms) {
+      if (!enabled) {
+        continue;
+      }
+
       const regex = new RegExp(name, 'i');
       for (let i = 0; i < pieces.length; i += 1) {
         if (pieces[i].isTerm) {
