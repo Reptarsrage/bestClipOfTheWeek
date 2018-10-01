@@ -7,7 +7,13 @@ import PlaylistVideoItem from './PlaylistVideoItem';
 export default class PlaylistVideoList extends Component {
   constructor() {
     super();
+
+    this.state = {
+      loadMore: false,
+    };
+
     this.videoSelect = this.videoSelect.bind(this);
+    this.handleLoadMoreClick = this.handleLoadMoreClick.bind(this);
   }
 
   videoSelect(id) {
@@ -19,8 +25,13 @@ export default class PlaylistVideoList extends Component {
     }
   }
 
+  handleLoadMoreClick() {
+    this.setState(prevState => ({ ...prevState, loadMore: true }));
+  }
+
   render() {
     const { playlistVideos, selectedVideo, primaryColor } = this.props;
+    const { loadMore } = this.state;
     const { fetching, results } = playlistVideos;
 
     if (fetching && results.length === 0) {
@@ -31,7 +42,12 @@ export default class PlaylistVideoList extends Component {
       return null;
     }
 
-    const items = results.slice(0, Math.min(50, results.length)).map(video => {
+    let filteredResults = results;
+    if (!loadMore) {
+      filteredResults = results.slice(0, Math.min(50, results.length));
+    }
+
+    const items = filteredResults.map(video => {
       const { id, title, publishedDate, imageMedium } = video;
       const subtitle = publishedDate.toLocaleString();
       const selectedId = selectedVideo && selectedVideo.id;
@@ -40,12 +56,24 @@ export default class PlaylistVideoList extends Component {
       return <PlaylistVideoItem active={active} id={id} key={id} onClick={this.videoSelect} subtitle={subtitle} thumb={imageMedium} title={title} />;
     });
 
+    const loadMoreButton = loadMore ? null : (
+      <div className="list-group-item list-group-item-action border-0 pointer ease text-center">
+        <button className="btn btn-lg btn-primary mx-auto" type="button" onClick={this.handleLoadMoreClick}>
+          <i className="mr-2 fas fa-ellipsis-h" />
+          Load More
+        </button>
+      </div>
+    );
+
     return (
       <section className="h-100 w-100 d-flex flex-column">
         <header className="d-none d-md-block p-2 card-header">
           <h5 className="text-nowrap text-truncate mb-0">Reccomended</h5>
         </header>
-        <div className="list-group short-list playlist-videos min-height-short">{items}</div>
+        <div className="list-group short-list playlist-videos min-height-short">
+          {items}
+          {loadMoreButton}
+        </div>
       </section>
     );
   }

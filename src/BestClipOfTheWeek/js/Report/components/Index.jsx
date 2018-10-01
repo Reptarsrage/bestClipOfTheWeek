@@ -84,7 +84,9 @@ export default class Index extends Component {
 
     const votes = {};
     for (const term of terms) {
-      votes[term.name] = { ...term, votes: 0 };
+      if (term.enabled) {
+        votes[term.name] = { ...term, votes: 0 };
+      }
     }
 
     // Set state
@@ -194,7 +196,7 @@ export default class Index extends Component {
               <div className="input-group">
                 <input className="form-control" placeholder="Video Id" readOnly type="text" value={id} />
                 <div className="input-group-append">
-                  <LoadingButton handleClick={this.startParsingYouTubeCommentsAsync} icon="fa-play" loading={fetching} title={title} />
+                  <LoadingButton handleClick={this.startParsingYouTubeCommentsAsync} icon="play" loading={fetching} title={title} />
                 </div>
               </div>
             </div>

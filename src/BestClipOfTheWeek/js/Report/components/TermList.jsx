@@ -23,8 +23,13 @@ export default class TermList extends Component {
     }
 
     const items = terms.map(term => {
-      const { name, color, termId } = term;
+      const { name, color, termId, enabled } = term;
       const style = { color };
+
+      if (!enabled) {
+        return null;
+      }
+
       return (
         <div className="list-group-item border-0" key={termId} style={style} title={name}>
           <span className="lead">{name}</span>
