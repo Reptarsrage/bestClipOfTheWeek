@@ -58,8 +58,8 @@ export default class CommentsPager extends Component {
       commentsPager: {
         ...prevState.commentsPager,
         fetching: true,
-        comments: startOver ? [] : prevState.comments,
-        nextPageToken: startOver ? undefined : prevState.nextPageToken,
+        comments: startOver ? [] : prevState.commentsPager.comments,
+        nextPageToken: startOver ? undefined : prevState.commentsPager.nextPageToken,
       },
     }));
 
@@ -91,7 +91,7 @@ export default class CommentsPager extends Component {
     const { comments } = commentsPager;
     const { primaryColor } = this.props;
 
-    if (comments.length === 0) {
+    if (!comments || comments.length === 0) {
       return <GridLoader className="min-height-short flex-center" color={primaryColor} />;
     }
 
