@@ -33,7 +33,7 @@ export default class Grid extends Component {
     // Set all existing cell images
     for (const { columns } of rows) {
       for (const column of columns) {
-        column.image = videos[Math.floor(Math.random() * videos.length)].imageMaxRes.url;
+        column.image = videos[Math.floor(Math.random() * videos.length)].imageMedium.url;
       }
     }
 
