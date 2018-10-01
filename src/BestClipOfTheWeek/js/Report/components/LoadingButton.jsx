@@ -24,7 +24,7 @@ export default class LoadingButton extends Component {
       return <i className="animate-spin mr-2 fas fa-spinner" />;
     }
 
-    return <i className={`mr-2 fa ${icon}`} />;
+    return <i className={`mr-2 fas fa-${icon}`} />;
   }
 
   render() {
