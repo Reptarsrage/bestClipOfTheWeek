@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Net;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BestClipOfTheWeek
 {
@@ -111,7 +112,7 @@ namespace BestClipOfTheWeek
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext dbContext)
         {
             if (env.IsDevelopment())
             {
@@ -147,6 +148,9 @@ namespace BestClipOfTheWeek
             });
 
             ConfigureNewtonsoft(app, env);
+
+            // Ensure database is created and up to date
+            dbContext.Database.Migrate();
         }
 
         /// <summary>
