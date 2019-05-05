@@ -15,7 +15,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Net;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace BestClipOfTheWeek
 {
@@ -101,10 +100,10 @@ namespace BestClipOfTheWeek
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
 
-            services.AddAutoMapper();
+            services.AddAutoMapper(typeof(Startup).Assembly);
             services.AddOptions();
             services.AddMemoryCache();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
             ConfigureDependencyInjection(services);
         }
