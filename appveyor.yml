@@ -26,7 +26,7 @@ build_script:
 test_script:
 - dotnet restore ./tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj --verbosity m --no-cache
 - dotnet build ./tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj -c Release --no-restore
-- coverlet tests/BestClipOfTheWeek.Tests.Unit/bin/Release/netcoreapp2.1/BestClipOfTheWeek.Tests.Unit.dll --target "dotnet" --targetargs "test tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj -c Release --no-build" --format opencover
+- coverlet tests/BestClipOfTheWeek.Tests.Unit/bin/Release/netcoreapp2.1/BestClipOfTheWeek.Tests.Unit.dll --target "dotnet" --targetargs "test tests/BestClipOfTheWeek.Tests.Unit/BestClipOfTheWeek.Tests.Unit.csproj -c Release --no-build" --format opencover --exclude "[xunit*]*"
 - codecov -f coverage.opencover.xml
 
 artifacts:
