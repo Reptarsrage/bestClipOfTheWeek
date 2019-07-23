@@ -2404,11 +2404,6 @@ classnames@2.2.5:
   resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.5.tgz#fb3801d453467649ef3603c7d61a02bd129bde6d"
   integrity sha1-+zgB1FNGdknvNgPH1hoCvRKb3m0=
 
-classnames@^2.2.0:
-  version "2.2.6"
-  resolved "https://registry.yarnpkg.com/classnames/-/classnames-2.2.6.tgz#43935bffdd291f326dad0a205309b38d00f650ce"
-  integrity sha512-JR/iSQOSt+LQIWwrwEzJ9uk0xfN3mTVYMwt1Ir5mUcSN6pU+V4zQFFaJsclJbPuAUQH+yfWef6tm7l1quW3C8Q==
-
 clean-stack@^1.1.1:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/clean-stack/-/clean-stack-1.3.0.tgz#9e821501ae979986c46b1d66d2d432db2fd4ae31"
@@ -7072,13 +7067,10 @@ rc@^1.0.1, rc@^1.1.6, rc@^1.2.7:
     minimist "^1.2.0"
     strip-json-comments "~2.0.1"
 
-react-card-flip@0.2.1:
-  version "0.2.1"
-  resolved "https://registry.yarnpkg.com/react-card-flip/-/react-card-flip-0.2.1.tgz#360b9786deb29eca35c9c6f71c78fdfbaf62d08c"
-  integrity sha1-NguXht6ynso1ycb3HHj9+69i0Iw=
-  dependencies:
-    classnames "^2.2.0"
-    prop-types "^15.6.0"
+react-card-flip@0.8.1:
+  version "0.8.1"
+  resolved "https://registry.yarnpkg.com/react-card-flip/-/react-card-flip-0.8.1.tgz#53cd036d5145a10a5c45f2419252d6b5f8e47d8e"
+  integrity sha512-iuyRAya8anf5aaR6BTCYyF4Z767WEgzkYSUfjxEG2zwQYvXHv98NtngAQRM+lqmwYLPTv/5cuCIOsZapy38x0g==
 
 react-color@2.14.1:
   version "2.14.1"
