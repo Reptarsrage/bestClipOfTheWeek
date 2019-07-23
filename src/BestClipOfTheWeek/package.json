@@ -28,7 +28,7 @@
     "halogenium": "2.2.3",
     "json-loader": "0.5.7",
     "mini-css-extract-plugin": "0.8.0",
-    "moment": "2.22.2",
+    "moment": "2.24.0",
     "prop-types": "15.6.2",
     "qrcode": "1.2.2",
     "qs": "6.5.2",
