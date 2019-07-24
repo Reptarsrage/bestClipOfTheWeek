@@ -41,7 +41,7 @@
     "react-router-dom": "4.3.1",
     "react-switch": "3.0.4",
     "recharts": "1.6.2",
-    "save-svg-as-png": "1.4.6",
+    "save-svg-as-png": "1.4.14",
     "uglifyjs-webpack-plugin": "2.0.1",
     "url-loader": "1.1.1",
     "webpack": "4.19.1",
