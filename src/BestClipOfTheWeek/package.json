@@ -40,7 +40,7 @@
     "react-odometerjs": "2.1.1",
     "react-router-dom": "4.3.1",
     "react-switch": "3.0.4",
-    "recharts": "1.8.0",
+    "recharts": "1.8.1",
     "save-svg-as-png": "1.4.14",
     "uglifyjs-webpack-plugin": "2.2.0",
     "url-loader": "1.1.2",
