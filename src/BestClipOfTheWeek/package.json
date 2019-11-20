@@ -23,7 +23,7 @@
     "babel-loader": "8.0.6",
     "cross-env": "5.2.1",
     "css-loader": "1.0.1",
-    "d3": "5.14.1",
+    "d3": "5.14.2",
     "file-loader": "2.0.0",
     "halogenium": "2.2.3",
     "json-loader": "0.5.7",
