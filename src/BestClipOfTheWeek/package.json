@@ -49,7 +49,7 @@
   },
   "devDependencies": {
     "aspnet-webpack": "3.0.0",
-    "aspnet-webpack-react": "3.0.0",
+    "aspnet-webpack-react": "4.0.0",
     "babel-eslint": "9.0.0",
     "eslint": "5.16.0",
     "eslint-config-airbnb": "17.1.1",
