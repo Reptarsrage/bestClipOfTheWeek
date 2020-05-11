@@ -38,7 +38,7 @@
     "react-dom": "16.13.1",
     "react-hot-loader": "4.12.20",
     "react-odometerjs": "2.1.1",
-    "react-router-dom": "4.3.1",
+    "react-router-dom": "5.2.0",
     "react-switch": "3.0.4",
     "recharts": "1.8.5",
     "save-svg-as-png": "1.4.17",
