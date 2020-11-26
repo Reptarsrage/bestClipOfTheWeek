@@ -52,7 +52,7 @@
     "aspnet-webpack-react": "3.0.0",
     "babel-eslint": "9.0.0",
     "eslint": "5.16.0",
-    "eslint-config-airbnb": "17.1.1",
+    "eslint-config-airbnb": "18.2.1",
     "eslint-config-airbnb-base": "13.2.0",
     "eslint-config-prettier": "3.6.0",
     "eslint-import-resolver-webpack": "0.12.1",
