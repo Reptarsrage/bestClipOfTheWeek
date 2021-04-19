@@ -1,55 +1,41 @@
-using AutoMapper;
 using BestClipOfTheWeek.Data;
+using BestClipOfTheWeek.Extensions;
 using BestClipOfTheWeek.Models;
 using BestClipOfTheWeek.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
+using Microsoft.Extensions.Hosting;
 using System.Net;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BestClipOfTheWeek
 {
     public class Startup
     {
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to build the configuration.
-        /// </summary>
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", false, true)
-                .AddEnvironmentVariables();
-
-            if (env.IsDevelopment())
-                builder
-                    .AddJsonFile("appsettings.local.json", true, true)
-                    .AddUserSecrets<Startup>();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
 
+        public IWebHostEnvironment Environment { get; }
 
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
-        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<ApplicationDbContext>(options => options
-                .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+                .UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>()
+            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
             services.Configure<CookiePolicyOptions>(options =>
@@ -78,6 +64,7 @@ namespace BestClipOfTheWeek
                 };
             });
 
+            // Add external logins
             services.AddAuthentication()
                 .AddGoogle(googleOptions =>
                 {
@@ -100,28 +87,50 @@ namespace BestClipOfTheWeek
                     facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
                 });
 
-            services.AddAutoMapper(typeof(Startup).Assembly);
-            services.AddOptions();
+            // Enable default memory cache
             services.AddMemoryCache();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
+            // Enable Options
+            services.AddOptions();
+
+            // Enable AutoMapper
+            services.AddAutoMapper(typeof(Startup));
+
+            // Enable http client factory
+            services.AddHttpClient();
+
+            // Enable response compression even for https, which should be fine
+            services.AddResponseCompression(opts =>
+            {
+                opts.EnableForHttps = true;
+            });
+
+            // Configure CORS
+            services.ConfigureCors();
+
+            // Add MVC
+            services.AddMvc().AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
+
+            // DI
             ConfigureDependencyInjection(services);
         }
 
         /// <summary>
         /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         /// </summary>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext dbContext)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext dbContext)
         {
+            // Use the injected ForwardedHeadersOptions
+            app.UseForwardedHeaders();
+
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true
-                });
+                app.UseMigrationsEndPoint();
             }
             else
             {
@@ -129,24 +138,33 @@ namespace BestClipOfTheWeek
                 app.UseHsts();
             }
 
+            // Redirect to https
             app.UseHttpsRedirection();
+
+            // Serve static assets
             app.UseStaticFiles();
+
+            // Cookies
             app.UseCookiePolicy();
 
+            // Use response compression
+            app.UseResponseCompression();
+
+            // Route MVC controllers
+            app.UseRouting();
+
+            // Support authentication
             app.UseAuthentication();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
+            // Map all endpoints
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    "default",
-                    "{controller=Home}/{action=Index}/{id?}");
-
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                endpoints.MapRazorPages();
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
             });
-
-            ConfigureNewtonsoft(app, env);
 
             // Ensure database is created and up to date
             dbContext.Database.Migrate();
@@ -155,8 +173,31 @@ namespace BestClipOfTheWeek
         /// <summary>
         /// Configures injected dependencies
         /// </summary>
-        private void ConfigureDependencyInjection(IServiceCollection services)
+        protected virtual void ConfigureDependencyInjection(IServiceCollection services)
         {
+            // Configuration for Forwarded Headers.
+            // Handle headers set by our load balancer.
+            // This allows authentication to work even though the nginx removes the https scheme from the request
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+
+                // Only loopback proxies are allowed by default.
+                // Clear that restriction because forwarders are enabled by explicit configuration.
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
+            // Identity options
+            services.Configure<IdentityOptions>(options =>
+            {
+                // Password settings
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+            });
+
             // Options
             services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
             services.Configure<YouTubeOptions>(Configuration.GetSection("YouTube"));
@@ -166,21 +207,6 @@ namespace BestClipOfTheWeek
 
             // Email
             services.AddSingleton<IEmailSender, EmailSender>();
-        }
-
-        /// <summary>
-        /// Configures Json serialization
-        /// </summary>
-        private static void ConfigureNewtonsoft(IApplicationBuilder app, IHostingEnvironment env)
-        {
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
-            {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DefaultValueHandling = DefaultValueHandling.Include,
-                Formatting = env.IsDevelopment() ? Formatting.Indented : Formatting.None,
-                NullValueHandling = NullValueHandling.Include
-            };
         }
     }
 }

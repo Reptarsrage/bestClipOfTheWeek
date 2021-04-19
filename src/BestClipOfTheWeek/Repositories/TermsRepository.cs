@@ -13,7 +13,7 @@ namespace BestClipOfTheWeek.Repositories
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Creates a new instanace of a <see cref="TermsRepository"/>
+        /// Creates a new isntance of a <see cref="TermsRepository"/>
         /// </summary>
         /// <param name="context"></param>
         public TermsRepository(ApplicationDbContext context)

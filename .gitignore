@@ -292,3 +292,6 @@ __pycache__/
 coverage.opencover.xml
 coverage.json
 package-lock.json
+
+# Sqlite
+*.sqlite

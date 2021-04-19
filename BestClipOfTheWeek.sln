@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2002
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31205.134
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BestClipOfTheWeek", "src\BestClipOfTheWeek\BestClipOfTheWeek.csproj", "{69E97C89-97FF-4006-9043-9837F704A4C6}"
 EndProject
@@ -12,13 +12,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.eslintrc.json = .eslintrc.json
 		.gitignore = .gitignore
 		.stylelintrc = .stylelintrc
-		appveyor.yml = appveyor.yml
-		Dockerfile = Dockerfile
 		LICENSE.md = LICENSE.md
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BestClipOfTheWeek.Tests.Unit", "tests\BestClipOfTheWeek.Tests.Unit\BestClipOfTheWeek.Tests.Unit.csproj", "{75954E18-95D1-4A1C-80A9-1C6CEF061372}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BestClipOfTheWeek.Tests.Unit", "tests\BestClipOfTheWeek.Tests.Unit\BestClipOfTheWeek.Tests.Unit.csproj", "{75954E18-95D1-4A1C-80A9-1C6CEF061372}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

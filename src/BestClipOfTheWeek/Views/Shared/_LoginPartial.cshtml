@@ -4,7 +4,7 @@
 
 @if (SignInManager.IsSignedIn(User))
 {
-  <form class="nav-item dropdown" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new {area = ""})" method="post" id="logoutForm">
+  <form class="nav-item dropdown" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Page("/", new { area = "" })" method="post" id="logoutForm">
     <a class="nav-link dropdown-toggle text-light" href="#" id="navbarDropdownMenuLink" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
       @UserManager.GetUserName(User)
     </a>
