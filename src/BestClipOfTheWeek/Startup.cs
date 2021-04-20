@@ -167,7 +167,7 @@ namespace BestClipOfTheWeek
             });
 
             // Ensure database is created and up to date
-            dbContext.Database.Migrate();
+            // dbContext.Database.Migrate();
         }
 
         /// <summary>
