@@ -118,6 +118,12 @@ namespace BestClipOfTheWeek
 
             // Repositories
             services.AddScoped<ITermsRepository, TermsRepository>();
+
+            // Options
+            services.Configure<Models.EmailSenderOptions>(Configuration);
+
+            // Other
+            services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();
         }
 
         protected virtual void ConfigureAuthentication(IServiceCollection services)

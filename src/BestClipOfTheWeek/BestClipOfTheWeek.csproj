@@ -12,6 +12,7 @@
     <IsTestProject>false</IsTestProject>
     <LangVersion>latest</LangVersion>
     <Nullable>enable</Nullable>
+     <UserSecretsId>aspnet-BestClipOfTheWeek-6EFDB5E8-ABF7-4823-A7A9-E33A9B83A8AD</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
