@@ -56,13 +56,13 @@ export default class Grid extends Component {
       return [];
     }
 
-    // Get playlsit Id
+    // Get playlist Id
     const playlistId = await service.getPlaylistId(channelId, playlistName, token);
     if (!playlistId) {
       return [];
     }
 
-    // Get playlsit video ids
+    // Get playlist video ids
     const videos = await service.getPlaylistVideos(playlistId, token);
     if (!videos) {
       return [];

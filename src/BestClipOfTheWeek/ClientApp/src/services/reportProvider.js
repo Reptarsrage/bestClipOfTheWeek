@@ -17,13 +17,13 @@ export const getChannelPlaylistVideosAsync = async (channelName, playlistName) =
     return undefined;
   }
 
-  // Get playlsit Id
+  // Get playlist Id
   const playlistId = await service.getPlaylistId(channelId, playlistName, token);
   if (!playlistId) {
     return undefined;
   }
 
-  // Get playlsit video ids
+  // Get playlist video ids
   const videos = await service.getPlaylistVideos(playlistId, token);
   if (!videos) {
     return undefined;
