@@ -18,4 +18,8 @@ jobs:
           dotnet-version: 6.0.100-preview.4.21255.9
 
       - name: Test
-        run: dotnet test -v n
+        run: dotnet test -v n -c Release --collect:"XPlat Code Coverage"
+
+      - uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
