@@ -1,103 +1,97 @@
-import React, { Component } from 'react'
+import React from 'react'
 import { Collapse, Container, Navbar, NavbarToggler, NavItem, NavLink, Nav } from 'reactstrap'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 import { LoginMenu } from './api-authorization/LoginMenu'
 import authService from './api-authorization/AuthorizeService'
 import './NavMenu.css'
 
-export class NavMenu extends Component {
-  static displayName = NavMenu.name
+export function NavMenu() {
+  const location = useLocation()
+  const [collapsed, setCollapsed] = React.useState(true)
+  const [isReady, setIsReady] = React.useState(false)
+  const [authenticated, setAuthenticated] = React.useState(false)
 
-  constructor(props) {
-    super(props)
+  React.useEffect(() => {
+    populateAuthenticationState()
+  })
 
-    this.toggleNavbar = this.toggleNavbar.bind(this)
-    this.state = {
-      collapsed: true,
-      isReady: false,
-      authenticated: false,
-    }
-  }
+  const isActive = React.useCallback(
+    (path) => {
+      return path === location.pathname
+    },
+    [location.pathname]
+  )
 
-  componentDidMount() {
-    this.populateAuthenticationState()
-  }
-
-  async populateAuthenticationState() {
+  async function populateAuthenticationState() {
     const authenticated = await authService.isAuthenticated()
-    this.setState({ isReady: true, authenticated })
+    setIsReady(true)
+    setAuthenticated(authenticated)
   }
 
-  toggleNavbar() {
-    this.setState({
-      collapsed: !this.state.collapsed,
-    })
+  function toggleNavbar() {
+    setCollapsed((prevValue) => !prevValue)
   }
 
-  render() {
-    const { isReady, authenticated } = this.state
+  if (!isReady) {
+    return null
+  }
 
-    if (!isReady) {
-      return <header></header>
-    }
-
-    return (
-      <header>
-        <Navbar color="primary" dark expand="md">
-          <Container>
-            <NavbarToggler onClick={this.toggleNavbar} className="mr-2" />
-            <Collapse isOpen={!this.state.collapsed} navbar>
-              <Nav className="mr-auto" navbar>
-                {!authenticated && (
-                  <NavItem>
-                    <NavLink tag={Link} to="/" activeClassName="active">
-                      <FontAwesomeIcon className="mr-2" icon={['fas', 'home']} />
-                      Home
-                    </NavLink>
-                  </NavItem>
-                )}
-
-                {authenticated && (
-                  <NavItem>
-                    <NavLink tag={Link} to="/report" activeClassName="active">
-                      <FontAwesomeIcon className="mr-2" icon={['fas', 'home']} />
-                      Report
-                    </NavLink>
-                  </NavItem>
-                )}
-
-                {authenticated && (
-                  <NavItem>
-                    <NavLink tag={Link} to="/terms" activeClassName="active">
-                      <FontAwesomeIcon className="mr-2" icon={['fas', 'edit']} />
-                      Edit Terms
-                    </NavLink>
-                  </NavItem>
-                )}
-
+  return (
+    <header>
+      <Navbar color="primary" dark expand="md">
+        <Container>
+          <NavbarToggler onClick={toggleNavbar} className="mr-2" />
+          <Collapse isOpen={!collapsed} navbar>
+            <Nav className="mr-auto" navbar>
+              {!authenticated && (
                 <NavItem>
-                  <NavLink tag={Link} to="/about" activeClassName="active">
-                    <FontAwesomeIcon className="mr-2" icon={['fas', 'info']} />
-                    About
+                  <NavLink tag={Link} to="/" active={isActive('/')}>
+                    <FontAwesomeIcon className="mr-2" icon={['fas', 'home']} />
+                    Home
                   </NavLink>
                 </NavItem>
+              )}
 
-                <NavItem className="mr-auto">
-                  <NavLink tag={Link} to="/contact" activeClassName="active">
-                    <FontAwesomeIcon className="mr-2" icon={['fas', 'envelope-open']} />
-                    Contact
+              {authenticated && (
+                <NavItem>
+                  <NavLink tag={Link} to="/report" active={isActive('/report')}>
+                    <FontAwesomeIcon className="mr-2" icon={['fas', 'home']} />
+                    Report
                   </NavLink>
                 </NavItem>
-              </Nav>
-              <Nav navbar>
-                <LoginMenu />
-              </Nav>
-            </Collapse>
-          </Container>
-        </Navbar>
-      </header>
-    )
-  }
+              )}
+
+              {authenticated && (
+                <NavItem>
+                  <NavLink tag={Link} to="/terms" active={isActive('/terms')}>
+                    <FontAwesomeIcon className="mr-2" icon={['fas', 'edit']} />
+                    Edit Terms
+                  </NavLink>
+                </NavItem>
+              )}
+
+              <NavItem>
+                <NavLink tag={Link} to="/about" active={isActive('/about')}>
+                  <FontAwesomeIcon className="mr-2" icon={['fas', 'info']} />
+                  About
+                </NavLink>
+              </NavItem>
+
+              <NavItem className="mr-auto">
+                <NavLink tag={Link} to="/contact" active={isActive('/contact')}>
+                  <FontAwesomeIcon className="mr-2" icon={['fas', 'envelope-open']} />
+                  Contact
+                </NavLink>
+              </NavItem>
+            </Nav>
+            <Nav navbar>
+              <LoginMenu />
+            </Nav>
+          </Collapse>
+        </Container>
+      </Navbar>
+    </header>
+  )
 }
