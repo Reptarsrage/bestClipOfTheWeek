@@ -251,6 +251,7 @@ class Report extends Component {
             </div>
           </div>
         </div>
+        
         <button
           type="button"
           aria-controls="topSectionCollapse"

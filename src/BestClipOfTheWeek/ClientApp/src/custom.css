@@ -108,7 +108,7 @@ body {
   width: 100%;
 }
 
-.collapse-toggle i {
+.collapse-toggle svg {
   transition: transform 250ms ease;
 }
 
@@ -116,7 +116,7 @@ body {
   outline: 0;
 }
 
-.collapse-toggle.collapsed i {
+.collapse-toggle.collapsed svg {
   transform: rotate(180deg);
 }
 
