@@ -1,5 +1,6 @@
 import YouTubeService from './youtubeService';
 import TermsService from './termsService';
+import authService from '../components/api-authorization/AuthorizeService'
 
 export const getTermsAsync = async (token) => {
   const service = new TermsService();
@@ -8,32 +9,34 @@ export const getTermsAsync = async (token) => {
 
 export const getChannelPlaylistVideosAsync = async (channelName, playlistName) => {
   const service = new YouTubeService();
+  const token = await authService.getAccessToken()
 
   // Get channel Id
-  const channelId = await service.getChannelId(channelName);
+  const channelId = await service.getChannelId(channelName, token);
   if (!channelId) {
     return undefined;
   }
 
   // Get playlsit Id
-  const playlistId = await service.getPlaylistId(channelId, playlistName);
+  const playlistId = await service.getPlaylistId(channelId, playlistName, token);
   if (!playlistId) {
     return undefined;
   }
 
   // Get playlsit video ids
-  const videos = await service.getPlaylistVideos(playlistId);
+  const videos = await service.getPlaylistVideos(playlistId, token);
   if (!videos) {
     return undefined;
   }
 
   // Get playlist videos
-  return service.batchProcessVideos(videos, 50, undefined);
+  return service.batchProcessVideos(videos, 50, undefined, token);
 };
 
-export const processVotes = (comments, oldVotes, oldVoters) => {
+export const processVotes = async (comments, oldVotes, oldVoters) => {
   // process votes
-  const ballots = batchProcessComments(comments, oldVotes);
+  const token = await authService.getAccessToken()
+  const ballots = batchProcessComments(comments, oldVotes, undefined, token);
   const voters = {};
   const votes = {};
 

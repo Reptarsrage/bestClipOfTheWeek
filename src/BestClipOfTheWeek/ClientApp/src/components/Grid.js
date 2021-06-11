@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 
-import YouTubeService from '../services/youtubeService';
 import Cell from './Cell';
+import YouTubeService from '../services/youtubeService';
+import authService from '../components/api-authorization/AuthorizeService'
 
 export default class Grid extends Component {
   constructor() {
@@ -47,27 +48,28 @@ export default class Grid extends Component {
   async getVideoImages() {
     const { channelName, playlistName } = this.state;
     const service = new YouTubeService();
+    const token = await authService.getAccessToken()
 
     // Get channel Id
-    const channelId = await service.getChannelId(channelName);
+    const channelId = await service.getChannelId(channelName, token);
     if (!channelId) {
       return [];
     }
 
     // Get playlsit Id
-    const playlistId = await service.getPlaylistId(channelId, playlistName);
+    const playlistId = await service.getPlaylistId(channelId, playlistName, token);
     if (!playlistId) {
       return [];
     }
 
     // Get playlsit video ids
-    const videos = await service.getPlaylistVideos(playlistId);
+    const videos = await service.getPlaylistVideos(playlistId, token);
     if (!videos) {
       return [];
     }
 
     // Get playlist videos
-    return service.batchProcessVideos(videos.slice(0, 20), 20);
+    return service.batchProcessVideos(videos.slice(0, 20), 20, undefined, token);
   }
 
   handleResize() {
@@ -77,11 +79,6 @@ export default class Grid extends Component {
 
     const columnCount = Math.max(minColumns, Math.floor(clientWidth / width));
     let rowCount = Math.floor(clientHeight / height);
-
-    console.log('>>>', { clientWidth, clientHeight })
-    console.log('>>>', columnCount)
-    console.log('>>>', rowCount)
-
 
     // If we're at the min column count, we need to adjust row count to keep cell aspect ratios
     if (columnCount === minColumns) {
@@ -118,7 +115,6 @@ export default class Grid extends Component {
       }
     }
 
-    console.log('>>>', rows)
     this.setState(prevState => ({ ...prevState, rows }));
   }
 

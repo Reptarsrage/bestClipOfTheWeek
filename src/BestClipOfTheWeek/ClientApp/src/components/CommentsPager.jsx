@@ -6,6 +6,7 @@ import { GridLoader } from 'halogenium';
 import LoadingButton from './LoadingButton';
 import { parseComments, sortComments } from '../services/reportProvider';
 import YouTubeService from '../services/youtubeService';
+import authService from '../components/api-authorization/AuthorizeService'
 
 export default class CommentsPager extends Component {
   static expandTop() {
@@ -64,8 +65,9 @@ export default class CommentsPager extends Component {
     }));
 
     // Get comments
+    const token = await authService.getAccessToken()
     const service = new YouTubeService();
-    const results = await service.getCommentPageForVideo(selectedVideo.id, 25, startOver ? undefined : nextPageToken);
+    const results = await service.getCommentPageForVideo(selectedVideo.id, 25, startOver ? undefined : nextPageToken, token);
 
     // Parse results
     let { comments } = results;

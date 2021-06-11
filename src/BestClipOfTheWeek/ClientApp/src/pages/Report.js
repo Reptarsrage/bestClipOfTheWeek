@@ -169,7 +169,8 @@ export class Report extends Component {
 
       // Start fetching comments
       const service = new YouTubeService()
-      await service.getAllCommentsForVideo(id, 500, this.processUpdates)
+      const token = await authService.getAccessToken()
+      await service.getAllCommentsForVideo(id, 500, this.processUpdates, token)
 
       // Finish
       this.setState((prevState) => ({

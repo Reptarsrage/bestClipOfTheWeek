@@ -118,6 +118,7 @@ namespace BestClipOfTheWeek
 
             // Options
             services.Configure<Models.EmailSenderOptions>(Configuration.GetSection("Email"));
+            services.Configure<Models.YouTubeOptions>(Configuration.GetSection("YouTube"));
 
             // Other
             services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();

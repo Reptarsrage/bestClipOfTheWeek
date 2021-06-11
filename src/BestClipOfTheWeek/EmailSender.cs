@@ -28,7 +28,7 @@ namespace BestClipOfTheWeek
             var client = new SendGridClient(apiKey);
             var msg = new SendGridMessage()
             {
-                From = new EmailAddress("no.reply.bestclipoftheweek@gmail.com"),
+                From = new EmailAddress(Options.User),
                 Subject = subject,
                 PlainTextContent = message,
                 HtmlContent = message
