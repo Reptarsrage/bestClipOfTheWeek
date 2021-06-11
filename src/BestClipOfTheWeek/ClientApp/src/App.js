@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Layout } from './components/Layout';
 import { Home } from './pages/Home';
-import { Report } from './pages/Report';
+import { ReportWithRouter } from './pages/Report';
 import { Terms } from './pages/Terms';
 import { Contact } from './pages/Contact';
 import { About } from './pages/About';
@@ -20,7 +20,7 @@ export default class App extends Component {
     return (
       <Layout>
         <Route exact path='/' component={Home} />
-        <AuthorizeRoute path='/report' component={Report} />
+        <AuthorizeRoute path='/report' component={ReportWithRouter} />
         <AuthorizeRoute path='/terms' component={Terms} />
         <Route path='/contact' component={Contact} />
         <Route path='/about' component={About} />
