@@ -1,9 +1,9 @@
-using System.Net;
-using System.Net.Mail;
-using System.Threading.Tasks;
 using BestClipOfTheWeek.Models;
 using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Options;
+using SendGrid;
+using SendGrid.Helpers.Mail;
+using System.Threading.Tasks;
 
 namespace BestClipOfTheWeek
 {
@@ -11,41 +11,35 @@ namespace BestClipOfTheWeek
     // For more details see https://go.microsoft.com/fwlink/?LinkID=532713
     public class EmailSender : IEmailSender
     {
-        private readonly SmtpClient _client;
-        private readonly IOptions<EmailSenderOptions> _options;
-        private readonly MailAddress _fromAddress;
-
-        public EmailSender(IOptions<EmailSenderOptions> options)
+        public EmailSender(IOptions<EmailSenderOptions> optionsAccessor)
         {
-            _options = options;
-            _fromAddress = new MailAddress(_options.Value.User, "Best Clip Of The Week");
-            _client = new SmtpClient
-            {
-                Host = "smtp.gmail.com",
-                Port = 587,
-                EnableSsl = true,
-                DeliveryMethod = SmtpDeliveryMethod.Network,
-                Credentials = new NetworkCredential(_fromAddress.Address, _options.Value.Password),
-                Timeout = 20000
-            };
+            Options = optionsAccessor.Value;
         }
 
-        /// <summary>
-        /// Sends a mail to a user using Gmail STMP
-        /// </summary>
-        /// <param name="email">Address to send to</param>
-        /// <param name="subject">Email subject line</param>
-        /// <param name="htmlMessage">Email body</param>
-        /// <remarks>
-        /// For troubleshooting
-        /// <see href="https://stackoverflow.com/questions/704636/sending-email-through-gmail-smtp-server-with-c-sharp" />
-        /// </remarks>
-        public async Task SendEmailAsync(string email, string subject, string htmlMessage)
+        public EmailSenderOptions Options { get; }
+
+        public Task SendEmailAsync(string email, string subject, string message)
         {
-            using (var msg = new MailMessage(_fromAddress.Address, email, subject, htmlMessage) { IsBodyHtml = true })
+            return Execute(Options.Key, subject, message, email);
+        }
+
+        public Task Execute(string apiKey, string subject, string message, string email)
+        {
+            var client = new SendGridClient(apiKey);
+            var msg = new SendGridMessage()
             {
-                await _client.SendMailAsync(msg);
-            }
+                From = new EmailAddress("no.reply.bestclipoftheweek@gmail.com"),
+                Subject = subject,
+                PlainTextContent = message,
+                HtmlContent = message
+            };
+            msg.AddTo(new EmailAddress(email));
+
+            // Disable click tracking.
+            // See https://sendgrid.com/docs/User_Guide/Settings/tracking.html
+            msg.SetClickTracking(false, false);
+
+            return client.SendEmailAsync(msg);
         }
     }
 }

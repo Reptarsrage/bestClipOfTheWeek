@@ -2,8 +2,8 @@ namespace BestClipOfTheWeek.Models
 {
     public class EmailSenderOptions
     {
-        public string? User { get; set; }
+        public string User { get; set; } = default!;
 
-        public string? Password { get; set; }
+        public string Key { get; set; } = default!;
     }
 }

@@ -53,9 +53,6 @@ namespace BestClipOfTheWeek
                 o.EnableForHttps = true;
             });
 
-            // Enable default memory cache
-            services.AddMemoryCache();
-
             // Configure Dependency Injection and Authentication
             ConfigureDependencyInjection(services);
             ConfigureAuthentication(services);
@@ -120,7 +117,7 @@ namespace BestClipOfTheWeek
             services.AddScoped<ITermsRepository, TermsRepository>();
 
             // Options
-            services.Configure<Models.EmailSenderOptions>(Configuration);
+            services.Configure<Models.EmailSenderOptions>(Configuration.GetSection("Email"));
 
             // Other
             services.AddTransient<Microsoft.AspNetCore.Identity.UI.Services.IEmailSender, EmailSender>();
