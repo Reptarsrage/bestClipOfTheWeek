@@ -9,7 +9,7 @@
     "axios": "^0.21.1",
     "bootstrap": "^5.0.1",
     "d3-format": "^1.4.5",
-    "halogenium": "^2.2.3",
+    "halogenium": "2.3.0",
     "http-proxy-middleware": "^0.19.1",
     "jquery": "^3.5.1",
     "luxon": "^1.27.0",
