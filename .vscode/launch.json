@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build",
-            "program": "${workspaceFolder}/BestClipOfTheWeek/bin/Debug/net6.0/BestClipOfTheWeek.dll",
+            "program": "${workspaceFolder}/src/BestClipOfTheWeek/bin/Debug/net6.0/BestClipOfTheWeek.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/BestClipOfTheWeek",
+            "cwd": "${workspaceFolder}/src/BestClipOfTheWeek",
             "stopAtEntry": false,
             "serverReadyAction": {
                 "action": "openExternally",
@@ -21,7 +21,7 @@
                 "ASPNETCORE_ENVIRONMENT": "Development"
             },
             "sourceFileMap": {
-                "/Views": "${workspaceFolder}/Views"
+                "/Views": "${workspaceFolder}/src/BestClipOfTheWeek/Views"
             }
         },
         {
