@@ -16,7 +16,7 @@
     "merge": "^1.2.1",
     "oidc-client": "^1.9.0",
     "react": "^16.0.0",
-    "react-card-flip": "^0.8.1",
+    "react-card-flip": "1.1.1",
     "react-color": "^2.18.0",
     "react-dom": "^16.0.0",
     "react-odometerjs": "^2.1.1",
