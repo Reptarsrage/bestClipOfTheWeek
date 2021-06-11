@@ -1,20 +1,13 @@
 using BestClipOfTheWeek.Data;
-using BestClipOfTheWeek.Extensions;
-using BestClipOfTheWeek.Models;
 using BestClipOfTheWeek.Repositories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using System.Net;
-using System.Text.Json;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace BestClipOfTheWeek
 {
@@ -27,106 +20,50 @@ namespace BestClipOfTheWeek
         }
 
         public IConfiguration Configuration { get; }
-
         public IWebHostEnvironment Environment { get; }
 
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options
-                .UseSqlite(Configuration.GetConnectionString("DefaultConnection")));
+            // Enable Entity Framework
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(
+                    Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            // Add authentication (Identity Server, JWT)
+            services.AddDefaultIdentity<Models.Dto.ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies
-                // is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
+            services.AddIdentityServer()
+                .AddApiAuthorization<Models.Dto.ApplicationUser, ApplicationDbContext>();
 
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Events.OnRedirectToLogin = (context) =>
-                {
-                    if (context.Request.Path.StartsWithSegments("/api"))
-                    {
-                        context.Response.Clear();
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    }
-                    else
-                    {
-                        context.Response.Redirect(context.RedirectUri);
-                    }
+            // Add MVC
+            services.AddControllersWithViews();
 
-                    return Task.CompletedTask;
-                };
-            });
-
-            // Add external logins
-            services.AddAuthentication()
-                .AddGoogle(googleOptions =>
-                {
-                    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-                    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-                })
-                .AddMicrosoftAccount(microsoftOptions =>
-                {
-                    microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ApplicationId"];
-                    microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:Password"];
-                })
-                .AddTwitter(twitterOptions =>
-                {
-                    twitterOptions.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
-                    twitterOptions.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
-                })
-                .AddFacebook(facebookOptions =>
-                {
-                    facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
-                    facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                });
-
-            // Enable default memory cache
-            services.AddMemoryCache();
-
-            // Enable Options
-            services.AddOptions();
+            // Add Razor
+            services.AddRazorPages();
 
             // Enable AutoMapper
             services.AddAutoMapper(typeof(Startup));
 
-            // Enable http client factory
-            services.AddHttpClient();
-
-            // Enable response compression even for https, which should be fine
-            services.AddResponseCompression(opts =>
+            // Enable compression
+            services.AddResponseCompression(o =>
             {
-                opts.EnableForHttps = true;
+                o.EnableForHttps = true;
             });
 
-            // Configure CORS
-            services.ConfigureCors();
+            // Enable default memory cache
+            services.AddMemoryCache();
 
-            // Add MVC
-            services.AddMvc().AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.PropertyNamingPolicy = JsonNamingPolicy.CamelCase;
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
-
-            // DI
+            // Configure Dependency Injection and Authentication
             ConfigureDependencyInjection(services);
+            ConfigureAuthentication(services);
         }
 
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        /// </summary>
-        public void Configure(IApplicationBuilder app, IWebHostEnvironment env, ApplicationDbContext dbContext)
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            // Use the injected ForwardedHeadersOptions
-            app.UseForwardedHeaders();
-
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -134,50 +71,35 @@ namespace BestClipOfTheWeek
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseForwardedHeaders();
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
+                app.UseResponseCompression();
             }
 
-            // Redirect to https
             app.UseHttpsRedirection();
-
-            // Serve static assets
             app.UseStaticFiles();
-
-            // Cookies
-            app.UseCookiePolicy();
-
-            // Use response compression
-            app.UseResponseCompression();
-
-            // Route MVC controllers
             app.UseRouting();
 
-            // Support authentication
             app.UseAuthentication();
+            app.UseIdentityServer();
             app.UseAuthorization();
-
-            // Map all endpoints
             app.UseEndpoints(endpoints =>
             {
-                endpoints.MapRazorPages();
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller=Home}/{action=Index}/{id?}");
-            });
+                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
 
-            // Ensure database is created and up to date
-            // dbContext.Database.Migrate();
+                endpoints.MapFallbackToFile("index.html");
+            });
         }
 
-        /// <summary>
-        /// Configures injected dependencies
-        /// </summary>
         protected virtual void ConfigureDependencyInjection(IServiceCollection services)
         {
             // Configuration for Forwarded Headers.
             // Handle headers set by our load balancer.
-            // This allows authentication to work even though the nginx removes the https scheme from the request
+            // This allows authentication to work even though the load balancer removes the https scheme from the request
             services.Configure<ForwardedHeadersOptions>(options =>
             {
                 options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
@@ -188,25 +110,24 @@ namespace BestClipOfTheWeek
                 options.KnownProxies.Clear();
             });
 
-            // Identity options
-            services.Configure<IdentityOptions>(options =>
+            // Configure compression
+            services.Configure<BrotliCompressionProviderOptions>(options =>
             {
-                // Password settings
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
+                options.Level = System.IO.Compression.CompressionLevel.Fastest;
             });
-
-            // Options
-            services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
-            services.Configure<YouTubeOptions>(Configuration.GetSection("YouTube"));
 
             // Repositories
             services.AddScoped<ITermsRepository, TermsRepository>();
+        }
 
-            // Email
-            services.AddSingleton<IEmailSender, EmailSender>();
+        protected virtual void ConfigureAuthentication(IServiceCollection services)
+        {
+            // Add JWT verification (when not testing)
+            if (!Environment.IsEnvironment("Testing"))
+            {
+                services.AddAuthentication()
+                    .AddIdentityServerJwt();
+            }
         }
     }
 }
