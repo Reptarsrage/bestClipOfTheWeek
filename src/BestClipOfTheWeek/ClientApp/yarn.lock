@@ -9292,10 +9292,10 @@ react-lifecycles-compat@^3.0.4:
   resolved "https://registry.yarnpkg.com/react-lifecycles-compat/-/react-lifecycles-compat-3.0.4.tgz#4f1a273afdfc8f3488a8c516bfda78f872352362"
   integrity sha512-fBASbA6LnOU9dOU2eW7aQ8xmYBSXUIWr+UmF9b1efZBazGNO+rcXT/icdKnYm2pTwcRylVUYwW7H1PHfLekVzA==
 
-react-odometerjs@2.1.1:
-  version "2.1.1"
-  resolved "https://registry.yarnpkg.com/react-odometerjs/-/react-odometerjs-2.1.1.tgz#f8bd14fa2c53366354abe127d3eb7ae0a3d019c8"
-  integrity sha512-LG48u0Jzysg+bwEhJ+Dyxo13vW/R9dYXetZmeZeM6FM52e76wt9FxG6ofKYZpcZxM3ytMfLmLDlVnOCKfAGnCQ==
+react-odometerjs@2.1.2:
+  version "2.1.2"
+  resolved "https://registry.yarnpkg.com/react-odometerjs/-/react-odometerjs-2.1.2.tgz#0a6376aac44fc68613c4b04ed6cb6952cd68182f"
+  integrity sha512-e2fflNzoOwCGOI2PG5HZkp8Sl8AEIk/Ug1UilU4H93GZWxK94g5AnrGuaqfAZKp85QxG61L/uHd98OOh/8HOyg==
   dependencies:
     odometer "^0.4.8"
 
