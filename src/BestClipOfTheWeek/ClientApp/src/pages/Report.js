@@ -3,6 +3,7 @@ import 'odometer/themes/odometer-theme-minimal.css'
 import React, { Component } from 'react'
 import Odometer from 'react-odometerjs'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { withRouter } from 'react-router'
 
 import LoadingButton from '../components/LoadingButton'
 import SelectedVideoInfo from '../components/SelectedVideoInfo'
@@ -16,10 +17,11 @@ import YouTubeService from '../services/youtubeService'
 import { getChannelPlaylistVideosAsync, getTermsAsync, processVotes } from '../services/reportProvider'
 import authService from '../components/api-authorization/AuthorizeService'
 
-export class Report extends Component {
+class Report extends Component {
   constructor() {
     super()
     this.state = {
+      isReady: false,
       channelName: 'StoneMountain64',
       playlistName: "World's Best Clip of the Week",
       primaryColor: '#2196F3',
@@ -54,6 +56,7 @@ export class Report extends Component {
     this.fetchTermsAsync = this.fetchTermsAsync.bind(this)
     this.changeSelectedVideo = this.changeSelectedVideo.bind(this)
     this.processUpdates = this.processUpdates.bind(this)
+    this.checkAuth = this.checkAuth.bind(this)
   }
 
   changeSelectedVideo(video) {
@@ -64,8 +67,19 @@ export class Report extends Component {
   }
 
   componentDidMount() {
+    this.checkAuth()
     this.fetchPlaylistVideosAsync()
     this.fetchTermsAsync()
+  }
+
+  async checkAuth() {
+    const { history } = this.props
+    const isAuthenticated = await authService.isAuthenticated()
+    if (!isAuthenticated) {
+      history.replace('/')
+    }
+
+    this.setState({ isReady: true })
   }
 
   async fetchPlaylistVideosAsync() {
@@ -188,12 +202,16 @@ export class Report extends Component {
   }
 
   render() {
-    const { selectedVideo, comments, playlistVideos, primaryColor, terms, channelName, playlistName, votes } =
+    const { isReady, selectedVideo, comments, playlistVideos, primaryColor, terms, channelName, playlistName, votes } =
       this.state
     const { fetching, total, count } = comments
     const title = fetching ? 'Loading...' : 'Start'
     const id = (selectedVideo && selectedVideo.id) || ''
     const showResults = fetching || count > 0
+
+    if (!isReady) {
+      return null
+    }
 
     return (
       <div className="container-fluid">
@@ -299,3 +317,5 @@ export class Report extends Component {
     )
   }
 }
+
+export const ReportWithRouter = withRouter(Report)
