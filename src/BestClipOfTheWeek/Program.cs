@@ -1,6 +1,6 @@
-using BestClipOfTheWeek.Extensions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Hosting;
+using TheArchives.Server.Extensions;
 
 namespace BestClipOfTheWeek
 {
@@ -15,8 +15,8 @@ namespace BestClipOfTheWeek
             Host.CreateDefaultBuilder(args)
                 .ConfigureWebHostDefaults(webBuilder =>
                 {
-                    webBuilder.UseStartup<Startup>();
                     webBuilder.AddLogging();
+                    webBuilder.UseStartup<Startup>();
                 });
     }
 }
