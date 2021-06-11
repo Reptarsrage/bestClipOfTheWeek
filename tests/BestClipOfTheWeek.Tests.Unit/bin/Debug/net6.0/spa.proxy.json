@@ -1,0 +1,8 @@
+{
+"SpaProxyServer": {
+"ServerUrl": "https://localhost:5002",
+"LaunchCommand": "npm start",
+"WorkingDirectory": "C:\\Users\\jrobb\\Source\\temp\\BestClipOfTheWeek\\src\\BestClipOfTheWeek\\ClientApp\\",
+"MaxTimeoutInSeconds": "120"
+}
+}

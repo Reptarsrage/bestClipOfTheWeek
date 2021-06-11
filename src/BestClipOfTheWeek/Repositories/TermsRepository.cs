@@ -1,5 +1,4 @@
 using BestClipOfTheWeek.Data;
-using BestClipOfTheWeek.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,13 +6,46 @@ using System.Threading.Tasks;
 
 namespace BestClipOfTheWeek.Repositories
 {
+    /// <summary>
+    /// CRUD operations for user terms
+    /// </summary>
+    public interface ITermsRepository
+    {
+        /// <summary>
+        /// Add a new user term
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <param name="term">Term to add</param>
+        /// <returns>The newly assigned <see cref="Term.TermId"/></returns>
+        Task<int> AddTerm(string userId, Models.Dto.Term term);
+
+        /// <summary>
+        /// Read user terms
+        /// </summary>
+        /// <param name="userId">User Id</param>
+        /// <returns>List of terms for the specified user.</returns>
+        Task<IEnumerable<Models.Dto.Term>> ReadTerms(string userId);
+
+        /// <summary>
+        /// Updates an existing user term
+        /// </summary>
+        /// <param name="terms">Term to update. Make sure <see cref="Term.TermId"/> stays the same.</param>
+        Task UpdateTerm(Models.Dto.Term terms);
+
+        /// <summary>
+        /// Remove a user term
+        /// </summary>
+        /// <param name="id"><see cref="Term.TermId"/></param>
+        Task RemoveTerm(int id);
+    }
+
     /// <inheritdoc cref="ITermsRepository"/>
     public class TermsRepository : ITermsRepository
     {
         private readonly ApplicationDbContext _context;
 
         /// <summary>
-        /// Creates a new instanace of a <see cref="TermsRepository"/>
+        /// Creates a new instance of a <see cref="TermsRepository"/>
         /// </summary>
         /// <param name="context"></param>
         public TermsRepository(ApplicationDbContext context)
@@ -22,25 +54,25 @@ namespace BestClipOfTheWeek.Repositories
         }
 
         /// <inheritdoc cref="ITermsRepository.ReadTerms"/>
-        public async Task<List<Term>> ReadTerms(string userId)
+        public async Task<IEnumerable<Models.Dto.Term>> ReadTerms(string userId)
         {
             var user = await GetUserAndTerms(userId);
             return user.Terms;
         }
 
         /// <inheritdoc cref="ITermsRepository.AddTerm"/>
-        public async Task<int> AddTerm(string userId, Term term)
+        public async Task<int> AddTerm(string userId, Models.Dto.Term term)
         {
             var user = await GetUserAndTerms(userId);
             _context.Users.Attach(user);
-            user.Terms = user.Terms ?? new List<Term>();
+            user.Terms = user.Terms ?? new List<Models.Dto.Term>();
             user.Terms.Add(term);
             await _context.SaveChangesAsync();
             return term.TermId;
         }
 
         /// <inheritdoc cref="ITermsRepository.UpdateTerm"/>
-        public async Task UpdateTerm(Term term)
+        public async Task UpdateTerm(Models.Dto.Term term)
         {
             var termOld = await GetTerm(term.TermId);
             _context.Terms.Attach(termOld);
@@ -63,7 +95,7 @@ namespace BestClipOfTheWeek.Repositories
         /// </summary>
         /// <param name="termId"><see cref="Term.TermId"/></param>
         /// <returns>The requested term</returns>
-        private async Task<Term> GetTerm(int termId)
+        private async Task<Models.Dto.Term> GetTerm(int termId)
         {
             return await _context.Terms
                 .Where(b => b.TermId.Equals(termId))
@@ -75,7 +107,7 @@ namespace BestClipOfTheWeek.Repositories
         /// </summary>
         /// <param name="userId">User Id</param>
         /// <returns>The requested <see cref="ApplicationUser"/></returns>
-        private async Task<ApplicationUser> GetUserAndTerms(string userId)
+        private async Task<Models.Dto.ApplicationUser> GetUserAndTerms(string userId)
         {
             return await _context.Users
                 .Where(b => b.Id.Equals(userId))

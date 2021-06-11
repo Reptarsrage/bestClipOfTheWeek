@@ -1,186 +1,133 @@
-using AutoMapper;
 using BestClipOfTheWeek.Data;
-using BestClipOfTheWeek.Models;
 using BestClipOfTheWeek.Repositories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity.UI.Services;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
-using System.Net;
-using System.Threading.Tasks;
+using Microsoft.Extensions.Hosting;
 
 namespace BestClipOfTheWeek
 {
     public class Startup
     {
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to build the configuration.
-        /// </summary>
-        public Startup(IHostingEnvironment env)
+        public Startup(IConfiguration configuration, IWebHostEnvironment environment)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", false, true)
-                .AddEnvironmentVariables();
-
-            if (env.IsDevelopment())
-                builder
-                    .AddJsonFile("appsettings.local.json", true, true)
-                    .AddUserSecrets<Startup>();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
+            Environment = environment;
         }
 
         public IConfiguration Configuration { get; }
+        public IWebHostEnvironment Environment { get; }
 
-
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to add services to the container.
-        /// </summary>
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddDbContext<ApplicationDbContext>(options => options
-                .UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+            // Enable Entity Framework
+            services.AddDbContext<ApplicationDbContext>(options =>
+                options.UseSqlite(
+                    Configuration.GetConnectionString("DefaultConnection")));
 
-            services.AddDefaultIdentity<ApplicationUser>()
+            services.AddDatabaseDeveloperPageExceptionFilter();
+
+            // Add authentication (Identity Server, JWT)
+            services.AddDefaultIdentity<Models.Dto.ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
                 .AddEntityFrameworkStores<ApplicationDbContext>();
 
-            services.Configure<CookiePolicyOptions>(options =>
+            services.AddIdentityServer()
+                .AddApiAuthorization<Models.Dto.ApplicationUser, ApplicationDbContext>();
+
+            // Add MVC
+            services.AddControllersWithViews();
+
+            // Add Razor
+            services.AddRazorPages();
+
+            // Enable AutoMapper
+            services.AddAutoMapper(typeof(Startup));
+
+            // Enable compression
+            services.AddResponseCompression(o =>
             {
-                // This lambda determines whether user consent for non-essential cookies
-                // is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                o.EnableForHttps = true;
             });
 
-            services.ConfigureApplicationCookie(options =>
-            {
-                options.Events.OnRedirectToLogin = (context) =>
-                {
-                    if (context.Request.Path.StartsWithSegments("/api"))
-                    {
-                        context.Response.Clear();
-                        context.Response.StatusCode = (int)HttpStatusCode.Unauthorized;
-                    }
-                    else
-                    {
-                        context.Response.Redirect(context.RedirectUri);
-                    }
-
-                    return Task.CompletedTask;
-                };
-            });
-
-            services.AddAuthentication()
-                .AddGoogle(googleOptions =>
-                {
-                    googleOptions.ClientId = Configuration["Authentication:Google:ClientId"];
-                    googleOptions.ClientSecret = Configuration["Authentication:Google:ClientSecret"];
-                })
-                .AddMicrosoftAccount(microsoftOptions =>
-                {
-                    microsoftOptions.ClientId = Configuration["Authentication:Microsoft:ApplicationId"];
-                    microsoftOptions.ClientSecret = Configuration["Authentication:Microsoft:Password"];
-                })
-                .AddTwitter(twitterOptions =>
-                {
-                    twitterOptions.ConsumerKey = Configuration["Authentication:Twitter:ConsumerKey"];
-                    twitterOptions.ConsumerSecret = Configuration["Authentication:Twitter:ConsumerSecret"];
-                })
-                .AddFacebook(facebookOptions =>
-                {
-                    facebookOptions.AppId = Configuration["Authentication:Facebook:AppId"];
-                    facebookOptions.AppSecret = Configuration["Authentication:Facebook:AppSecret"];
-                });
-
-            services.AddAutoMapper(typeof(Startup).Assembly);
-            services.AddOptions();
+            // Enable default memory cache
             services.AddMemoryCache();
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Latest);
 
+            // Configure Dependency Injection and Authentication
             ConfigureDependencyInjection(services);
+            ConfigureAuthentication(services);
         }
 
-        /// <summary>
-        /// This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        /// </summary>
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ApplicationDbContext dbContext)
+        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true,
-                    ReactHotModuleReplacement = true
-                });
+                app.UseMigrationsEndPoint();
             }
             else
             {
-                app.UseExceptionHandler("/Home/Error");
+                app.UseForwardedHeaders();
+                app.UseExceptionHandler("/Error");
                 app.UseHsts();
+                app.UseResponseCompression();
             }
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-            app.UseCookiePolicy();
+            app.UseRouting();
 
             app.UseAuthentication();
-
-            app.UseMvc(routes =>
+            app.UseIdentityServer();
+            app.UseAuthorization();
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    "default",
-                    "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default",
+                    pattern: "{controller}/{action=Index}/{id?}");
+                endpoints.MapRazorPages();
 
-                routes.MapSpaFallbackRoute(
-                    name: "spa-fallback",
-                    defaults: new { controller = "Home", action = "Index" });
+                endpoints.MapFallbackToFile("index.html");
             });
-
-            ConfigureNewtonsoft(app, env);
-
-            // Ensure database is created and up to date
-            dbContext.Database.Migrate();
         }
 
-        /// <summary>
-        /// Configures injected dependencies
-        /// </summary>
-        private void ConfigureDependencyInjection(IServiceCollection services)
+        protected virtual void ConfigureDependencyInjection(IServiceCollection services)
         {
-            // Options
-            services.Configure<AuthMessageSenderOptions>(Configuration.GetSection("Email"));
-            services.Configure<YouTubeOptions>(Configuration.GetSection("YouTube"));
+            // Configuration for Forwarded Headers.
+            // Handle headers set by our load balancer.
+            // This allows authentication to work even though the load balancer removes the https scheme from the request
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor | Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+
+                // Only loopback proxies are allowed by default.
+                // Clear that restriction because forwarders are enabled by explicit configuration.
+                options.KnownNetworks.Clear();
+                options.KnownProxies.Clear();
+            });
+
+            // Configure compression
+            services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = System.IO.Compression.CompressionLevel.Fastest;
+            });
 
             // Repositories
             services.AddScoped<ITermsRepository, TermsRepository>();
-
-            // Email
-            services.AddSingleton<IEmailSender, EmailSender>();
         }
 
-        /// <summary>
-        /// Configures Json serialization
-        /// </summary>
-        private static void ConfigureNewtonsoft(IApplicationBuilder app, IHostingEnvironment env)
+        protected virtual void ConfigureAuthentication(IServiceCollection services)
         {
-            JsonConvert.DefaultSettings = () => new JsonSerializerSettings
+            // Add JWT verification (when not testing)
+            if (!Environment.IsEnvironment("Testing"))
             {
-                ContractResolver = new CamelCasePropertyNamesContractResolver(),
-                DateFormatHandling = DateFormatHandling.IsoDateFormat,
-                DefaultValueHandling = DefaultValueHandling.Include,
-                Formatting = env.IsDevelopment() ? Formatting.Indented : Formatting.None,
-                NullValueHandling = NullValueHandling.Include
-            };
+                services.AddAuthentication()
+                    .AddIdentityServerJwt();
+            }
         }
     }
 }
