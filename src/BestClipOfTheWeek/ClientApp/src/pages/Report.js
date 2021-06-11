@@ -63,9 +63,9 @@ export class Report extends Component {
     }))
   }
 
-  async componentDidMount() {
-    await this.fetchPlaylistVideosAsync()
-    await this.fetchTermsAsync()
+  componentDidMount() {
+    this.fetchPlaylistVideosAsync()
+    this.fetchTermsAsync()
   }
 
   async fetchPlaylistVideosAsync() {
@@ -110,11 +110,11 @@ export class Report extends Component {
     }))
   }
 
-  processUpdates(commentsBatchResults) {
+  async processUpdates(commentsBatchResults) {
     // Process Votes
     const { votes: votesState } = this.state
     const { votes, voters } = votesState
-    const voteResults = processVotes(commentsBatchResults, votes, voters)
+    const voteResults = await processVotes(commentsBatchResults, votes, voters)
 
     // Set state
     this.setState((prevState) => ({
