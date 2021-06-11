@@ -2,6 +2,7 @@ const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const context =  [
   "/api/terms",
+  "/api/youtubeapiconfig",
   "/_configuration",
   "/.well-known",
   "/Identity",

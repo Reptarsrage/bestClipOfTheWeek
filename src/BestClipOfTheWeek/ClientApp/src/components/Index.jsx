@@ -14,6 +14,7 @@ import VoteResultsList from './VoteResultsList'
 import YouTubeService from '../../youtubeService'
 import VoteTabControl from './VoteTabControl'
 import { getChannelPlaylistVideosAsync, getTermsAsync, processVotes } from '../reportProvider'
+import authService from '../components/api-authorization/AuthorizeService'
 
 export default class Index extends Component {
   constructor() {
@@ -167,7 +168,8 @@ export default class Index extends Component {
 
       // Start fetching comments
       const service = new YouTubeService()
-      await service.getAllCommentsForVideo(id, 500, this.processUpdates)
+      const token = await authService.getAccessToken()
+      await service.getAllCommentsForVideo(id, 500, this.processUpdates, token)
 
       // Finish
       this.setState((prevState) => ({

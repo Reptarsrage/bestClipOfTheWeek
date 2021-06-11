@@ -1,78 +1,83 @@
-import axios from 'axios';
+import axios from 'axios'
+
+import YouTubeApiConfigService from './youTubeApiConfigService'
 
 export default class YouTubeService {
   static chooseWorstImage(item) {
-    const { thumbnails } = item.snippet;
-    let image;
+    const { thumbnails } = item.snippet
+    let image
 
     if (thumbnails.default) {
-      image = thumbnails.default;
+      image = thumbnails.default
     } else if (thumbnails.medium) {
-      image = thumbnails.medium;
+      image = thumbnails.medium
     } else if (thumbnails.high) {
-      image = thumbnails.high;
+      image = thumbnails.high
     } else if (thumbnails.standard) {
-      image = thumbnails.standard;
+      image = thumbnails.standard
     } else if (thumbnails.maxres) {
-      image = thumbnails.maxres;
+      image = thumbnails.maxres
     } else {
-      return undefined;
+      return undefined
     }
 
     return {
       height: image.height,
       url: image.url,
       width: image.width,
-    };
+    }
   }
 
   static chooseBestImage(item) {
-    const { thumbnails } = item.snippet;
-    let image;
+    const { thumbnails } = item.snippet
+    let image
 
     if (thumbnails.maxres) {
-      image = thumbnails.maxres;
+      image = thumbnails.maxres
     } else if (thumbnails.standard) {
-      image = thumbnails.standard;
+      image = thumbnails.standard
     } else if (thumbnails.high) {
-      image = thumbnails.high;
+      image = thumbnails.high
     } else if (thumbnails.medium) {
-      image = thumbnails.medium;
+      image = thumbnails.medium
     } else if (thumbnails.default) {
-      image = thumbnails.default;
+      image = thumbnails.default
     } else {
-      return undefined;
+      return undefined
     }
 
     return {
       height: image.height,
       url: image.url,
       width: image.width,
-    };
+    }
   }
 
   constructor() {
-    this.baseUrl = 'https://www.googleapis.com/youtube/v3';
-    this.infoCacheTime = 86400; // seconds
-    this.playlistCacheTime = 300; // seconds
+    this.baseUrl = 'https://www.googleapis.com/youtube/v3'
+    this.infoCacheTime = 86400 // seconds
+    this.playlistCacheTime = 300 // seconds
+    this.configService = new YouTubeApiConfigService()
+    this.apiKey = undefined;
   }
 
   stringIsNotNullOrEmpty(s) {
-    return typeof s !== 'undefined' && s.length > 0;
+    return typeof s !== 'undefined' && s.length > 0
   }
 
-  async processVideoBatch(videoIds) {
+  async processVideoBatch(videoIds, token) {
+    const apiKey = await this.getApiKey(token)
     const params = {
       fields: 'items(id,snippet(publishedAt,thumbnails,title),statistics,contentDetails(duration))',
       id: videoIds.join(','),
-      key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0', // TODO: hit server for this
+      key: apiKey,
       maxResults: videoIds.length,
       part: 'id,statistics,snippet,contentDetails',
-    };
+    }
 
-    const response = await axios.get(`${this.baseUrl}/videos`, { params }, { ttl: this.infoCacheTime });
+    const response = await axios.get(`${this.baseUrl}/videos`, { params }, { ttl: this.infoCacheTime })
 
-    return response.data.items.map(item => ({
+    return response.data.items.map((item) => ({
       commentCount: parseInt(item.statistics.commentCount, 10),
       dislikeCount: parseInt(item.statistics.dislikeCount, 10),
       id: item.id,
@@ -82,244 +87,273 @@ export default class YouTubeService {
       publishedDate: new Date(Date.parse(item.snippet.publishedAt)),
       title: item.snippet.title,
       viewCount: parseInt(item.statistics.viewCount, 10),
-    }));
+    }))
   }
 
-  async processCommentBatch(commentIds) {
+  async processCommentBatch(commentIds, token) {
+    const apiKey = await this.getApiKey(token)
     const params = {
       fields: 'items(id,snippet(authorDisplayName,publishedAt,parentId,textDisplay))',
       id: commentIds.join(','),
-      key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0',
+      key: apiKey,
       part: 'id,snippet',
       textFormat: 'plainText',
-    };
+    }
 
-    const response = await axios.get(`${this.baseUrl}/comments`, { params }, { ttl: this.infoCacheTime });
+    const response = await axios.get(`${this.baseUrl}/comments`, { params }, { ttl: this.infoCacheTime })
 
-    return response.data.items.map(item => ({
+    return response.data.items.map((item) => ({
       author: item.snippet.authorDisplayName,
       id: item.id,
       parentId: item.snippet.parentId,
       publishedDate: new Date(Date.parse(item.snippet.publishedAt)),
       text: item.snippet.textDisplay,
-    }));
+    }))
   }
 
-  async batchProcessVideos(videoIds, batchSize, update) {
+  async batchProcessVideos(videoIds, batchSize, update, token) {
     // split all the videos we need to fetch into batches
-    const batches = [];
+    const batches = []
     for (let i = 0; i < videoIds.length; i += batchSize) {
-      batches.push(videoIds.slice(i, i + batchSize));
+      batches.push(videoIds.slice(i, i + batchSize))
     }
 
     // run all batches at once
     const results = await Promise.all(
-      batches.map(async batch => {
-        const batchResult = await this.processVideoBatch(batch);
+      batches.map(async (batch) => {
+        const batchResult = await this.processVideoBatch(batch, token)
         if (update) {
-          update(batchResult);
+          update(batchResult)
         }
 
-        return batchResult;
-      }),
-    );
+        return batchResult
+      })
+    )
 
     // flatten batches and return
-    const flatResults = [].concat(...results);
-    return flatResults;
+    const flatResults = [].concat(...results)
+    return flatResults
   }
 
-  async batchProcessComments(commentIds, batchSize, update) {
+  async batchProcessComments(commentIds, batchSize, update, token) {
     // split all the comments we need to fetch into batches
-    const batches = [];
+    const batches = []
     for (let i = 0; i < commentIds.length; i += batchSize) {
-      batches.push(commentIds.slice(i, i + batchSize));
+      batches.push(commentIds.slice(i, i + batchSize))
     }
 
     // run all batches at once
     const results = await Promise.all(
-      batches.map(async batch => {
-        const batchResult = await this.processCommentBatch(batch);
+      batches.map(async (batch) => {
+        const batchResult = await this.processCommentBatch(batch, token)
         if (update) {
-          update(batchResult);
+          update(batchResult)
         }
 
-        return batchResult;
-      }),
-    );
+        return batchResult
+      })
+    )
 
     // flatten batches and return
-    const flatResults = (results && results.length > 0 && results.reduce((a, b) => a.concat(b))) || [];
-    return flatResults;
+    const flatResults = (results && results.length > 0 && results.reduce((a, b) => a.concat(b))) || []
+    return flatResults
   }
 
-  async getCommentPageForVideo(videoId, pageSize, pageToken) {
-    const url = `${this.baseUrl}/commentThreads`;
+  async getCommentPageForVideo(videoId, pageSize, pageToken, token) {
+    const url = `${this.baseUrl}/commentThreads`
+    const apiKey = await this.getApiKey(token)
     const params = {
       fields: 'items(id,replies(comments(id,snippet(publishedAt,textDisplay,authorDisplayName)))),nextPageToken',
-      key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0',
+      key: apiKey,
       maxResults: pageSize,
       order: 'relevance',
       pageToken,
       part: 'id,replies',
       videoId,
-    };
+    }
 
     // Get comment Ids
-    const response = await axios.get(url, { params }, { ttl: this.infoCacheTime });
+    const response = await axios.get(url, { params }, { ttl: this.infoCacheTime })
 
     // Add comments
-    let commentIds = response.data.items.map(item => item.id).filter(id => this.stringIsNotNullOrEmpty(id));
+    let commentIds = response.data.items.map((item) => item.id).filter((id) => this.stringIsNotNullOrEmpty(id))
 
     // Add replies
-    const commentsWithReplies = response.data.items.filter(item => item.replies && item.replies.comments && item.replies.comments.length > 0);
-    const commentReplies = commentsWithReplies && commentsWithReplies.length > 0 && commentsWithReplies.map(item => item.replies.comments).reduce((a, b) => a.concat(b));
-    const replies = commentReplies && commentReplies.map(item => item.id).filter(id => this.stringIsNotNullOrEmpty(id));
+    const commentsWithReplies = response.data.items.filter(
+      (item) => item.replies && item.replies.comments && item.replies.comments.length > 0
+    )
+    const commentReplies =
+      commentsWithReplies &&
+      commentsWithReplies.length > 0 &&
+      commentsWithReplies.map((item) => item.replies.comments).reduce((a, b) => a.concat(b))
+    const replies =
+      commentReplies && commentReplies.map((item) => item.id).filter((id) => this.stringIsNotNullOrEmpty(id))
     if (replies && replies.length > 0) {
-      commentIds = commentIds.concat(replies);
+      commentIds = commentIds.concat(replies)
     }
 
     // Fetch actual comments
     return {
-      comments: await this.batchProcessComments(commentIds, pageSize),
+      comments: await this.batchProcessComments(commentIds, pageSize, undefined, token),
       nextPageToken: response.data.nextPageToken,
-    };
+    }
   }
 
-  async getAllCommentsForVideo(videoId, batchSize, update) {
-    const url = `${this.baseUrl}/commentThreads`;
+  async getAllCommentsForVideo(videoId, batchSize, update, token) {
+    const url = `${this.baseUrl}/commentThreads`
+    const apiKey = await this.getApiKey(token)
     const params = {
       fields: 'items(id,replies(comments(id,snippet(publishedAt,textDisplay,authorDisplayName)))),nextPageToken',
-      key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0',
+      key: apiKey,
       maxResults: '100',
       pageToken: '',
       part: 'id,replies',
       videoId,
-    };
+    }
 
-    let pageToken = '';
-    let comments = [];
-    let batch = []; // wait until batch gets to > batchSize and process
+    let pageToken = ''
+    let comments = []
+    let batch = [] // wait until batch gets to > batchSize and process
 
     do {
       if (this.stringIsNotNullOrEmpty(pageToken)) {
-        params.pageToken = pageToken;
+        params.pageToken = pageToken
       }
-      const response = await axios.get(url, { params }, { ttl: this.infoCacheTime });
+      const response = await axios.get(url, { params }, { ttl: this.infoCacheTime })
 
       // Add comments
-      let commentIds = response.data.items.map(item => item.id).filter(id => this.stringIsNotNullOrEmpty(id));
+      let commentIds = response.data.items.map((item) => item.id).filter((id) => this.stringIsNotNullOrEmpty(id))
 
       // Add replies
-      const commentsWithReplies = response.data.items.filter(item => item.replies && item.replies.comments && item.replies.comments.length > 0);
-      const commentReplies = commentsWithReplies && commentsWithReplies.length > 0 && commentsWithReplies.map(item => item.replies.comments).reduce((a, b) => a.concat(b));
-      const replies = commentReplies && commentReplies.map(item => item.id).filter(id => this.stringIsNotNullOrEmpty(id));
+      const commentsWithReplies = response.data.items.filter(
+        (item) => item.replies && item.replies.comments && item.replies.comments.length > 0
+      )
+      const commentReplies =
+        commentsWithReplies &&
+        commentsWithReplies.length > 0 &&
+        commentsWithReplies.map((item) => item.replies.comments).reduce((a, b) => a.concat(b))
+      const replies =
+        commentReplies && commentReplies.map((item) => item.id).filter((id) => this.stringIsNotNullOrEmpty(id))
       if (replies && replies.length > 0) {
-        commentIds = commentIds.concat(replies);
+        commentIds = commentIds.concat(replies)
       }
 
-      batch = batch.concat(commentIds);
+      batch = batch.concat(commentIds)
       if (batch.length > batchSize) {
         // Use comment Ids to fetch comments
-        const commentsBatch = await this.batchProcessComments(batch, 50, undefined);
+        const commentsBatch = await this.batchProcessComments(batch, 50, undefined, token)
         if (update) {
-          update(commentsBatch);
+          update(commentsBatch)
         }
 
-        comments = comments.concat(commentsBatch);
-        batch = []; // empty out batch
+        comments = comments.concat(commentsBatch)
+        batch = [] // empty out batch
       }
 
       // Check next page
-      pageToken = response.data.nextPageToken;
-    } while (this.stringIsNotNullOrEmpty(pageToken));
+      pageToken = response.data.nextPageToken
+    } while (this.stringIsNotNullOrEmpty(pageToken))
 
     // Make sure to process any left over
     if (batch.length > 0) {
       // Use comment Ids to fetch comments
-      const commentsBatch = await this.batchProcessComments(batch, 50, update);
-      comments = comments.concat(commentsBatch);
+      const commentsBatch = await this.batchProcessComments(batch, 50, update, token)
+      comments = comments.concat(commentsBatch)
     }
 
-    return comments;
+    return comments
   }
 
-  async getChannelId(channelName) {
+  async getChannelId(channelName, token) {
+    const apiKey = await this.getApiKey(token)
     const response = await axios.get(
       `${this.baseUrl}/channels`,
       {
         params: {
           fields: 'items/id,nextPageToken',
           forUsername: channelName,
-          key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0',
+          key: apiKey,
           maxResults: '1',
           part: 'id',
         },
       },
-      { ttl: this.infoCacheTime },
-    );
-    return response.data.items.length === 0 ? undefined : response.data.items[0].id;
+      { ttl: this.infoCacheTime }
+    )
+    return response.data.items.length === 0 ? undefined : response.data.items[0].id
   }
 
-  async getPlaylistId(channelId, playlistName) {
-    const url = `${this.baseUrl}/playlists`;
+  async getPlaylistId(channelId, playlistName, token) {
+    const url = `${this.baseUrl}/playlists`
+    const apiKey = await this.getApiKey(token)
     const params = {
       channelId,
       fields: 'items(id,snippet/title),nextPageToken',
-      key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0',
+      key: apiKey,
       maxResults: '50',
       pageToken: '',
       part: 'id,snippet',
-    };
-    let pageToken = '';
-    let id;
+    }
+    let pageToken = ''
+    let id
 
     do {
       if (this.stringIsNotNullOrEmpty(pageToken)) {
-        params.pageToken = pageToken;
+        params.pageToken = pageToken
       }
-      const response = await axios.get(url, { params }, { ttl: this.infoCacheTime });
-      const itemsWithId = response.data.items.filter(item => item.snippet.title === playlistName);
+      const response = await axios.get(url, { params }, { ttl: this.infoCacheTime })
+      const itemsWithId = response.data.items.filter((item) => item.snippet.title === playlistName)
 
       if (itemsWithId.length > 0) {
-        const [item] = itemsWithId;
-        ({ id } = item);
+        const [item] = itemsWithId
+        ;({ id } = item)
       }
 
-      pageToken = response.data.nextPageToken;
-    } while (!id && this.stringIsNotNullOrEmpty(pageToken));
+      pageToken = response.data.nextPageToken
+    } while (!id && this.stringIsNotNullOrEmpty(pageToken))
 
-    return id || undefined;
+    return id || undefined
   }
 
-  async getPlaylistVideos(playlistId) {
-    const url = `${this.baseUrl}/playlistItems`;
+  async getPlaylistVideos(playlistId, token) {
+    const url = `${this.baseUrl}/playlistItems`
+    const apiKey = await this.getApiKey(token)
     const params = {
       fields: 'items/contentDetails/videoId,nextPageToken',
-      key: 'AIzaSyBEILCX6QiEAMGNR8PsN5ppI6lfK78Th-0',
+      key: apiKey,
       maxResults: '50',
       pageToken: '',
       part: 'contentDetails',
       playlistId,
-    };
+    }
 
-    let pageToken = '';
-    let list = [];
+    let pageToken = ''
+    let list = []
 
     do {
       if (this.stringIsNotNullOrEmpty(pageToken)) {
-        params.pageToken = pageToken;
+        params.pageToken = pageToken
       }
-      const response = await axios.get(url, { params }, { ttl: this.playlistCacheTime });
-      const videoIds = response.data.items.map(item => item.contentDetails.videoId).filter(videoId => this.stringIsNotNullOrEmpty(videoId));
+      const response = await axios.get(url, { params }, { ttl: this.playlistCacheTime })
+      const videoIds = response.data.items
+        .map((item) => item.contentDetails.videoId)
+        .filter((videoId) => this.stringIsNotNullOrEmpty(videoId))
 
       // Add Ids to list
-      list = list.concat(videoIds);
+      list = list.concat(videoIds)
 
       // Process next page
-      pageToken = response.data.nextPageToken;
-    } while (this.stringIsNotNullOrEmpty(pageToken));
+      pageToken = response.data.nextPageToken
+    } while (this.stringIsNotNullOrEmpty(pageToken))
 
-    return list;
+    return list
+  }
+
+  async getApiKey(token) {
+    if (this.apiKey) {
+      return this.apiKey
+    }
+
+    this.apiKey = await this.configService.getConfig(token)
+    return this.apiKey
   }
 }
