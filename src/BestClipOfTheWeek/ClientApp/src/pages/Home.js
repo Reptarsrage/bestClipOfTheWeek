@@ -6,6 +6,7 @@ import Grid from '../components/Grid'
 
 export function Home() {
   const history = useHistory()
+  const [ready, setReady] = React.useState(false)
 
   React.useEffect(() => {
     checkAuth()
@@ -16,6 +17,12 @@ export function Home() {
     if (authenticated) {
       history.replace('/report')
     }
+
+    setReady(true)
+  }
+
+  if (!ready) {
+    return null
   }
 
   return (
