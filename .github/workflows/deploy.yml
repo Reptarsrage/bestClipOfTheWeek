@@ -24,7 +24,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
-          dotnet-version: 6.0.0-preview.5.21301.17
+          dotnet-version: 6.0.100-preview.5.21302.13
 
       - name: Publish
         run: dotnet publish ./src/BestClipOfTheWeek/BestClipOfTheWeek.csproj -o ./publish -c Release -v n
