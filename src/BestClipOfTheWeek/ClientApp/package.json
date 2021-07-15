@@ -32,7 +32,7 @@
     "styled-components": "5.3.0"
   },
   "devDependencies": {
-    "ajv": "8.6.1",
+    "ajv": "8.6.2",
     "cross-env": "7.0.3",
     "eslint": "7.30.0",
     "eslint-config-react-app": "6.0.0",
