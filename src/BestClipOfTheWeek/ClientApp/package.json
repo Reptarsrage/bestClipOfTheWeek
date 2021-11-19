@@ -39,7 +39,7 @@
     "eslint-plugin-flowtype": "5.10.0",
     "eslint-plugin-import": "2.25.3",
     "eslint-plugin-jsx-a11y": "6.5.1",
-    "eslint-plugin-react": "7.27.0",
+    "eslint-plugin-react": "7.27.1",
     "nan": "2.15.0",
     "typescript": "4.5.2"
   },
