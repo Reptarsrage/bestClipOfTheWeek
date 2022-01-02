@@ -74,7 +74,6 @@ namespace BestClipOfTheWeek
                 app.UseResponseCompression();
             }
 
-            app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseRouting();
 
