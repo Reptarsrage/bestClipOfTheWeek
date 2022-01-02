@@ -7,7 +7,6 @@ using Microsoft.Extensions.Options;
 
 namespace BestClipOfTheWeek.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
     public class YouTubeApiConfigController : ControllerBase
