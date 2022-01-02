@@ -2,8 +2,8 @@
 
 ## An ASP.NET Core Web App
 
-[![codecov](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek/branch/master/graph/badge.svg)](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek)
-[![Build status](https://ci.appveyor.com/api/projects/status/4ntsr4sl2vey3krf?svg=true)](https://ci.appveyor.com/project/Reptarsrage/bestclipoftheweek)
+[![codecov](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek/branch/main/graph/badge.svg)](https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek)
+[![github](https://github.com/Reptarsrage/bestClipOfTheWeek/actions/workflows/test.yml/badge.svg)](https://github.com/Reptarsrage/bestClipOfTheWeek/actions/workflows/test.yml)
 
 ## Description
 

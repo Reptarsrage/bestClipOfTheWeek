@@ -12,13 +12,13 @@ export function About() {
         <p>
           <a href="https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek">
             <img
-              src="https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek/branch/master/graph/badge.svg"
+              src="https://codecov.io/gh/Reptarsrage/bestClipOfTheWeek/branch/main/graph/badge.svg"
               alt="Code Coverage status"
             />
           </a>
-          <a href="https://ci.appveyor.com/project/Reptarsrage/bestclipoftheweek">
+          <a href="https://github.com/Reptarsrage/bestClipOfTheWeek/actions/workflows/test.yml">
             <img
-              src="https://ci.appveyor.com/api/projects/status/4ntsr4sl2vey3krf/branch/master?svg=true"
+              src="https://github.com/Reptarsrage/bestClipOfTheWeek/actions/workflows/test.yml/badge.svg"
               alt="Build status"
             />
           </a>
