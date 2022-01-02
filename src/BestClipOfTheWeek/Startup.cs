@@ -70,7 +70,6 @@ namespace BestClipOfTheWeek
             {
                 app.UseForwardedHeaders();
                 app.UseExceptionHandler("/Error");
-                app.UseHsts();
                 app.UseResponseCompression();
             }
 
