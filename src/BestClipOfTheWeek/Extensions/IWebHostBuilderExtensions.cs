@@ -15,13 +15,14 @@ namespace TheArchives.Server.Extensions
             return webHostBuilder.UseSerilog((hostingContext, loggingConfiguration) =>
             {
                 var logDirectory = hostingContext.Configuration["LogDirectory"];
-                if (!string.IsNullOrEmpty(logDirectory)) {
+                if (!string.IsNullOrEmpty(logDirectory))
+                {
                     var logPath = Path.Combine(logDirectory, "log.txt");
                     loggingConfiguration.WriteTo.File(logPath, rollingInterval: RollingInterval.Day);
                 }
 
                 loggingConfiguration
-                        .MinimumLevel.Debug()
+                        .ReadFrom.Configuration(hostingContext.Configuration)
                         .Enrich.FromLogContext()
                         .Enrich.WithExceptionDetails()
                         .WriteTo.Console();
