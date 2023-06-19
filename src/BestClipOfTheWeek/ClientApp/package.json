@@ -13,7 +13,7 @@
     "halogenium": "2.3.0",
     "http-proxy-middleware": "2.0.6",
     "jquery": "3.6.1",
-    "luxon": "2.5.0",
+    "luxon": "2.5.2",
     "merge": "2.1.1",
     "oidc-client": "1.11.5",
     "react": "17.0.2",
