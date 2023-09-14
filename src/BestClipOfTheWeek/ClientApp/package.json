@@ -29,7 +29,7 @@
     "recharts": "2.1.16",
     "rimraf": "3.0.2",
     "save-svg-as-png": "1.4.17",
-    "styled-components": "5.3.6"
+    "styled-components": "5.3.11"
   },
   "devDependencies": {
     "ajv": "8.11.2",
