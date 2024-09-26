@@ -25,7 +25,7 @@
     "react-router-dom": "5.3.4",
     "react-scripts": "5.0.1",
     "react-switch": "6.1.0",
-    "reactstrap": "8.10.1",
+    "reactstrap": "9.2.3",
     "recharts": "2.1.16",
     "rimraf": "3.0.2",
     "save-svg-as-png": "1.4.17",
